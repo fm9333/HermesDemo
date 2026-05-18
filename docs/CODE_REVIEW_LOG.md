@@ -1968,3 +1968,43 @@ python -m pytest -q
 ```text
 b35e163 stage 8 e2e release flow v1
 ```
+
+## 2026-05-18 阶段 8 安全测试 v1 评审
+
+范围：
+```text
+tests/test_security_release.py
+Red Zone 危险请求
+ExportService 表白名单
+Update settings 渠道校验
+Map Provider 默认断开边界
+Backup restore backup_id 校验
+```
+
+结论：
+```text
+通过，形成可提交点 stage-8-security-release-tests-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app desktop tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+```text
+安全测试 v1 覆盖发布前必须持续回归的高风险边界。
+Red Zone 测试确认危险请求不会进入 Action Gate。
+导出测试确认 API 不能绕过白名单读取任意 SQLite 表。
+地图测试确认 Provider 未连接时不会调用外部服务。
+备份测试确认恢复入口拒绝路径穿越式 id。
+更新测试确认非法发布渠道不能写入配置。
+```
+
+提交记录：
+```text
+待提交 stage 8 security release tests v1
+```

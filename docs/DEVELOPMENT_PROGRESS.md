@@ -310,7 +310,13 @@
   - 验证：覆盖对话生成 Idea、Action 确认、Idea 转待办、周复盘、首页聚合
   - 验证：覆盖备份、导出、迁移、性能索引、运行恢复接口
   - 测试：`python -m compileall hermes_app desktop tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，95 passed
-- [ ] 安全测试
+- [x] 安全测试 v1
+  - 验证：Red Zone 危险对话不会创建 Action
+  - 验证：数据导出拒绝非白名单表
+  - 验证：更新渠道非法值被拒绝
+  - 验证：地图搜索在 Provider 未连接时不会访问外部服务
+  - 验证：备份恢复拒绝路径穿越式 backup id
+  - 测试：`python -m compileall hermes_app desktop tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，100 passed
 
 ## GitHub / SVN 同步状态
 
@@ -368,5 +374,6 @@
   - commit：`acdfee4 stage 8 update strategy v1`
   - commit：`b753ec1 stage 8 performance indexes v1`
   - commit：`b35e163 stage 8 e2e release flow v1`
+  - commit：`待提交 stage 8 security release tests v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
