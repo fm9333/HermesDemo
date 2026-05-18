@@ -434,5 +434,6 @@
   - commit：`5dc399a stage 8 security release tests v1`
   - commit：`06a5ae9 stage 9 llm provider and prompts v1`
   - commit：`146a3e0 stage 10 gap audit and cloud file guard`
+  - commit：`ba6a0b9 stage 11 personal skill drafts v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
