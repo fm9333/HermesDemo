@@ -1044,3 +1044,43 @@ Idea 转 PRD 草案 v1 会把结构化 Idea Card 转为 Markdown 风格 PRD。
 ```text
 6164f3b stage 5 idea to prd v1
 ```
+
+## 2026-05-18 阶段 5 Idea 转 Scene 草案 v1 评审
+
+范围：
+
+```text
+SceneService.get_by_source_context
+POST /api/ideas/{id}/to-scene
+客户端 Idea 面板转场景操作
+Idea 到 Scene 幂等转换测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-5-idea-to-scene-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+Idea 转 Scene 草案 v1 复用现有 Scene Registry，不新增平行场景模型。
+转换结果标记 source=idea，context_signal=idea:{id}，可从 Scene 追溯回 Idea Card。
+同一 Idea 重复转换返回已有 Scene，避免重复创建。
+客户端已提供 Idea 面板转场景入口，转换后跳转到场景面板。
+```
+
+提交记录：
+
+```text
+待提交 stage 5 idea to scene v1
+```

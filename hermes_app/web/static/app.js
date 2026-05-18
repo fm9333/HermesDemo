@@ -227,6 +227,12 @@ async function convertIdeaToPrd(ideaId) {
   await loadPanel("prdDrafts");
 }
 
+async function convertIdeaToScene(ideaId) {
+  const data = await requestJson(`/api/ideas/${ideaId}/to-scene`, { method: "POST" });
+  addMessage("assistant", `Scene 草案已生成：${data.name}`);
+  await loadPanel("scenes");
+}
+
 async function completeTodo(todoId) {
   const data = await requestJson(`/api/todos/${todoId}/complete`, { method: "POST" });
   addMessage("assistant", `待办已完成：${data.title}`);
@@ -241,6 +247,7 @@ function renderPanelItem(item, panel) {
   if (panel === "ideas") {
     controls.push(`<button class="action-button" data-idea-to-todo="${item.id}">转待办</button>`);
     controls.push(`<button class="action-button" data-idea-to-prd="${item.id}">转 PRD</button>`);
+    controls.push(`<button class="action-button" data-idea-to-scene="${item.id}">转场景</button>`);
   }
   if (panel === "todos" && item.status === "open") {
     controls.push(`<button class="action-button" data-complete-todo="${item.id}">完成</button>`);
@@ -303,6 +310,7 @@ document.addEventListener("click", async (event) => {
   const misfireSceneId = event.target.dataset?.sceneFeedbackMisfire;
   const ideaToTodoId = event.target.dataset?.ideaToTodo;
   const ideaToPrdId = event.target.dataset?.ideaToPrd;
+  const ideaToSceneId = event.target.dataset?.ideaToScene;
   const completeTodoId = event.target.dataset?.completeTodo;
   const panel = event.target.dataset?.panel;
 
@@ -314,6 +322,7 @@ document.addEventListener("click", async (event) => {
     if (misfireSceneId) await recordSceneFeedback(misfireSceneId, "misfire");
     if (ideaToTodoId) await convertIdeaToTodo(ideaToTodoId);
     if (ideaToPrdId) await convertIdeaToPrd(ideaToPrdId);
+    if (ideaToSceneId) await convertIdeaToScene(ideaToSceneId);
     if (completeTodoId) await completeTodo(completeTodoId);
     if (panel) await loadPanel(panel);
   } catch (error) {

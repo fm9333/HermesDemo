@@ -168,7 +168,12 @@
   - 验证：`GET /api/prd-drafts`、`GET /api/prd-drafts/{id}` 可查询
   - 验证：客户端 Idea 面板可转 PRD，PRD 面板可查看草案
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，45 passed
-- [ ] Idea 转 Scene 草案
+- [x] Idea 转 Scene 草案 v1
+  - 验证：`POST /api/ideas/{id}/to-scene` 可将 Idea Card 转为 Scene 草案
+  - 验证：转换结果写入 Scene Registry，`source=idea`、`context_signal=idea:{id}`
+  - 验证：同一 Idea 重复转换返回已有 Scene，不重复创建
+  - 验证：客户端 Idea 面板可转场景，转换后跳转到场景面板
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，45 passed
 - [ ] 灵感偏好写入确认
 
 ## GitHub / SVN 同步状态
@@ -204,5 +209,6 @@
   - commit：`650fd6f stage 5 inspiration idea card v1`
   - commit：`9d6d4f4 stage 5 idea to todo v1`
   - commit：`6164f3b stage 5 idea to prd v1`
+  - commit：`待提交 stage 5 idea to scene v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

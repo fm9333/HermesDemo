@@ -195,6 +195,27 @@ def create_api_router(
         idea = _deserialize_idea(row)
         return prd_drafts.create_from_idea(idea)
 
+    @router.post("/ideas/{idea_id}/to-scene")
+    def convert_idea_to_scene(idea_id: str) -> dict:
+        row = orchestrator.actions.db.query_one("SELECT * FROM idea_cards WHERE id = ?", (idea_id,))
+        if not row:
+            raise HTTPException(status_code=404, detail="Idea not found.")
+        idea = _deserialize_idea(row)
+        context_signal = f"idea:{idea_id}"
+        existing = scenes.get_by_source_context("idea", context_signal)
+        if existing:
+            return existing
+        return scenes.create(
+            name=f"Idea 场景：{idea['title']}",
+            source="idea",
+            context_signal=context_signal,
+            user_state="idea_review",
+            opportunity=idea.get("direction") or idea["title"],
+            decision_policy="confirm_before_interrupt",
+            output_type="recommendation",
+            status="active",
+        )
+
     @router.get("/prd-drafts")
     def list_prd_drafts(status: str | None = None) -> list[dict]:
         return prd_drafts.list(status=status)

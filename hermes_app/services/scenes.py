@@ -54,6 +54,16 @@ class SceneService:
     def get(self, scene_id: str) -> dict | None:
         return self.db.query_one("SELECT * FROM scenes WHERE id = ?", (scene_id,))
 
+    def get_by_source_context(self, source: str, context_signal: str) -> dict | None:
+        return self.db.query_one(
+            """
+            SELECT * FROM scenes
+            WHERE source = ? AND context_signal = ?
+            ORDER BY created_at DESC LIMIT 1
+            """,
+            (source, context_signal),
+        )
+
     def update(self, scene_id: str, **updates) -> dict:
         current = self.get(scene_id)
         if not current:

@@ -234,6 +234,15 @@ def test_inspiration_chat_saves_structured_idea_card():
     assert prd_detail.status_code == 200
     assert prd_detail.json()["id"] == prd.json()["id"]
 
+    scene = client.post(f"/api/ideas/{idea_id}/to-scene")
+    assert scene.status_code == 200
+    assert scene.json()["source"] == "idea"
+    assert scene.json()["context_signal"] == f"idea:{idea_id}"
+
+    scene_again = client.post(f"/api/ideas/{idea_id}/to-scene")
+    assert scene_again.status_code == 200
+    assert scene_again.json()["id"] == scene.json()["id"]
+
 
 def test_scene_api_and_chat_flow():
     response = client.post("/api/scenes", json={"name": "雨天通勤提醒", "output_type": "reminder"})

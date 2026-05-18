@@ -9,11 +9,13 @@ def test_scene_service_create_run_pause_flow(tmp_path):
 
     scene = service.create(
         "雨天通勤提醒",
+        source="idea",
         context_signal="weather.rain",
         opportunity="umbrella_reminder",
         output_type="reminder",
     )
     assert scene["status"] == "active"
+    assert service.get_by_source_context("idea", "weather.rain")["id"] == scene["id"]
 
     run = service.run(scene["id"])
     assert run["status"] == "ok"
