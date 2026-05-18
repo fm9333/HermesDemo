@@ -334,6 +334,6 @@
   - commit：`f6a7b8c stage 7 news provider v1`
   - commit：`8eb78ac stage 7 map provider v1`
   - commit：`c8b2bc6 stage 8 backup restore v1`
-  - commit：`待提交 stage 8 database migrations v1`
+  - commit：`cdd072e stage 8 database migrations v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
