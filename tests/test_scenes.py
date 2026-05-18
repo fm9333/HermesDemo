@@ -19,9 +19,24 @@ def test_scene_service_create_run_pause_flow(tmp_path):
     assert run["status"] == "ok"
     assert run["output"]["type"] == "reminder"
 
+    positive = service.record_feedback(
+        scene["id"],
+        rating="positive",
+        reason="useful",
+        run_id=run["run_id"],
+        payload={"source": "test"},
+    )
+    assert positive["rating"] == "positive"
+    assert positive["payload"]["source"] == "test"
+    assert round(service.get(scene["id"])["effect_score"], 2) == 0.3
+
+    misfire = service.record_feedback(scene["id"], rating="misfire", reason="too noisy")
+    assert misfire["rating"] == "misfire"
+    assert service.get(scene["id"])["effect_score"] == 0
+    assert len(service.list_feedback(scene["id"])) == 2
+
     paused = service.pause(scene["id"])
     assert paused["status"] == "paused"
 
     skipped = service.run(scene["id"])
     assert skipped["status"] == "skipped"
-

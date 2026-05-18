@@ -158,6 +158,18 @@ class Database:
                     FOREIGN KEY(scene_id) REFERENCES scenes(id)
                 );
 
+                CREATE TABLE IF NOT EXISTS scene_feedback (
+                    id TEXT PRIMARY KEY,
+                    scene_id TEXT NOT NULL,
+                    run_id TEXT,
+                    rating TEXT NOT NULL,
+                    reason TEXT NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(scene_id) REFERENCES scenes(id),
+                    FOREIGN KEY(run_id) REFERENCES scene_runs(id)
+                );
+
                 CREATE TABLE IF NOT EXISTS context_signals (
                     id TEXT PRIMARY KEY,
                     source TEXT NOT NULL,

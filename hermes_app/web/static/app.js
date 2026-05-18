@@ -20,6 +20,7 @@ const panelLabels = {
   memoryCandidates: "记忆候选",
   reminders: "提醒",
   scenes: "场景",
+  sceneFeedback: "反馈",
   signals: "信号",
   opportunities: "机会",
   recommendations: "推荐",
@@ -39,6 +40,7 @@ const panelEndpoints = {
   memoryCandidates: "/api/memory/candidates",
   reminders: "/api/reminders",
   scenes: "/api/scenes",
+  sceneFeedback: "/api/scene-feedback",
   signals: "/api/context-signals",
   opportunities: "/api/opportunities",
   recommendations: "/api/recommendations",
@@ -196,11 +198,28 @@ async function dismissRecommendation(recommendationId) {
   await loadPanel(activePanel);
 }
 
+async function recordSceneFeedback(sceneId, rating) {
+  const data = await requestJson(`/api/scenes/${sceneId}/feedback`, {
+    method: "POST",
+    body: JSON.stringify({
+      rating,
+      reason: rating === "misfire" ? "用户标记误触发" : "用户标记有效",
+      payload: { source: "inspector" },
+    }),
+  });
+  addMessage("assistant", `场景反馈已记录：${data.rating}`);
+  await loadPanel(activePanel);
+}
+
 function renderPanelItem(item, panel) {
   let title = item.title || item.key || item.skill_id || item.intent || item.name || item.action_type || item.id;
   if (panel === "reminders") title = item.title;
   if (panel === "ideas") title = item.title;
   const controls = [];
+  if (panel === "scenes") {
+    controls.push(`<button class="action-button" data-scene-feedback-positive="${item.id}">有效</button>`);
+    controls.push(`<button class="action-button reject" data-scene-feedback-misfire="${item.id}">误触发</button>`);
+  }
   if (panel === "recommendations" && item.status === "open") {
     controls.push(`<button class="action-button reject" data-dismiss-recommendation="${item.id}">忽略</button>`);
   }
@@ -251,12 +270,16 @@ document.addEventListener("click", async (event) => {
   const confirmId = event.target.dataset?.confirm;
   const rejectId = event.target.dataset?.reject;
   const dismissRecommendationId = event.target.dataset?.dismissRecommendation;
+  const positiveSceneId = event.target.dataset?.sceneFeedbackPositive;
+  const misfireSceneId = event.target.dataset?.sceneFeedbackMisfire;
   const panel = event.target.dataset?.panel;
 
   try {
     if (confirmId) await confirmAction(confirmId);
     if (rejectId) await rejectAction(rejectId);
     if (dismissRecommendationId) await dismissRecommendation(dismissRecommendationId);
+    if (positiveSceneId) await recordSceneFeedback(positiveSceneId, "positive");
+    if (misfireSceneId) await recordSceneFeedback(misfireSceneId, "misfire");
     if (panel) await loadPanel(panel);
   } catch (error) {
     addMessage("assistant", `操作失败：${error.message}`);

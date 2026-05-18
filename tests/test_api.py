@@ -29,6 +29,7 @@ def test_home_contains_recommendation_controls():
     response = client.get("/")
     assert response.status_code == 200
     assert 'data-panel="recommendations"' in response.text
+    assert 'data-panel="sceneFeedback"' in response.text
     assert 'id="panel-action"' in response.text
 
 
@@ -185,6 +186,21 @@ def test_scene_api_and_chat_flow():
     run = client.post(f"/api/scenes/{scene['id']}/run")
     assert run.status_code == 200
     assert run.json()["status"] == "ok"
+
+    feedback = client.post(
+        f"/api/scenes/{scene['id']}/feedback",
+        json={"rating": "misfire", "reason": "too early", "run_id": run.json()["run_id"]},
+    )
+    assert feedback.status_code == 200
+    assert feedback.json()["rating"] == "misfire"
+
+    feedback_items = client.get(f"/api/scenes/{scene['id']}/feedback")
+    assert feedback_items.status_code == 200
+    assert any(item["id"] == feedback.json()["id"] for item in feedback_items.json())
+
+    all_feedback = client.get("/api/scene-feedback")
+    assert all_feedback.status_code == 200
+    assert any(item["id"] == feedback.json()["id"] for item in all_feedback.json())
 
     chat = client.post("/api/chat", json={"message": "创建雨天通勤提醒场景"})
     assert chat.status_code == 200

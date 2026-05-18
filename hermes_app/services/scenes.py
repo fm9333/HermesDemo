@@ -90,7 +90,7 @@ class SceneService:
             output = self._build_output(scene)
             status = "ok"
             self.db.execute(
-                "UPDATE scenes SET effect_score = effect_score + ? WHERE id = ?",
+                "UPDATE scenes SET effect_score = round(effect_score + ?, 3) WHERE id = ?",
                 (0.1, scene_id),
             )
 
@@ -116,6 +116,70 @@ class SceneService:
             row["output"] = json.loads(row.pop("output_json"))
         return rows
 
+    def record_feedback(
+        self,
+        scene_id: str,
+        rating: str,
+        reason: str = "",
+        run_id: str | None = None,
+        payload: dict | None = None,
+    ) -> dict:
+        if not self.get(scene_id):
+            raise KeyError(f"Scene not found: {scene_id}")
+        if run_id:
+            run = self.db.query_one("SELECT * FROM scene_runs WHERE id = ?", (run_id,))
+            if not run:
+                raise KeyError(f"Scene run not found: {run_id}")
+            if run["scene_id"] != scene_id:
+                raise ValueError("Scene run does not belong to this scene.")
+
+        normalized = (rating or "negative").strip().lower()
+        if normalized not in {"positive", "helpful", "neutral", "negative", "misfire"}:
+            raise ValueError("Unsupported scene feedback rating.")
+
+        feedback_id = str(uuid4())
+        self.db.execute(
+            """
+            INSERT INTO scene_feedback (id, scene_id, run_id, rating, reason, payload_json, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                feedback_id,
+                scene_id,
+                run_id,
+                normalized,
+                (reason or "").strip(),
+                json.dumps(payload or {}, ensure_ascii=False),
+                _now(),
+            ),
+        )
+
+        delta = self._feedback_delta(normalized)
+        if delta:
+            self.db.execute(
+                "UPDATE scenes SET effect_score = round(max(effect_score + ?, 0), 3) WHERE id = ?",
+                (delta, scene_id),
+            )
+        return self.get_feedback(feedback_id) or {}
+
+    def list_feedback(self, scene_id: str | None = None) -> list[dict]:
+        if scene_id:
+            rows = self.db.query(
+                "SELECT * FROM scene_feedback WHERE scene_id = ? ORDER BY created_at DESC LIMIT 100",
+                (scene_id,),
+            )
+        else:
+            rows = self.db.query("SELECT * FROM scene_feedback ORDER BY created_at DESC LIMIT 100")
+        for row in rows:
+            row["payload"] = json.loads(row.pop("payload_json"))
+        return rows
+
+    def get_feedback(self, feedback_id: str) -> dict | None:
+        row = self.db.query_one("SELECT * FROM scene_feedback WHERE id = ?", (feedback_id,))
+        if row:
+            row["payload"] = json.loads(row.pop("payload_json"))
+        return row
+
     def _build_output(self, scene: dict) -> dict:
         return {
             "type": scene["output_type"],
@@ -124,7 +188,15 @@ class SceneService:
             "requires_confirmation": scene["decision_policy"] != "silent",
         }
 
+    def _feedback_delta(self, rating: str) -> float:
+        if rating in {"positive", "helpful"}:
+            return 0.2
+        if rating == "misfire":
+            return -0.3
+        if rating == "negative":
+            return -0.2
+        return 0.0
+
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
-

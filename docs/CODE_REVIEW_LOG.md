@@ -866,3 +866,49 @@ Recommendation Cards v1 会把 open opportunities 转为可查询、可忽略的
 ```text
 dbafd42 stage 4 attention recommendations v1
 ```
+
+## 2026-05-18 阶段 4 Scene Feedback v1 评审
+
+范围：
+
+```text
+scene_feedback 数据表
+SceneService.record_feedback
+SceneService.list_feedback
+POST /api/scenes/{scene_id}/feedback
+GET /api/scenes/{scene_id}/feedback
+GET /api/scene-feedback
+客户端场景面板有效/误触发反馈操作
+客户端反馈面板
+场景服务和 API 单元测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-4-scene-feedback-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+Scene Feedback v1 已支持记录用户对场景的有效、误触发、负向、中性反馈。
+反馈可绑定 scene_run，绑定错误 run 会返回 400，缺失 scene/run 会返回 404。
+effect_score 会根据反馈自动调整，并统一做小数规整，避免浮点残差污染评分。
+客户端可以在场景面板直接标记有效或误触发，反馈面板可集中查看记录。
+该能力满足“Scene 误触发能反馈”的阶段验收要求。
+```
+
+提交记录：
+
+```text
+待提交 stage 4 scene feedback v1
+```

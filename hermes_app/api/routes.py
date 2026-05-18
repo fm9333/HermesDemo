@@ -270,6 +270,31 @@ def create_api_router(
     def list_scene_runs(scene_id: str | None = None) -> list[dict]:
         return scenes.list_runs(scene_id=scene_id)
 
+    @router.get("/scene-feedback")
+    def list_all_scene_feedback(scene_id: str | None = None) -> list[dict]:
+        return scenes.list_feedback(scene_id=scene_id)
+
+    @router.post("/scenes/{scene_id}/feedback")
+    def record_scene_feedback(scene_id: str, payload: dict) -> dict:
+        try:
+            return scenes.record_feedback(
+                scene_id,
+                rating=payload.get("rating", "negative"),
+                reason=payload.get("reason", ""),
+                run_id=payload.get("run_id"),
+                payload=payload.get("payload", {}),
+            )
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @router.get("/scenes/{scene_id}/feedback")
+    def list_scene_feedback(scene_id: str) -> list[dict]:
+        if not scenes.get(scene_id):
+            raise HTTPException(status_code=404, detail="Scene not found.")
+        return scenes.list_feedback(scene_id=scene_id)
+
     @router.post("/context-signals")
     def collect_context_signal(payload: dict) -> dict:
         return context_signals.collect(

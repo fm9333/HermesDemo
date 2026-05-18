@@ -139,7 +139,12 @@
   - 验证：`GET /api/recommendations` 可查询，`POST /api/recommendations/{id}/dismiss` 可忽略
   - 验证：客户端推荐面板可触发生成推荐，并可忽略 open 推荐
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过
-- [ ] Scene Feedback
+- [x] Scene Feedback v1
+  - 验证：`scene_feedback` 可记录 scene/run 反馈、rating、reason、payload
+  - 验证：正向反馈提升 `effect_score`，误触发反馈降低评分且不低于 0
+  - 验证：`POST /api/scenes/{scene_id}/feedback`、`GET /api/scenes/{scene_id}/feedback`、`GET /api/scene-feedback` 可用
+  - 验证：客户端场景面板可标记“有效/误触发”，反馈面板可查看记录
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，41 passed
 
 ## GitHub / SVN 同步状态
 
@@ -170,5 +175,6 @@
   - commit：`4787665 stage 4 context signal pipeline v1`
   - commit：`3479a07 stage 4 opportunity engine v1`
   - commit：`dbafd42 stage 4 attention recommendations v1`
+  - commit：`待提交 stage 4 scene feedback v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
