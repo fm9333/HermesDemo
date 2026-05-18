@@ -1580,3 +1580,44 @@ python -m pytest -q
 ```text
 73075ce stage 7 personalized home cards v1
 ```
+
+## 2026-05-18 阶段 7 新闻 Provider v1 评审
+
+范围：
+```text
+news_articles 数据表
+ProviderRegistry news.rss 默认 Provider
+NewsService RSS/Atom 拉取、解析和缓存
+POST /api/news/refresh
+GET /api/news
+GET /api/news/{id}
+客户端新闻面板
+新闻 Provider 服务和 API 测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-7-news-provider-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+```text
+新闻 Provider v1 采用公开 RSS/Atom 源作为默认实现，不引入付费 API Key 或 OAuth 依赖，适合当前桌面本地 MVP。
+新闻内容只缓存标题、链接、摘要、发布时间、标签和来源，不抓取全文，降低版权和存储风险。
+文章 ID 基于 URL 稳定生成，重复刷新会更新已有缓存，不会产生重复列表。
+Provider 状态为 disconnected 时刷新会返回 disabled，不会继续访问外部网络。
+客户端新闻面板只在用户点击刷新时拉取，避免高频后台请求。
+```
+
+提交记录：
+```text
+待提交 stage 7 news provider v1
+```

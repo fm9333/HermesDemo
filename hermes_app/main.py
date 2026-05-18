@@ -27,6 +27,7 @@ from hermes_app.services.inspiration import InspirationService
 from hermes_app.services.intent_router import IntentRouter
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
+from hermes_app.services.news import NewsService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
 from hermes_app.services.prd_drafts import PrdDraftService
@@ -68,6 +69,7 @@ todo_service = TodoService(db)
 prd_draft_service = PrdDraftService(db)
 log_service = ExecutionLogService(db)
 weather_service = WeatherService(db)
+news_service = NewsService(db, provider_registry)
 file_service = FileService(db)
 image_service = ImageService(db, file_service)
 scene_service = SceneService(db)
@@ -123,6 +125,7 @@ app.include_router(
         todo_service,
         prd_draft_service,
         weather_service,
+        news_service,
         file_service,
         image_service,
         scene_service,

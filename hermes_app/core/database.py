@@ -123,6 +123,19 @@ class Database:
                     created_at TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS news_articles (
+                    id TEXT PRIMARY KEY,
+                    provider_id TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    url TEXT NOT NULL,
+                    summary TEXT NOT NULL,
+                    published_at TEXT NOT NULL,
+                    tags_json TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    fetched_at TEXT NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS reminders (
                     id TEXT PRIMARY KEY,
                     title TEXT NOT NULL,

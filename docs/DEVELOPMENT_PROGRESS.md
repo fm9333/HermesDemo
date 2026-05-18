@@ -249,7 +249,12 @@
   - 验证：首页卡片包含 `type`、`title`、`priority`、`route`、`action_label`、`payload` 统一结构
   - 验证：客户端默认打开首页面板，卡片可跳转到对应模块
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，68 passed
-- [ ] 新闻 Provider
+- [x] 新闻 Provider v1
+  - 验证：`news.rss` 默认 Provider 可配置 RSS/Atom 源并缓存新闻
+  - 验证：`POST /api/news/refresh` 可刷新公开 RSS/Atom 新闻源
+  - 验证：`GET /api/news`、`GET /api/news/{id}` 可查看新闻列表和详情
+  - 验证：客户端新闻面板可刷新并查看本地缓存新闻
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，71 passed
 - [ ] 地图 Provider
 
 ## GitHub / SVN 同步状态
@@ -298,5 +303,6 @@
   - commit：`5451de5 stage 7 lightweight triggers v1`
   - commit：`e235bb9 stage 7 weekly review v1`
   - commit：`73075ce stage 7 personalized home cards v1`
+  - commit：`待提交 stage 7 news provider v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

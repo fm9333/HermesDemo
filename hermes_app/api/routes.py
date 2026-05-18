@@ -15,6 +15,7 @@ from hermes_app.services.home_cards import HomeCardService
 from hermes_app.services.images import ImageService
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
+from hermes_app.services.news import NewsService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
 from hermes_app.services.prd_drafts import PrdDraftService
@@ -66,6 +67,7 @@ def create_api_router(
     todos: TodoService,
     prd_drafts: PrdDraftService,
     weather: WeatherService,
+    news: NewsService,
     files: FileService,
     images: ImageService,
     scenes: SceneService,
@@ -456,6 +458,21 @@ def create_api_router(
     @router.get("/weather/cache")
     def list_weather_cache() -> list[dict]:
         return weather.list_cache()
+
+    @router.get("/news")
+    def list_news(limit: int = 50) -> list[dict]:
+        return news.list(limit=limit)
+
+    @router.post("/news/refresh")
+    def refresh_news(limit: int = 20) -> dict:
+        return news.refresh(limit=limit)
+
+    @router.get("/news/{article_id}")
+    def get_news_article(article_id: str) -> dict:
+        item = news.get(article_id)
+        if not item:
+            raise HTTPException(status_code=404, detail="News article not found.")
+        return item
 
     @router.get("/skills")
     def list_skills() -> list[dict]:

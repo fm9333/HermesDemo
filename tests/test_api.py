@@ -7,7 +7,7 @@ os.environ.pop("HERMES_LOCAL_TOKEN", None)
 from PIL import Image
 from fastapi.testclient import TestClient
 
-from hermes_app.main import app, weather_service
+from hermes_app.main import app, news_service, weather_service
 
 
 client = TestClient(app)
@@ -17,6 +17,20 @@ def _png_bytes() -> bytes:
     buffer = BytesIO()
     Image.new("RGB", (2, 3), color=(255, 0, 0)).save(buffer, format="PNG")
     return buffer.getvalue()
+
+
+NEWS_RSS = b"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <item>
+      <title>API news headline</title>
+      <link>https://example.com/api-news</link>
+      <description>API news summary</description>
+      <pubDate>Mon, 18 May 2026 10:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
+"""
 
 
 def test_health():
@@ -33,6 +47,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="proactive"' in response.text
     assert 'data-panel="triggerRuns"' in response.text
     assert 'data-panel="weeklyReviews"' in response.text
+    assert 'data-panel="news"' in response.text
     assert 'data-panel="sceneFeedback"' in response.text
     assert 'data-panel="todos"' in response.text
     assert 'data-panel="prdDrafts"' in response.text
@@ -129,6 +144,23 @@ def test_weather_chat_flow(monkeypatch):
     assert data["task_plan"]["steps"][1]["target"] == "weather.lookup"
     assert data["cards"][0]["type"] == "weather"
     assert "北京 当前 20°C" in data["reply"]
+
+
+def test_news_api(monkeypatch):
+    monkeypatch.setattr(news_service, "_fetch", lambda url: NEWS_RSS)
+
+    refreshed = client.post("/api/news/refresh")
+    assert refreshed.status_code == 200
+    assert refreshed.json()["status"] == "ok"
+    assert refreshed.json()["count"] >= 1
+
+    listed = client.get("/api/news")
+    assert listed.status_code == 200
+    article = next(item for item in listed.json() if item["title"] == "API news headline")
+
+    detail = client.get(f"/api/news/{article['id']}")
+    assert detail.status_code == 200
+    assert detail.json()["url"] == "https://example.com/api-news"
 
 
 def test_decompose_api():

@@ -40,6 +40,20 @@ class ProviderRegistry:
             "permissions": ["drive.read_metadata"],
             "config": {"auth": "pending"},
         },
+        {
+            "provider_id": "news.rss",
+            "name": "RSS News",
+            "provider_type": "news",
+            "status": "connected",
+            "permissions": ["news.read", "news.cache"],
+            "config": {
+                "auth": "none",
+                "feeds": [
+                    {"source": "BBC News", "url": "https://feeds.bbci.co.uk/news/rss.xml"},
+                    {"source": "Hacker News", "url": "https://hnrss.org/frontpage"},
+                ],
+            },
+        },
     ]
 
     def __init__(self, db: Database):
