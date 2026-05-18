@@ -1211,5 +1211,5 @@ Eval Runner v1 已具备本地评测套件、运行记录和 API 查询能力。
 提交记录：
 
 ```text
-待提交 stage 6 eval runner v1
+e2b3163 stage 6 eval runner v1
 ```
