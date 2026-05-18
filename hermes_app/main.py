@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from pathlib import Path
 import os
 import secrets
@@ -38,6 +39,7 @@ from hermes_app.services.proactive import ProactiveSuggestionService
 from hermes_app.services.providers import ProviderRegistry
 from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
+from hermes_app.services.runtime_state import RuntimeStateService
 from hermes_app.services.scenes import SceneService
 from hermes_app.services.safety import SafetyService
 from hermes_app.services.settings import SettingsService
@@ -55,6 +57,8 @@ from hermes_app.services.weekly_reviews import WeeklyReviewService
 settings = get_settings()
 db = Database(settings.database_path)
 db.init()
+runtime_state_service = RuntimeStateService.from_database_path(settings.database_path)
+runtime_state_service.start()
 
 memory_service = MemoryService(db)
 reminder_service = ReminderService(db)
@@ -101,7 +105,15 @@ orchestrator = HermesOrchestrator(
     logs=log_service,
 )
 
-app = FastAPI(title=settings.app_name, version=settings.app_version)
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    try:
+        yield
+    finally:
+        runtime_state_service.mark_clean_shutdown()
+
+
+app = FastAPI(title=settings.app_name, version=settings.app_version, lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -122,6 +134,7 @@ app.include_router(
         provider_registry,
         backup_service,
         export_service,
+        runtime_state_service,
         proactive_service,
         trigger_service,
         weekly_review_service,

@@ -47,6 +47,7 @@ const panelLabels = {
   growthLog: "成长",
   settings: "设置",
   databaseMigrations: "\u8fc1\u79fb",
+  runtimeRecovery: "\u6062\u590d",
   providers: "集成",
   backups: "\u5907\u4efd",
   exports: "\u5bfc\u51fa",
@@ -85,6 +86,7 @@ const panelEndpoints = {
   growthLog: "/api/growth-log",
   settings: "/api/settings",
   databaseMigrations: "/api/database/migrations",
+  runtimeRecovery: "/api/runtime/recovery",
   providers: "/api/providers",
   backups: "/api/backups",
   exports: "/api/exports",
@@ -410,11 +412,12 @@ async function loadPanel(panel) {
 
   panelList.innerHTML = `<div class="panel-empty">Loading</div>`;
   const data = await requestJson(panelEndpoints[panel]);
-  if (!data.length) {
+  const items = Array.isArray(data) ? data : [data];
+  if (!items.length) {
     panelList.innerHTML = `<div class="panel-empty">No records</div>`;
     return;
   }
-  panelList.innerHTML = data.map((item) => renderPanelItem(item, panel)).join("");
+  panelList.innerHTML = items.map((item) => renderPanelItem(item, panel)).join("");
 }
 
 form.addEventListener("submit", async (event) => {

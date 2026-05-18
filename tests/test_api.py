@@ -76,6 +76,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="growthLog"' in response.text
     assert 'data-panel="settings"' in response.text
     assert 'data-panel="databaseMigrations"' in response.text
+    assert 'data-panel="runtimeRecovery"' in response.text
     assert 'data-panel="providers"' in response.text
     assert 'data-panel="backups"' in response.text
     assert 'data-panel="exports"' in response.text
@@ -111,6 +112,15 @@ def test_database_migrations_api():
     migration_ids = [item["id"] for item in response.json()]
     assert "0001_core_schema" in migration_ids
     assert "0004_release_backups" in migration_ids
+
+
+def test_runtime_recovery_api():
+    response = client.get("/api/runtime/recovery")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["state"]["status"] == "running"
+    assert data["recovery"]["status"] in {"clean", "recovered"}
+    assert data["state_path"]
 
 
 def test_export_api(tmp_path, monkeypatch):

@@ -26,6 +26,7 @@ from hermes_app.services.proactive import ProactiveSuggestionService
 from hermes_app.services.providers import ProviderRegistry
 from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
+from hermes_app.services.runtime_state import RuntimeStateService
 from hermes_app.services.scenes import SceneService
 from hermes_app.services.settings import SettingsService
 from hermes_app.services.skill_runtime import SkillRuntime
@@ -61,6 +62,7 @@ def create_api_router(
     providers: ProviderRegistry,
     backups: BackupService,
     exports: ExportService,
+    runtime_state: RuntimeStateService,
     proactive: ProactiveSuggestionService,
     triggers: TriggerService,
     weekly_reviews: WeeklyReviewService,
@@ -93,6 +95,10 @@ def create_api_router(
     @router.get("/database/migrations")
     def list_database_migrations() -> list[dict]:
         return actions.db.list_migrations()
+
+    @router.get("/runtime/recovery")
+    def runtime_recovery_status() -> dict:
+        return runtime_state.heartbeat()
 
     @router.post("/chat", response_model=ChatResponse)
     def chat(request: ChatRequest) -> ChatResponse:

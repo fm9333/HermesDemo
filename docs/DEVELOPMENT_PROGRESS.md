@@ -267,7 +267,12 @@
 
 - [ ] PyInstaller 打包
 - [ ] 自动更新策略
-- [ ] 崩溃恢复
+- [x] 崩溃恢复 v1
+  - 验证：`RuntimeStateService` 可记录运行中、心跳和干净关闭状态
+  - 验证：启动时可检测上次 `running` 且未干净关闭的异常退出
+  - 验证：FastAPI lifespan 关闭时写入 clean shutdown
+  - 验证：`GET /api/runtime/recovery` 和客户端恢复面板可查看恢复状态
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，85 passed
 - [x] 数据库迁移 v1
   - 验证：`schema_migrations` 可记录当前本地 schema 迁移状态
   - 验证：重复 `Database.init()` 不重复写迁移记录
@@ -341,5 +346,6 @@
   - commit：`c8b2bc6 stage 8 backup restore v1`
   - commit：`cdd072e stage 8 database migrations v1`
   - commit：`5330923 stage 8 data export v1`
+  - commit：`待提交 stage 8 crash recovery v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
