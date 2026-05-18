@@ -38,6 +38,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="evalRuns"' in response.text
     assert 'data-panel="growthLog"' in response.text
     assert 'data-panel="settings"' in response.text
+    assert 'data-panel="providers"' in response.text
     assert 'id="panel-action"' in response.text
 
 
@@ -190,6 +191,22 @@ def test_settings_api():
 
     invalid = client.patch("/api/settings/red_zone_policy", json={"value": "unsafe"})
     assert invalid.status_code == 400
+
+
+def test_provider_registry_api():
+    listed = client.get("/api/providers")
+    assert listed.status_code == 200
+    providers = {item["provider_id"]: item for item in listed.json()}
+    assert providers["weather.open_meteo"]["status"] == "connected"
+
+    connected = client.post("/api/providers/calendar.local/connect", json={"config": {"account": "local"}})
+    assert connected.status_code == 200
+    assert connected.json()["status"] == "connected"
+    assert connected.json()["config"]["account"] == "local"
+
+    disconnected = client.post("/api/providers/calendar.local/disconnect")
+    assert disconnected.status_code == 200
+    assert disconnected.json()["status"] == "disconnected"
 
 
 def test_tools_api_lists_action_tool_registry():

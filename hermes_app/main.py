@@ -29,6 +29,7 @@ from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
 from hermes_app.services.prd_drafts import PrdDraftService
+from hermes_app.services.providers import ProviderRegistry
 from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
 from hermes_app.services.scenes import SceneService
@@ -54,6 +55,7 @@ autonomy_classifier = AutonomyZoneClassifier()
 eval_runner = EvalRunner(db, autonomy_classifier)
 growth_log_service = GrowthLogService(db)
 settings_service = SettingsService(db)
+provider_registry = ProviderRegistry(db)
 tool_registry = ToolRegistry(db, memory_service, reminder_service, wardrobe_service)
 action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
@@ -101,6 +103,7 @@ app.include_router(
         eval_runner,
         growth_log_service,
         settings_service,
+        provider_registry,
         memory_service,
         action_service,
         skill_registry,

@@ -40,6 +40,7 @@ const panelLabels = {
   evalRuns: "评测",
   growthLog: "成长",
   settings: "设置",
+  providers: "集成",
   logs: "日志",
 };
 
@@ -68,6 +69,7 @@ const panelEndpoints = {
   evalRuns: "/api/eval/runs",
   growthLog: "/api/growth-log",
   settings: "/api/settings",
+  providers: "/api/providers",
   logs: "/api/logs",
 };
 
@@ -271,6 +273,12 @@ async function updateSetting(key, rawValue) {
   await loadPanel(activePanel);
 }
 
+async function setProviderStatus(providerId, action) {
+  const data = await requestJson(`/api/providers/${providerId}/${action}`, { method: "POST" });
+  addMessage("assistant", `Provider 已${action === "connect" ? "连接" : "断开"}：${data.name}`);
+  await loadPanel(activePanel);
+}
+
 async function completeTodo(todoId) {
   const data = await requestJson(`/api/todos/${todoId}/complete`, { method: "POST" });
   addMessage("assistant", `待办已完成：${data.title}`);
@@ -314,6 +322,15 @@ function renderPanelItem(item, panel) {
         </button>`
       );
     }
+  }
+  if (panel === "providers") {
+    const action = item.status === "connected" ? "disconnect" : "connect";
+    controls.push(
+      `<button class="action-button${action === "disconnect" ? " reject" : ""}"
+        data-provider-id="${item.provider_id}" data-provider-action="${action}">
+        ${action === "connect" ? "连接" : "断开"}
+      </button>`
+    );
   }
   if (panel === "scenes") {
     controls.push(`<button class="action-button" data-scene-feedback-positive="${item.id}">有效</button>`);
@@ -378,6 +395,8 @@ document.addEventListener("click", async (event) => {
   const rollbackGrowthId = event.target.dataset?.rollbackGrowth;
   const settingKey = event.target.dataset?.settingKey;
   const settingValue = event.target.dataset?.settingValue;
+  const providerId = event.target.dataset?.providerId;
+  const providerAction = event.target.dataset?.providerAction;
   const completeTodoId = event.target.dataset?.completeTodo;
   const panel = event.target.dataset?.panel;
 
@@ -393,6 +412,7 @@ document.addEventListener("click", async (event) => {
     if (ideaPreferenceId) await createIdeaPreferenceCandidate(ideaPreferenceId);
     if (rollbackGrowthId) await rollbackGrowthLog(rollbackGrowthId);
     if (settingKey) await updateSetting(settingKey, settingValue);
+    if (providerId) await setProviderStatus(providerId, providerAction);
     if (completeTodoId) await completeTodo(completeTodoId);
     if (panel) await loadPanel(panel);
   } catch (error) {

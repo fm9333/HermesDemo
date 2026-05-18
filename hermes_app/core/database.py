@@ -74,6 +74,16 @@ class Database:
                     updated_at TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS providers (
+                    provider_id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    provider_type TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    permissions_json TEXT NOT NULL,
+                    config_json TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS eval_runs (
                     id TEXT PRIMARY KEY,
                     suite_id TEXT NOT NULL,

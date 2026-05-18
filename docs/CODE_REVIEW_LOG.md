@@ -1380,3 +1380,46 @@ python -m pytest -q
 ```text
 826bfd5 stage 6 safety settings v1
 ```
+
+## 2026-05-18 阶段 7 Provider Registry v1 评审
+
+范围：
+
+```text
+providers 数据表
+ProviderRegistry
+GET /api/providers
+POST /api/providers/{id}/connect
+POST /api/providers/{id}/disconnect
+客户端集成 Provider 面板
+Provider Registry 服务和 API 测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-7-provider-registry-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+Provider Registry v1 建立了外部服务连接状态、权限和配置的统一入口。
+默认包含 Open-Meteo Weather 已连接 Provider，以及日历、邮件、网盘占位 Provider。
+连接和断开操作会更新本地状态，不依赖外部 OAuth，后续可平滑替换为真实授权流程。
+客户端集成面板已支持查看、连接和断开 Provider。
+```
+
+提交记录：
+
+```text
+待提交 stage 7 provider registry v1
+```

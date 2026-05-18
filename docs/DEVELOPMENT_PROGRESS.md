@@ -219,6 +219,21 @@
   - 验证：客户端设置面板可切换布尔策略和 Red Zone 策略
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，56 passed
 
+## 阶段 7：主动智能与外部集成
+
+- [x] Provider Registry v1
+  - 验证：`providers` 可记录外部服务状态、权限和配置
+  - 验证：默认 Provider 包含 Open-Meteo 天气、日历、邮件、网盘占位
+  - 验证：`GET /api/providers`、`POST /api/providers/{id}/connect`、`POST /api/providers/{id}/disconnect` 可用
+  - 验证：客户端集成面板可连接/断开 Provider
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，58 passed
+- [ ] 主动建议中心
+- [ ] 轻量实时触发
+- [ ] 每周灵感复盘
+- [ ] 个性化首页卡片
+- [ ] 新闻 Provider
+- [ ] 地图 Provider
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库
@@ -260,5 +275,6 @@
   - commit：`1e377b6 stage 6 yellow zone queue v1`
   - commit：`3328566 stage 6 red zone blocking v1`
   - commit：`826bfd5 stage 6 safety settings v1`
+  - commit：`待提交 stage 7 provider registry v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

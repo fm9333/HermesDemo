@@ -17,6 +17,7 @@ from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
 from hermes_app.services.prd_drafts import PrdDraftService
+from hermes_app.services.providers import ProviderRegistry
 from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
 from hermes_app.services.scenes import SceneService
@@ -49,6 +50,7 @@ def create_api_router(
     eval_runner: EvalRunner,
     growth_logs: GrowthLogService,
     settings: SettingsService,
+    providers: ProviderRegistry,
     memory: MemoryService,
     actions: ActionService,
     skills: SkillRegistry,
@@ -159,6 +161,24 @@ def create_api_router(
             raise HTTPException(status_code=404, detail=str(exc)) from exc
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @router.get("/providers")
+    def list_providers() -> list[dict]:
+        return providers.list()
+
+    @router.post("/providers/{provider_id}/connect")
+    def connect_provider(provider_id: str, payload: dict | None = None) -> dict:
+        try:
+            return providers.connect(provider_id, config=(payload or {}).get("config", {}))
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.post("/providers/{provider_id}/disconnect")
+    def disconnect_provider(provider_id: str) -> dict:
+        try:
+            return providers.disconnect(provider_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     @router.get("/memory")
     def list_memory() -> list[dict]:
