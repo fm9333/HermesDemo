@@ -79,6 +79,21 @@
   - 验证：Open-Meteo Geocoding + Forecast 可真实查询，`北京` 返回 `ok` 和 3 天预报
   - 测试：`python -m pytest -q` 通过，8 passed
 
+## 阶段 3：Skills 扩展
+
+- [x] Skill Registry v1
+  - 验证：`/api/skills` 可列出 MVP Skill Capability Contract
+- [x] Skill Runtime v1
+  - 验证：`POST /api/skills/{skill_id}/run` 可运行 Skill 并写入 `skill_runs`
+  - 验证：`GET /api/skills/runs` 可查看运行历史
+  - 测试：`python -m pytest -q` 通过，21 passed
+- [ ] 文件上传
+- [ ] 图片上传
+- [ ] document.summarize 真实文档解析
+- [ ] image.clothing_recognition 真实图片识别
+- [ ] work.todo_extract 深化
+- [ ] content.list_generate 深化
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库
@@ -96,5 +111,6 @@
   - commit：`93cdbc8 stage 2 tool registry v1`
   - commit：`bdabf9f stage 2 reminder center v1`
   - commit：`ee3659d stage 2 wardrobe center v1`
+  - 当前提交点：`stage-3-skill-runtime-v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

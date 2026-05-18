@@ -109,6 +109,17 @@ def test_tools_api_lists_action_tool_registry():
     assert "wardrobe.add" in tool_ids
 
 
+def test_skill_run_api_records_result():
+    response = client.post("/api/skills/content.list_generate/run", json={"message": "帮我生成上线清单"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
+    assert data["output"]["title"] == "清单草案"
+
+    runs = client.get("/api/skills/runs").json()
+    assert any(run["skill_id"] == "content.list_generate" for run in runs)
+
+
 def test_wardrobe_action_and_crud_flow():
     response = client.post("/api/chat", json={"message": "把这件黑色外套加入衣橱"})
     assert response.status_code == 200

@@ -8,6 +8,7 @@ from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.reminders import ReminderService
+from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.wardrobe import WardrobeService
 from hermes_app.services.weather import WeatherService
@@ -18,6 +19,7 @@ def create_api_router(
     memory: MemoryService,
     actions: ActionService,
     skills: SkillRegistry,
+    skill_runtime: SkillRuntime,
     weather: WeatherService,
     logs: ExecutionLogService,
 ) -> APIRouter:
@@ -172,6 +174,14 @@ def create_api_router(
     @router.get("/skills")
     def list_skills() -> list[dict]:
         return [skill.model_dump() for skill in skills.list()]
+
+    @router.post("/skills/{skill_id}/run")
+    def run_skill(skill_id: str, request: ChatRequest) -> dict:
+        return skill_runtime.run(skill_id, request.message)
+
+    @router.get("/skills/runs")
+    def list_skill_runs(skill_id: str | None = None) -> list[dict]:
+        return skill_runtime.list_runs(skill_id=skill_id)
 
     @router.get("/logs")
     def list_logs() -> list[dict]:

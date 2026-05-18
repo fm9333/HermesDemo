@@ -22,6 +22,7 @@ from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.reminders import ReminderService
 from hermes_app.services.safety import SafetyService
+from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.task_decomposer import TaskDecomposer
 from hermes_app.services.tools import ToolRegistry
@@ -39,6 +40,7 @@ wardrobe_service = WardrobeService(db)
 tool_registry = ToolRegistry(db, memory_service, reminder_service, wardrobe_service)
 action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
+skill_runtime = SkillRuntime(db, skill_registry)
 log_service = ExecutionLogService(db)
 weather_service = WeatherService(db)
 orchestrator = HermesOrchestrator(
@@ -48,6 +50,7 @@ orchestrator = HermesOrchestrator(
     memory=memory_service,
     actions=action_service,
     skills=skill_registry,
+    skill_runtime=skill_runtime,
     inspiration=InspirationService(),
     weather=weather_service,
     logs=log_service,
@@ -65,7 +68,7 @@ WEB_DIR = Path(__file__).resolve().parent / "web"
 templates = Jinja2Templates(directory=str(WEB_DIR / "templates"))
 app.mount("/static", StaticFiles(directory=str(WEB_DIR / "static")), name="static")
 app.include_router(
-    create_api_router(orchestrator, memory_service, action_service, skill_registry, weather_service, log_service)
+    create_api_router(orchestrator, memory_service, action_service, skill_registry, skill_runtime, weather_service, log_service)
 )
 
 

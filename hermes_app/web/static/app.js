@@ -22,6 +22,7 @@ const panelLabels = {
   weather: "天气",
   wardrobe: "衣橱",
   skills: "技能",
+  skillRuns: "技能运行",
   tools: "工具",
   logs: "日志",
 };
@@ -34,6 +35,7 @@ const panelEndpoints = {
   weather: "/api/weather/cache",
   wardrobe: "/api/wardrobe",
   skills: "/api/skills",
+  skillRuns: "/api/skills/runs",
   tools: "/api/tools",
   logs: "/api/logs",
 };

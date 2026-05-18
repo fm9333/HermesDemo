@@ -383,3 +383,44 @@ WardrobeService 为后续图片识别、穿搭建议和 Scene 联动提供服务
 ```text
 ee3659d stage 2 wardrobe center v1
 ```
+
+## 2026-05-18 阶段 3 Skill Runtime v1 评审
+
+范围：
+
+```text
+skill_runs 数据表
+SkillRuntime
+POST /api/skills/{skill_id}/run
+GET /api/skills/runs
+HermesOrchestrator Skill 调用记录化
+客户端技能运行面板
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-3-skill-runtime-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+Skill 调用现在有持久化运行记录。
+Orchestrator 调用 document.summarize、work.todo_extract、content.list_generate 时会通过 SkillRuntime。
+Skill Runtime 保留输入、输出、状态和创建时间，后续可接 Eval Center 和 Skill Curator。
+未注册 Skill 返回 not_found 并记录，不会抛出未处理异常。
+```
+
+提交记录：
+
+```text
+待提交：stage-3-skill-runtime-v1
+```

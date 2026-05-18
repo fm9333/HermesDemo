@@ -11,6 +11,7 @@ from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.safety import SafetyService
 from hermes_app.services.skills import SkillRegistry
+from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.task_decomposer import TaskDecomposer
 from hermes_app.services.weather import WeatherService
 
@@ -24,6 +25,7 @@ class HermesOrchestrator:
         memory: MemoryService,
         actions: ActionService,
         skills: SkillRegistry,
+        skill_runtime: SkillRuntime,
         inspiration: InspirationService,
         weather: WeatherService,
         logs: ExecutionLogService,
@@ -34,6 +36,7 @@ class HermesOrchestrator:
         self.memory = memory
         self.actions = actions
         self.skills = skills
+        self.skill_runtime = skill_runtime
         self.inspiration = inspiration
         self.weather = weather
         self.logs = logs
@@ -124,7 +127,7 @@ class HermesOrchestrator:
                 "todo_extract": "work.todo_extract",
                 "list_generate": "content.list_generate",
             }[intent]
-            result = self.skills.run(skill_id, message)
+            result = self.skill_runtime.run(skill_id, message)
             reply = f"已通过 `{skill_id}` 生成草案。"
             cards.append({"type": "skill_result", "skill_id": skill_id, "payload": result})
 

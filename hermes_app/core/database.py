@@ -103,6 +103,15 @@ class Database:
                     payload_json TEXT NOT NULL,
                     created_at TEXT NOT NULL
                 );
+
+                CREATE TABLE IF NOT EXISTS skill_runs (
+                    id TEXT PRIMARY KEY,
+                    skill_id TEXT NOT NULL,
+                    input_text TEXT NOT NULL,
+                    output_json TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
                 """
             )
             self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")
