@@ -88,6 +88,27 @@ def create_api_router(
     def classify_autonomy_zone(payload: dict) -> dict:
         return autonomy.classify(payload)
 
+    @router.post("/red-zone/check")
+    def check_red_zone(request: ChatRequest) -> dict:
+        intent = orchestrator.intent_router.route(request.message)
+        result = orchestrator.safety.red_zone_check(request.message, intent)
+        return {"intent": intent, **result}
+
+    @router.get("/red-zone/rules")
+    def list_red_zone_rules() -> list[dict]:
+        return [
+            {
+                "rule": "blocked_keywords",
+                "risk_level": "blocked",
+                "keywords": list(orchestrator.safety.high_risk_keywords),
+            },
+            {
+                "rule": "sensitive_keywords",
+                "risk_level": "sensitive",
+                "keywords": list(orchestrator.safety.sensitive_keywords),
+            },
+        ]
+
     @router.get("/eval/suites")
     def list_eval_suites() -> list[dict]:
         return eval_runner.list_suites()

@@ -34,6 +34,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="prdDrafts"' in response.text
     assert 'data-panel="yellowQueue"' in response.text
     assert 'data-panel="autonomy"' in response.text
+    assert 'data-panel="redZone"' in response.text
     assert 'data-panel="evalRuns"' in response.text
     assert 'data-panel="growthLog"' in response.text
     assert 'id="panel-action"' in response.text

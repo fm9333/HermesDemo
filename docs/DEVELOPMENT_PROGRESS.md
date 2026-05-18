@@ -206,7 +206,12 @@
   - 验证：确认页复用 Action Gate 的确认/拒绝链路
   - 验证：客户端确认面板可查看 Yellow Zone 队列并确认/拒绝
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，52 passed
-- [ ] Red Zone 拦截强化
+- [x] Red Zone 拦截强化 v1
+  - 验证：删除、清空、支付、转账、授权、导出/分享等高风险请求会被标记 `blocked`
+  - 验证：被 blocked 的对话不会创建 Action
+  - 验证：`POST /api/red-zone/check` 和 `GET /api/red-zone/rules` 可用
+  - 验证：客户端红区面板可查看阻断规则
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，54 passed
 - [ ] 安全策略设置
 
 ## GitHub / SVN 同步状态
@@ -248,5 +253,6 @@
   - commit：`e2b3163 stage 6 eval runner v1`
   - commit：`8dd90b7 stage 6 growth log v1`
   - commit：`1e377b6 stage 6 yellow zone queue v1`
+  - commit：`待提交 stage 6 red zone blocking v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
