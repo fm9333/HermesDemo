@@ -654,5 +654,5 @@ PDF v1 使用 pypdf，支持文本层 PDF；扫描版 PDF OCR 不在本次范围
 提交记录：
 
 ```text
-待提交：stage-3-document-summarize-pdf-docx-v1
+c9f3503 stage 3 document summarize pdf docx v1
 ```
