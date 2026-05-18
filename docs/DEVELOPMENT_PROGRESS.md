@@ -64,6 +64,10 @@
 - [x] 衣橱基础管理原型
 - [x] Action Gate v1 原型
 - [x] 用户确认卡原型
+- [x] App Tool 白名单 / Tool Registry v1
+  - 验证：`/api/tools` 可列出注册工具；未知工具执行会被 blocked
+  - 验证：ActionService 通过 ToolRegistry 执行，不再直接硬编码执行分支
+  - 测试：`python -m pytest -q` 通过，16 passed
 - [x] Execution Log 原型
 - [x] 天气 Provider v1
   - 验证：Open-Meteo Geocoding + Forecast 可真实查询，`北京` 返回 `ok` 和 3 天预报
@@ -83,5 +87,6 @@
   - commit：`c67d12c stage 2 weather provider v1`
   - commit：`3a76b06 stage 2 task decomposer v1`
   - commit：`827b28f stage 2 memory candidate pipeline`
+  - 当前提交点：`stage-2-tool-registry-v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

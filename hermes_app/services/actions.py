@@ -5,14 +5,16 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from hermes_app.core.database import Database
-from hermes_app.schemas import MemoryCandidate, PendingAction, RiskLevel
+from hermes_app.schemas import PendingAction, RiskLevel
 from hermes_app.services.memory import MemoryService
+from hermes_app.services.tools import ToolRegistry
 
 
 class ActionService:
-    def __init__(self, db: Database, memory_service: MemoryService):
+    def __init__(self, db: Database, memory_service: MemoryService, tool_registry: ToolRegistry | None = None):
         self.db = db
         self.memory_service = memory_service
+        self.tool_registry = tool_registry or ToolRegistry(db, memory_service)
 
     def create_pending(self, action_type: str, payload: dict, risk_level: RiskLevel, reason: str) -> PendingAction:
         now = datetime.now(timezone.utc).isoformat()
@@ -57,72 +59,7 @@ class ActionService:
         return self.get(action_id)
 
     def _execute(self, action: PendingAction) -> dict:
-        now = datetime.now(timezone.utc).isoformat()
-        payload = action.payload
-
-        if action.action_type == "reminder.create":
-            reminder_id = str(uuid4())
-            self.db.execute(
-                """
-                INSERT INTO reminders (id, title, due_at_text, source, status, created_at)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    reminder_id,
-                    payload.get("title", "未命名提醒"),
-                    payload.get("due_at_text", "待补充时间"),
-                    "hermes",
-                    "active",
-                    now,
-                ),
-            )
-            return {"reminder_id": reminder_id, "status": "created"}
-
-        if action.action_type == "memory.write":
-            candidate = MemoryCandidate(**payload)
-            item = self.memory_service.save(candidate, source="action_confirmation")
-            return {"memory_id": item.get("id"), "status": "saved"}
-
-        if action.action_type == "memory.confirm_candidate":
-            item = self.memory_service.confirm_candidate(payload["candidate_id"])
-            return {"memory_id": item.get("id"), "status": "saved"}
-
-        if action.action_type == "idea.save":
-            idea_id = str(uuid4())
-            self.db.execute(
-                """
-                INSERT INTO idea_cards (id, title, body, tags_json, created_at)
-                VALUES (?, ?, ?, ?, ?)
-                """,
-                (
-                    idea_id,
-                    payload.get("title", "Untitled Idea"),
-                    payload.get("body", ""),
-                    json.dumps(payload.get("tags", []), ensure_ascii=False),
-                    now,
-                ),
-            )
-            return {"idea_id": idea_id, "status": "saved"}
-
-        if action.action_type == "wardrobe.add":
-            item_id = str(uuid4())
-            self.db.execute(
-                """
-                INSERT INTO wardrobe_items (id, name, category, color, source, created_at)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    item_id,
-                    payload.get("name", "未命名衣物"),
-                    payload.get("category", "unknown"),
-                    payload.get("color", "unknown"),
-                    "hermes",
-                    now,
-                ),
-            )
-            return {"wardrobe_item_id": item_id, "status": "created"}
-
-        return {"status": "noop", "message": f"No executor registered for {action.action_type}"}
+        return self.tool_registry.execute(action.action_type, action.payload)
 
     def _to_action(self, row: dict) -> PendingAction:
         return PendingAction(

@@ -88,3 +88,11 @@ def test_decompose_api():
     data = response.json()
     assert data["intent"] == "memory_update"
     assert data["steps"][0]["target"] == "memory_candidate_pipeline"
+
+
+def test_tools_api_lists_action_tool_registry():
+    response = client.get("/api/tools")
+    assert response.status_code == 200
+    tool_ids = {tool["tool_id"] for tool in response.json()}
+    assert "reminder.create" in tool_ids
+    assert "wardrobe.add" in tool_ids

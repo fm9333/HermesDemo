@@ -259,3 +259,44 @@ python -m pytest -q
 ```text
 827b28f stage 2 memory candidate pipeline
 ```
+
+## 2026-05-18 阶段 2 Tool Registry v1 评审
+
+范围：
+
+```text
+ToolDefinition schema
+ToolRegistry 服务
+ActionService 通过 ToolRegistry 执行
+/api/tools
+客户端工具面板
+工具注册表单元测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-2-tool-registry-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+ActionService 不再直接维护具体工具执行分支。
+当前注册工具包括 reminder.create、memory.write、memory.confirm_candidate、idea.save、wardrobe.add。
+未知工具会被 blocked，不会进入数据库写入。
+ToolDefinition 暴露风险等级、是否需要确认、是否可回滚、是否启用。
+```
+
+提交记录：
+
+```text
+待提交：stage-2-tool-registry-v1
+```

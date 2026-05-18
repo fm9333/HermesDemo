@@ -67,6 +67,10 @@ def create_api_router(
     def list_pending_actions() -> list[dict]:
         return [action.model_dump() for action in actions.list_pending()]
 
+    @router.get("/tools")
+    def list_tools() -> list[dict]:
+        return [tool.model_dump() for tool in actions.tool_registry.list()]
+
     @router.post("/actions/{action_id}/confirm", response_model=ConfirmActionResponse)
     def confirm_action(action_id: str) -> ConfirmActionResponse:
         try:

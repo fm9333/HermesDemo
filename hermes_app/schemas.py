@@ -68,6 +68,16 @@ class SkillContract(BaseModel):
     rollback_supported: bool
 
 
+class ToolDefinition(BaseModel):
+    tool_id: str
+    title: str
+    description: str
+    risk_level: RiskLevel
+    requires_confirmation: bool
+    rollback_supported: bool
+    enabled: bool = True
+
+
 class TaskStep(BaseModel):
     id: str
     title: str
