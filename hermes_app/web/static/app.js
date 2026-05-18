@@ -40,6 +40,7 @@ const panelLabels = {
   skillPatches: "技能补丁",
   skillCurator: "技能治理",
   llmProviders: "模型",
+  llmFilePolicy: "文件策略",
   prompts: "提示词",
   llmCalls: "模型调用",
   skillRuns: "技能运行",
@@ -87,6 +88,7 @@ const panelEndpoints = {
   skillPatches: "/api/personal-skill-patches",
   skillCurator: "/api/skill-curator/runs",
   llmProviders: "/api/llm/providers",
+  llmFilePolicy: "/api/llm/file-policy",
   prompts: "/api/prompts",
   llmCalls: "/api/llm/calls",
   skillRuns: "/api/skills/runs",
@@ -385,6 +387,15 @@ async function toggleLlmProvider(providerId, status) {
   await loadPanel(activePanel);
 }
 
+async function toggleLlmFileContext(providerId, allowed) {
+  const data = await requestJson(`/api/llm/providers/${providerId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ allow_file_context: allowed }),
+  });
+  addMessage("assistant", `模型文件权限已更新：${data.allow_file_context ? "允许" : "禁止"}`);
+  await loadPanel(activePanel);
+}
+
 async function evaluatePersonalSkill(skillId) {
   const data = await requestJson(`/api/personal-skills/${skillId}/evaluate`, { method: "POST" });
   addMessage("assistant", `个人技能评测：${data.eval_status}`, { cards: [{ title: "个人技能评测", payload: data }] });
@@ -514,6 +525,15 @@ function renderPanelItem(item, panel) {
         ${nextStatus === "connected" ? "启用" : "停用"}
       </button>`
     );
+    if (item.provider_type !== "local_openai_compatible") {
+      const nextFileContext = !item.allow_file_context;
+      controls.push(
+        `<button class="action-button${nextFileContext ? "" : " reject"}"
+          data-llm-file-provider="${item.provider_id}" data-llm-file-allowed="${String(nextFileContext)}">
+          ${nextFileContext ? "允许文件" : "禁止文件"}
+        </button>`
+      );
+    }
   }
   if (panel === "personalSkills") {
     if (item.status !== "archived") {
@@ -611,6 +631,8 @@ document.addEventListener("click", async (event) => {
   const llmDefaultId = event.target.dataset?.llmDefault;
   const llmToggleId = event.target.dataset?.llmToggle;
   const llmStatus = event.target.dataset?.llmStatus;
+  const llmFileProviderId = event.target.dataset?.llmFileProvider;
+  const llmFileAllowed = event.target.dataset?.llmFileAllowed;
   const personalSkillEvalId = event.target.dataset?.personalSkillEval;
   const personalSkillActivateId = event.target.dataset?.personalSkillActivate;
   const personalSkillArchiveId = event.target.dataset?.personalSkillArchive;
@@ -638,6 +660,7 @@ document.addEventListener("click", async (event) => {
     if (llmTestId) await testLlmProvider(llmTestId);
     if (llmDefaultId) await setDefaultLlmProvider(llmDefaultId);
     if (llmToggleId) await toggleLlmProvider(llmToggleId, llmStatus);
+    if (llmFileProviderId) await toggleLlmFileContext(llmFileProviderId, llmFileAllowed === "true");
     if (personalSkillEvalId) await evaluatePersonalSkill(personalSkillEvalId);
     if (personalSkillActivateId) await activatePersonalSkill(personalSkillActivateId);
     if (personalSkillArchiveId) await archivePersonalSkill(personalSkillArchiveId);

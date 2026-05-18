@@ -2240,3 +2240,41 @@ Skill Curator v1 为 Personal Skill 和 Skill Patch 增加了治理层。
 ```text
 f2b45e1 stage 13 skill curator v1
 ```
+
+## 2026-05-18 阶段 14 LLM 文件权限策略可见化 v1 评审
+
+范围：
+```text
+GET /api/llm/file-policy
+LLM Provider allow_file_context UI toggle
+客户端文件策略面板
+API 回归测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-14-llm-file-policy-ui-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest tests\test_api.py -q
+python -m pytest -q
+```
+
+评审结论：
+```text
+云模型文件上下文策略现在可见、可审计、可切换。
+全局 llm_allow_cloud_file_context 和 Provider allow_file_context 必须同时打开，云模型才允许接收上传文件文本。
+本地 OpenAI-compatible Provider 作为隐私优先路径，不受云端文件限制。
+客户端新增“策略”面板，模型面板新增云 Provider 文件权限切换按钮。
+该能力关闭了阶段 10 审计中“文件权限缺少 UI 策略可见性”的 P0 缺口。
+```
+
+测试结果：
+```text
+117 passed, 2 warnings
+```

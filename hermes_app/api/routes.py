@@ -281,6 +281,33 @@ def create_api_router(
     def list_llm_calls(limit: int = 80) -> list[dict]:
         return llm_providers.list_calls(limit=limit)
 
+    @router.get("/llm/file-policy")
+    def get_llm_file_policy() -> dict:
+        global_setting = settings.get("llm_allow_cloud_file_context")
+        providers_payload = []
+        for provider in llm_providers.list():
+            is_local = provider["provider_type"] == "local_openai_compatible"
+            providers_payload.append(
+                {
+                    "provider_id": provider["provider_id"],
+                    "name": provider["name"],
+                    "provider_type": provider["provider_type"],
+                    "status": provider["status"],
+                    "is_default": provider["is_default"],
+                    "allow_file_context": provider["allow_file_context"],
+                    "effective_file_context_allowed": is_local
+                    or (bool(global_setting and global_setting["value"]) and provider["allow_file_context"]),
+                    "reason": "local_provider"
+                    if is_local
+                    else "requires_global_and_provider_allowance",
+                }
+            )
+        return {
+            "global_allow_cloud_file_context": bool(global_setting and global_setting["value"]),
+            "default_policy": "block_cloud_file_context",
+            "providers": providers_payload,
+        }
+
     @router.get("/prompts")
     def list_prompts() -> list[dict]:
         return prompts.list()

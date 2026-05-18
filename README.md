@@ -92,6 +92,7 @@ POST /api/llm/providers/{provider_id}/default
 POST /api/llm/providers/{provider_id}/test
 POST /api/llm/chat
 GET  /api/llm/calls
+GET  /api/llm/file-policy
 GET  /api/prompts
 GET  /api/memory
 GET  /api/actions/pending

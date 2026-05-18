@@ -408,6 +408,18 @@
   - 验证：客户端新增“治理”面板，可运行治理并查看历史
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，116 passed
 
+## 阶段 14：LLM 文件权限策略可见化
+
+- [x] LLM 文件策略 API v1
+  - 验证：`GET /api/llm/file-policy` 可返回全局云模型文件策略、每个 Provider 的文件上下文授权和最终生效结果
+  - 验证：云 Provider 必须同时满足全局授权和 Provider 授权，`effective_file_context_allowed` 才为 true
+  - 验证：本地 OpenAI-compatible Provider 标记为 `local_provider`
+- [x] LLM Provider 文件权限 UI v1
+  - 验证：客户端新增“策略”面板，可查看文件策略
+  - 验证：模型面板可对云 Provider 切换 `allow_file_context`
+  - 验证：设置面板可切换全局 `llm_allow_cloud_file_context`
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，117 passed
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库

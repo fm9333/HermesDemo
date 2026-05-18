@@ -92,6 +92,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="skillPatches"' in response.text
     assert 'data-panel="skillCurator"' in response.text
     assert 'data-panel="llmProviders"' in response.text
+    assert 'data-panel="llmFilePolicy"' in response.text
     assert 'data-panel="prompts"' in response.text
     assert 'data-panel="llmCalls"' in response.text
     assert 'data-panel="backups"' in response.text
@@ -421,6 +422,33 @@ def test_llm_provider_api_and_chat(monkeypatch):
     calls = client.get("/api/llm/calls")
     assert calls.status_code == 200
     assert any(item["provider_id"] == "api.llm.test" for item in calls.json())
+
+
+def test_llm_file_policy_api():
+    client.post(
+        "/api/llm/providers",
+        json={
+            "provider_id": "api.file.policy",
+            "name": "File Policy",
+            "base_url": "https://api.openai.com/v1",
+            "model": "test-model",
+            "api_key": "secret",
+            "allow_file_context": False,
+        },
+    )
+
+    policy = client.get("/api/llm/file-policy")
+    assert policy.status_code == 200
+    provider = next(item for item in policy.json()["providers"] if item["provider_id"] == "api.file.policy")
+    assert provider["effective_file_context_allowed"] is False
+
+    client.patch("/api/settings/llm_allow_cloud_file_context", json={"value": True})
+    client.patch("/api/llm/providers/api.file.policy", json={"allow_file_context": True})
+    allowed_policy = client.get("/api/llm/file-policy")
+    allowed_provider = next(
+        item for item in allowed_policy.json()["providers"] if item["provider_id"] == "api.file.policy"
+    )
+    assert allowed_provider["effective_file_context_allowed"] is True
 
 
 def test_prompt_library_api():

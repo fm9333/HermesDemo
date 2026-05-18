@@ -30,6 +30,7 @@
 | 本地数据 | 基本完成 | SQLite、迁移、备份、导出、性能索引 |
 | 主对话 | MVP 完成 | 支持意图路由、计划、LLM 普通对话 |
 | LLM Provider | v1 完成 | OpenAI-compatible Chat Completions |
+| LLM 文件策略 | v1 完成 | 云模型默认禁止文件上下文，策略面板可见，Provider 可单独授权 |
 | Prompt Library | v1 完成 | Agent、Planner、Skill、Eval、Safety 提示词 |
 | Action Gate | v1 完成 | 提醒、记忆、衣橱等变更需确认 |
 | Memory | MVP 完成 | 候选、确认、拒绝、删除 |
@@ -50,7 +51,6 @@
 | 缺口 | 严重度 | 原因 |
 |---|---:|---|
 | 完整 Skills 清单未实现 | P0 | 合同、账单、归档、照片分类、日程、邮件、表格等缺失 |
-| 云模型处理文件权限刚补 v1，还需 UI 策略完善 | P0 | 商用必须默认阻断敏感文件外发 |
 | API Key 不是 OS Keychain/SQLCipher 级加密 | P0 | 当前只是本地保护保存 |
 | 日历、邮件、网盘没有真实 OAuth Provider | P1 | 仍是本地占位 Provider |
 | UI 不是完整模块化产品界面 | P1 | 当前是控制台式面板，不是完整页面/详情/向导 |
@@ -80,13 +80,12 @@ python -m pytest -q
 最新结果：
 
 ```text
-116 passed, 2 warnings
+117 passed, 2 warnings
 ```
 
 ## 下一步开发顺序
 
-1. 完成云模型文件权限 UI 和策略审计。
-2. 补全完整 Skills 清单中的高价值技能。
-3. 接入日历、邮件、网盘真实 Provider。
-4. 升级密钥存储到 OS Keychain 或 SQLCipher。
-5. 补正式安装器、签名、更新校验和 GUI 冒烟测试。
+1. 补全完整 Skills 清单中的高价值技能。
+2. 接入日历、邮件、网盘真实 Provider。
+3. 升级密钥存储到 OS Keychain 或 SQLCipher。
+4. 补正式安装器、签名、更新校验和 GUI 冒烟测试。
