@@ -1256,3 +1256,43 @@ Growth Log v1 让用户可以查看 Hermes 最近优化了什么。
 ```text
 8dd90b7 stage 6 growth log v1
 ```
+
+## 2026-05-18 阶段 6 Yellow Zone 确认页 v1 评审
+
+范围：
+
+```text
+GET /api/yellow-zone/pending
+客户端 Yellow Zone 确认面板
+Action Gate 确认/拒绝复用
+Yellow Zone API 测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-6-yellow-zone-queue-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+Yellow Zone 确认页 v1 复用现有 Action Gate，不新增平行确认机制。
+队列仅收集中风险 pending actions，避免把 Red Zone 或低风险记录混入确认页。
+客户端确认面板可直接确认或拒绝，操作后走既有 ActionService 流程。
+该能力满足阶段 6 “Yellow Zone 优化必须让用户感知”的基础要求。
+```
+
+提交记录：
+
+```text
+待提交 stage 6 yellow zone queue v1
+```

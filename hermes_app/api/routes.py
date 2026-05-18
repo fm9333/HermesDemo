@@ -156,6 +156,14 @@ def create_api_router(
     def list_pending_actions() -> list[dict]:
         return [action.model_dump() for action in actions.list_pending()]
 
+    @router.get("/yellow-zone/pending")
+    def list_yellow_zone_pending() -> list[dict]:
+        return [
+            action.model_dump()
+            for action in actions.list_pending()
+            if action.risk_level == "medium"
+        ]
+
     @router.get("/tools")
     def list_tools() -> list[dict]:
         return [tool.model_dump() for tool in actions.tool_registry.list()]

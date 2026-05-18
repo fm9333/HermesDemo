@@ -32,6 +32,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="sceneFeedback"' in response.text
     assert 'data-panel="todos"' in response.text
     assert 'data-panel="prdDrafts"' in response.text
+    assert 'data-panel="yellowQueue"' in response.text
     assert 'data-panel="autonomy"' in response.text
     assert 'data-panel="evalRuns"' in response.text
     assert 'data-panel="growthLog"' in response.text
@@ -182,6 +183,21 @@ def test_tools_api_lists_action_tool_registry():
     tool_ids = {tool["tool_id"] for tool in response.json()}
     assert "reminder.create" in tool_ids
     assert "wardrobe.add" in tool_ids
+
+
+def test_yellow_zone_pending_queue():
+    response = client.post("/api/chat", json={"message": "明天上午提醒我确认合同"})
+    assert response.status_code == 200
+    action = response.json()["actions"][0]
+    assert action["risk_level"] == "medium"
+
+    pending = client.get("/api/yellow-zone/pending")
+    assert pending.status_code == 200
+    assert any(item["id"] == action["id"] for item in pending.json())
+
+    rejected = client.post(f"/api/actions/{action['id']}/reject")
+    assert rejected.status_code == 200
+    assert rejected.json()["status"] == "rejected"
 
 
 def test_skill_run_api_records_result():

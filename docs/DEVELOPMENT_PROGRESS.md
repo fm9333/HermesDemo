@@ -201,7 +201,11 @@
   - 验证：回滚采用 `status=rolled_back` 和 `rolled_back_at` 记录，不物理删除
   - 验证：客户端成长面板可查看和回滚优化记录
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，51 passed
-- [ ] Yellow Zone 确认页
+- [x] Yellow Zone 确认页 v1
+  - 验证：`GET /api/yellow-zone/pending` 仅返回中风险待确认 Action
+  - 验证：确认页复用 Action Gate 的确认/拒绝链路
+  - 验证：客户端确认面板可查看 Yellow Zone 队列并确认/拒绝
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，52 passed
 - [ ] Red Zone 拦截强化
 - [ ] 安全策略设置
 
@@ -243,5 +247,6 @@
   - commit：`03ea6c3 stage 6 autonomy zone classifier v1`
   - commit：`e2b3163 stage 6 eval runner v1`
   - commit：`8dd90b7 stage 6 growth log v1`
+  - commit：`待提交 stage 6 yellow zone queue v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

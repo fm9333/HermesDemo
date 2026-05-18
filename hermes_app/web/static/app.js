@@ -34,6 +34,7 @@ const panelLabels = {
   files: "文件",
   images: "图片",
   tools: "工具",
+  yellowQueue: "确认",
   autonomy: "自治",
   evalRuns: "评测",
   growthLog: "成长",
@@ -59,6 +60,7 @@ const panelEndpoints = {
   files: "/api/files",
   images: "/api/images",
   tools: "/api/tools",
+  yellowQueue: "/api/yellow-zone/pending",
   autonomy: "/api/autonomy/zones",
   evalRuns: "/api/eval/runs",
   growthLog: "/api/growth-log",
@@ -277,6 +279,10 @@ function renderPanelItem(item, panel) {
   }
   if (panel === "growthLog" && item.status === "active") {
     controls.push(`<button class="action-button reject" data-rollback-growth="${item.id}">回滚</button>`);
+  }
+  if (panel === "yellowQueue" && item.status === "pending") {
+    controls.push(`<button class="action-button" data-confirm="${item.id}">确认</button>`);
+    controls.push(`<button class="action-button reject" data-reject="${item.id}">拒绝</button>`);
   }
   if (panel === "scenes") {
     controls.push(`<button class="action-button" data-scene-feedback-positive="${item.id}">有效</button>`);
