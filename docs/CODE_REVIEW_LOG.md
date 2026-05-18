@@ -2011,3 +2011,46 @@ Red Zone 测试确认危险请求不会进入 Action Gate。
 ```text
 5dc399a stage 8 security release tests v1
 ```
+
+## 2026-05-18 阶段 9 OpenAI-compatible LLM Provider v1 评审
+
+范围：
+```text
+llm_providers SQLite schema
+LLMProviderService
+LLMClient
+PromptLibrary
+HermesOrchestrator general_chat LLM 接入
+SkillRuntime LLM Prompt 优先 + 本地规则 fallback
+客户端模型 / 提示词 / 模型调用面板
+API 与服务单元测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-9-llm-provider-prompts-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest tests\test_llm_providers.py tests\test_api.py -q
+python -m pytest -q
+```
+
+评审结论：
+```text
+本次补齐了产品文档中缺失的真实大模型配置入口，不再只是本地规则 MVP。
+LLM Provider 使用 OpenAI-compatible Chat Completions 协议，用户可配置 Base URL、模型 ID、API Key、温度、超时和输出 token。
+API 响应不回显完整 API Key，只返回是否已设置和短 preview；当前实现为本地保护保存，不等同于 OS Keychain/SQLCipher 级强加密。
+主智能体普通对话可调用默认模型；模型未配置、调用失败或 Skill LLM 输出异常时会回退本地规则能力，避免核心功能不可用。
+Prompt Library 覆盖 Agent、Planner、Memory、Skill、Inspiration、Scene、Eval 和 Safety，强调内部深度分析但不输出隐藏推理过程。
+LLM 仍不能直接写数据库或直接调用外部 API，执行类动作继续受 Tool Registry 与 Action Gate 约束。
+```
+
+测试结果：
+```text
+105 passed, 2 warnings
+```

@@ -11,7 +11,7 @@ Client
   -> FastAPI API
   -> HermesOrchestrator
   -> IntentRouter / SafetyService
-  -> MemoryService / SkillRegistry / InspirationService
+  -> LLMClient / PromptLibrary / MemoryService / SkillRegistry / InspirationService
   -> ActionService
   -> SQLite
 ```
@@ -29,6 +29,9 @@ Domain Services
   MemoryService: 记忆候选、保存、删除、查询。
   ActionService: 创建待确认动作、确认执行、拒绝动作。
   SkillRegistry: 管理 Skill Capability Contract。
+  LLMProviderService: 管理 OpenAI-compatible Provider、模型参数和本地 API Key 保护保存。
+  LLMClient: 调用 `/v1/chat/completions` 兼容接口，只生成回复或草案。
+  PromptLibrary: 管理 Hermes 主智能体、任务规划、Skill、Eval 和 Safety 提示词。
   InspirationService: 生成 Idea Card。
   SafetyService: 风险分级与 Autonomy Zone 判断。
 
@@ -97,15 +100,25 @@ Skill 调用：
 ```text
 用户输入
 -> IntentRouter 选择 Skill intent
--> SkillRegistry 返回 mock 结果
+-> SkillRuntime 优先尝试 LLM Prompt
+-> LLM 未配置或失败时回退 SkillRegistry 本地规则
 -> Orchestrator 返回 skill_result card
+```
+
+普通对话：
+
+```text
+用户输入
+-> IntentRouter 标记 general_chat
+-> LLMClient 使用默认 LLM Provider 和 hermes.agent.core prompt
+-> 记录 llm_calls 审计
+-> LLM 不直接写数据库或调用外部 API
 ```
 
 ## 后续演进方向
 
 1. 抽象 `LLMPlanner`，输入上下文、记忆和能力契约，输出结构化计划。
-2. 增加 `ToolRegistry`，用注册表替代 `ActionService._execute` 的 if 分支。
+2. 增加 Responses API、工具调用和结构化输出适配。
 3. 为每个 Skill 增加 `evals/` 样例与自动评测。
-4. 将 Autonomy Zone 分类落成独立服务，绑定 Skill Patch 流程。
-5. 增加用户系统、权限边界、审计查询和回滚 API。
-
+4. 将 Autonomy Zone 分类绑定 Skill Patch 生成、激活和回滚流程。
+5. 增加用户系统、权限边界、审计查询和 OS Keychain/SQLCipher 密钥保护。

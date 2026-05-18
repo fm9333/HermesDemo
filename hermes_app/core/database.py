@@ -13,6 +13,7 @@ MIGRATIONS = (
     ("0003_proactive_integrations", "Providers, triggers, weekly reviews, news, and maps schema"),
     ("0004_release_backups", "Release readiness support for local backup and restore"),
     ("0005_performance_indexes", "Indexes for common status, source, and history queries"),
+    ("0006_llm_provider_config", "OpenAI-compatible LLM provider configuration and prompt library support"),
 )
 
 
@@ -98,6 +99,38 @@ class Database:
                     permissions_json TEXT NOT NULL,
                     config_json TEXT NOT NULL,
                     updated_at TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS llm_providers (
+                    provider_id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    provider_type TEXT NOT NULL,
+                    protocol TEXT NOT NULL,
+                    base_url TEXT NOT NULL,
+                    endpoint_path TEXT NOT NULL,
+                    api_key_secret TEXT NOT NULL,
+                    model TEXT NOT NULL,
+                    temperature REAL NOT NULL,
+                    timeout_seconds REAL NOT NULL,
+                    max_output_tokens INTEGER NOT NULL,
+                    status TEXT NOT NULL,
+                    is_default INTEGER NOT NULL,
+                    allow_file_context INTEGER NOT NULL,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS llm_calls (
+                    id TEXT PRIMARY KEY,
+                    provider_id TEXT NOT NULL,
+                    model TEXT NOT NULL,
+                    prompt_id TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    request_json TEXT NOT NULL,
+                    response_json TEXT NOT NULL,
+                    error TEXT NOT NULL,
+                    latency_ms INTEGER NOT NULL,
+                    created_at TEXT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS eval_runs (
@@ -356,6 +389,8 @@ class Database:
                     ON news_articles(status, published_at);
                 CREATE INDEX IF NOT EXISTS idx_map_places_query_created
                     ON map_places(query, created_at);
+                CREATE INDEX IF NOT EXISTS idx_llm_calls_provider_created
+                    ON llm_calls(provider_id, created_at);
                 """
             )
             self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")

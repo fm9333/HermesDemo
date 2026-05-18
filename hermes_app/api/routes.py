@@ -15,6 +15,8 @@ from hermes_app.services.files import FileService
 from hermes_app.services.growth import GrowthLogService
 from hermes_app.services.home_cards import HomeCardService
 from hermes_app.services.images import ImageService
+from hermes_app.services.llm_client import LLMClient
+from hermes_app.services.llm_providers import LLMProviderService
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.maps import MapService
 from hermes_app.services.memory import MemoryService
@@ -23,6 +25,7 @@ from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
 from hermes_app.services.prd_drafts import PrdDraftService
 from hermes_app.services.proactive import ProactiveSuggestionService
+from hermes_app.services.prompt_library import PromptLibrary
 from hermes_app.services.providers import ProviderRegistry
 from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
@@ -61,6 +64,9 @@ def create_api_router(
     growth_logs: GrowthLogService,
     settings: SettingsService,
     providers: ProviderRegistry,
+    llm_providers: LLMProviderService,
+    llm_client: LLMClient,
+    prompts: PromptLibrary,
     backups: BackupService,
     exports: ExportService,
     runtime_state: RuntimeStateService,
@@ -205,6 +211,81 @@ def create_api_router(
     @router.get("/providers")
     def list_providers() -> list[dict]:
         return providers.list()
+
+    @router.get("/llm/providers")
+    def list_llm_providers() -> list[dict]:
+        return llm_providers.list()
+
+    @router.post("/llm/providers")
+    def create_llm_provider(payload: dict) -> dict:
+        try:
+            return llm_providers.create(payload)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @router.get("/llm/providers/{provider_id}")
+    def get_llm_provider(provider_id: str) -> dict:
+        provider = llm_providers.get(provider_id)
+        if not provider:
+            raise HTTPException(status_code=404, detail="LLM provider not found.")
+        return provider
+
+    @router.patch("/llm/providers/{provider_id}")
+    def update_llm_provider(provider_id: str, payload: dict) -> dict:
+        try:
+            return llm_providers.update(provider_id, payload)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @router.delete("/llm/providers/{provider_id}")
+    def delete_llm_provider(provider_id: str) -> dict:
+        try:
+            return llm_providers.delete(provider_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.post("/llm/providers/{provider_id}/default")
+    def set_default_llm_provider(provider_id: str) -> dict:
+        try:
+            return llm_providers.set_default(provider_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.post("/llm/providers/{provider_id}/test")
+    def test_llm_provider(provider_id: str) -> dict:
+        try:
+            return llm_client.test_provider(provider_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.post("/llm/chat")
+    def llm_chat(payload: dict) -> dict:
+        message = str(payload.get("message", "")).strip()
+        if not message:
+            raise HTTPException(status_code=400, detail="message is required.")
+        return llm_client.chat(
+            message,
+            provider_id=payload.get("provider_id"),
+            prompt_id=payload.get("prompt_id", "hermes.agent.core"),
+            context=payload.get("context") or {},
+        )
+
+    @router.get("/llm/calls")
+    def list_llm_calls(limit: int = 80) -> list[dict]:
+        return llm_providers.list_calls(limit=limit)
+
+    @router.get("/prompts")
+    def list_prompts() -> list[dict]:
+        return prompts.list()
+
+    @router.get("/prompts/{prompt_id:path}")
+    def get_prompt(prompt_id: str) -> dict:
+        try:
+            return prompts.get(prompt_id).to_dict()
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     @router.post("/providers/{provider_id}/connect")
     def connect_provider(provider_id: str, payload: dict | None = None) -> dict:

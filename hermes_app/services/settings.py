@@ -16,6 +16,10 @@ class SettingsService:
         "auto_update_enabled": False,
         "update_channel": "stable",
         "update_manifest_url": "",
+        "llm_enabled": True,
+        "llm_enabled_for_general_chat": True,
+        "llm_enabled_for_skills": True,
+        "llm_allow_cloud_file_context": False,
     }
 
     def __init__(self, db: Database):

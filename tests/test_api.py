@@ -7,7 +7,15 @@ os.environ.pop("HERMES_LOCAL_TOKEN", None)
 from PIL import Image
 from fastapi.testclient import TestClient
 
-from hermes_app.main import app, backup_service, export_service, map_service, news_service, weather_service
+from hermes_app.main import (
+    app,
+    backup_service,
+    export_service,
+    llm_client,
+    map_service,
+    news_service,
+    weather_service,
+)
 
 
 client = TestClient(app)
@@ -80,6 +88,9 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="updates"' in response.text
     assert 'data-panel="performance"' in response.text
     assert 'data-panel="providers"' in response.text
+    assert 'data-panel="llmProviders"' in response.text
+    assert 'data-panel="prompts"' in response.text
+    assert 'data-panel="llmCalls"' in response.text
     assert 'data-panel="backups"' in response.text
     assert 'data-panel="exports"' in response.text
     assert 'id="panel-action"' in response.text
@@ -364,6 +375,59 @@ def test_provider_registry_api():
     disconnected = client.post("/api/providers/calendar.local/disconnect")
     assert disconnected.status_code == 200
     assert disconnected.json()["status"] == "disconnected"
+
+
+def test_llm_provider_api_and_chat(monkeypatch):
+    created = client.post(
+        "/api/llm/providers",
+        json={
+            "provider_id": "api.llm.test",
+            "name": "API LLM Test",
+            "base_url": "http://127.0.0.1:11434/v1",
+            "model": "test-model",
+            "api_key": "secret-key",
+            "is_default": True,
+        },
+    )
+    assert created.status_code == 200
+    provider = created.json()
+    assert provider["api_key_set"] is True
+    assert "secret-key" not in str(provider)
+
+    monkeypatch.setattr(
+        llm_client,
+        "_post_json",
+        lambda provider, payload: {"choices": [{"message": {"content": "模型回复"}}]},
+    )
+
+    tested = client.post("/api/llm/providers/api.llm.test/test")
+    assert tested.status_code == 200
+    assert tested.json()["status"] == "ok"
+
+    chatted = client.post("/api/llm/chat", json={"message": "你好"})
+    assert chatted.status_code == 200
+    assert chatted.json()["reply"] == "模型回复"
+
+    general = client.post("/api/chat", json={"message": "帮我分析这个产品下一步怎么做"})
+    assert general.status_code == 200
+    data = general.json()
+    assert data["intent"] == "general_chat"
+    assert data["reply"] == "模型回复"
+    assert data["cards"][0]["type"] == "llm"
+
+    calls = client.get("/api/llm/calls")
+    assert calls.status_code == 200
+    assert any(item["provider_id"] == "api.llm.test" for item in calls.json())
+
+
+def test_prompt_library_api():
+    prompts = client.get("/api/prompts")
+    assert prompts.status_code == 200
+    assert any(item["prompt_id"] == "hermes.agent.core" for item in prompts.json())
+
+    detail = client.get("/api/prompts/hermes.agent.core")
+    assert detail.status_code == 200
+    assert "Hermes" in detail.json()["system_prompt"]
 
 
 def test_proactive_suggestions_api():

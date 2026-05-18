@@ -7,6 +7,7 @@ from hermes_app.schemas import ChatRequest, ChatResponse
 from hermes_app.services.actions import ActionService
 from hermes_app.services.inspiration import InspirationService
 from hermes_app.services.intent_router import IntentRouter
+from hermes_app.services.llm_client import LLMClient
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.scenes import SceneService
@@ -31,6 +32,7 @@ class HermesOrchestrator:
         inspiration: InspirationService,
         weather: WeatherService,
         logs: ExecutionLogService,
+        llm_client: LLMClient | None = None,
     ):
         self.intent_router = intent_router
         self.task_decomposer = task_decomposer
@@ -43,6 +45,7 @@ class HermesOrchestrator:
         self.inspiration = inspiration
         self.weather = weather
         self.logs = logs
+        self.llm_client = llm_client
 
     def handle_chat(self, request: ChatRequest) -> ChatResponse:
         message = request.message.strip()
@@ -149,8 +152,13 @@ class HermesOrchestrator:
             cards.append({"type": "skill_result", "skill_id": skill_id, "payload": result})
 
         else:
-            reply = "我会把这个请求作为普通对话处理。当前 MVP 已搭好意图路由、记忆、Action 和 Skill 管线。"
-            cards.append({"type": "system", "title": "Hermes MVP", "payload": {"next": "接入真实 LLM Adapter"}})
+            llm_result = self._handle_llm_chat(message, intent, risk_level)
+            if llm_result:
+                reply = llm_result["reply"]
+                cards.append({"type": "llm", "title": "LLM Provider", "payload": llm_result})
+            else:
+                reply = "我会把这个请求作为普通对话处理。当前未配置可用的大模型 Provider，请在“模型”面板配置 OpenAI-compatible 接口、API Key 和模型名。"
+                cards.append({"type": "system", "title": "模型未配置", "payload": {"next": "配置 LLM Provider"}})
 
         response_payload = {
             "reply": reply,
@@ -163,6 +171,31 @@ class HermesOrchestrator:
         }
         execution_id = self.logs.record(intent, risk_level, "planned", request.model_dump(), response_payload)
         return ChatResponse(execution_id=execution_id, **response_payload)
+
+    def _handle_llm_chat(self, message: str, intent: str, risk_level: str) -> dict | None:
+        if not self.llm_client:
+            return None
+        result = self.llm_client.chat(
+            message,
+            prompt_id="hermes.agent.core",
+            context={
+                "intent": intent,
+                "risk_level": risk_level,
+                "available_skills": ", ".join(skill.skill_id for skill in self.skills.list()),
+                "safety_boundary": "LLM only drafts replies and plans; backend executes through Tool Registry and Action Gate.",
+            },
+        )
+        if result.get("status") != "ok" or not result.get("reply"):
+            return None
+        return {
+            "status": result["status"],
+            "provider_id": result.get("provider_id"),
+            "model": result.get("model"),
+            "prompt_id": result.get("prompt_id"),
+            "call_id": result.get("call_id"),
+            "latency_ms": result.get("latency_ms"),
+            "reply": result["reply"],
+        }
 
     def _parse_reminder(self, message: str) -> dict:
         title = message

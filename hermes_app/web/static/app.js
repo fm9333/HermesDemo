@@ -36,6 +36,9 @@ const panelLabels = {
   maps: "\u5730\u56fe",
   wardrobe: "衣橱",
   skills: "技能",
+  llmProviders: "模型",
+  prompts: "提示词",
+  llmCalls: "模型调用",
   skillRuns: "技能运行",
   files: "文件",
   images: "图片",
@@ -77,6 +80,9 @@ const panelEndpoints = {
   maps: "/api/maps/places",
   wardrobe: "/api/wardrobe",
   skills: "/api/skills",
+  llmProviders: "/api/llm/providers",
+  prompts: "/api/prompts",
+  llmCalls: "/api/llm/calls",
   skillRuns: "/api/skills/runs",
   files: "/api/files",
   images: "/api/images",
@@ -108,6 +114,7 @@ const panelActions = {
   recommendations: { label: "生成推荐", endpoint: "/api/recommendations/generate" },
   triggerRuns: { label: "运行触发", endpoint: "/api/triggers/run" },
   evalRuns: { label: "运行评测", endpoint: "/api/eval/suites/autonomy.zone.basic/run" },
+  llmProviders: { label: "添加模型", endpoint: "/api/llm/providers" },
 };
 
 function escapeHtml(value) {
@@ -243,6 +250,25 @@ async function runPanelAction() {
     if (!query?.trim()) return;
     options.body = JSON.stringify({ query: query.trim() });
   }
+  if (activePanel === "llmProviders") {
+    const name = window.prompt("模型名称", "OpenAI Compatible");
+    if (!name?.trim()) return;
+    const baseUrl = window.prompt("Base URL", "https://api.openai.com/v1");
+    if (!baseUrl?.trim()) return;
+    const model = window.prompt("模型 ID，例如你服务商提供的 model 名称");
+    if (!model?.trim()) return;
+    const apiKey = window.prompt("API Key，本地保存且界面不会回显完整密钥；本地模型可留空", "");
+    options.body = JSON.stringify({
+      name: name.trim(),
+      provider_type: baseUrl.includes("127.0.0.1") || baseUrl.includes("localhost")
+        ? "local_openai_compatible"
+        : "openai_compatible",
+      base_url: baseUrl.trim(),
+      model: model.trim(),
+      api_key: apiKey || "",
+      is_default: true,
+    });
+  }
   const data = await requestJson(action.endpoint, options);
   addMessage("assistant", `${action.label}完成`, { cards: [{ title: action.label, payload: data }] });
   await loadPanel(activePanel);
@@ -316,6 +342,27 @@ async function setProviderStatus(providerId, action) {
   await loadPanel(activePanel);
 }
 
+async function testLlmProvider(providerId) {
+  const data = await requestJson(`/api/llm/providers/${providerId}/test`, { method: "POST" });
+  addMessage("assistant", `模型测试完成：${data.status}`, { cards: [{ title: "模型测试", payload: data }] });
+  await loadPanel("llmCalls");
+}
+
+async function setDefaultLlmProvider(providerId) {
+  const data = await requestJson(`/api/llm/providers/${providerId}/default`, { method: "POST" });
+  addMessage("assistant", `默认模型已设置：${data.name}`);
+  await loadPanel(activePanel);
+}
+
+async function toggleLlmProvider(providerId, status) {
+  const data = await requestJson(`/api/llm/providers/${providerId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+  addMessage("assistant", `模型状态已更新：${data.status}`);
+  await loadPanel(activePanel);
+}
+
 async function restoreBackup(backupId) {
   if (!window.confirm("\u786e\u8ba4\u6062\u590d\u8fd9\u4e2a\u5907\u4efd\uff1f")) return;
   const data = await requestJson(`/api/backups/${backupId}/restore`, { method: "POST" });
@@ -380,6 +427,19 @@ function renderPanelItem(item, panel) {
       `<button class="action-button${action === "disconnect" ? " reject" : ""}"
         data-provider-id="${item.provider_id}" data-provider-action="${action}">
         ${action === "connect" ? "连接" : "断开"}
+      </button>`
+    );
+  }
+  if (panel === "llmProviders") {
+    controls.push(`<button class="action-button" data-llm-test="${item.provider_id}">测试</button>`);
+    if (!item.is_default) {
+      controls.push(`<button class="action-button" data-llm-default="${item.provider_id}">设为默认</button>`);
+    }
+    const nextStatus = item.status === "connected" ? "disabled" : "connected";
+    controls.push(
+      `<button class="action-button${nextStatus === "disabled" ? " reject" : ""}"
+        data-llm-toggle="${item.provider_id}" data-llm-status="${nextStatus}">
+        ${nextStatus === "connected" ? "启用" : "停用"}
       </button>`
     );
   }
@@ -452,6 +512,10 @@ document.addEventListener("click", async (event) => {
   const settingValue = event.target.dataset?.settingValue;
   const providerId = event.target.dataset?.providerId;
   const providerAction = event.target.dataset?.providerAction;
+  const llmTestId = event.target.dataset?.llmTest;
+  const llmDefaultId = event.target.dataset?.llmDefault;
+  const llmToggleId = event.target.dataset?.llmToggle;
+  const llmStatus = event.target.dataset?.llmStatus;
   const restoreBackupId = event.target.dataset?.restoreBackup;
   const completeTodoId = event.target.dataset?.completeTodo;
   const panel = event.target.dataset?.panel;
@@ -469,6 +533,9 @@ document.addEventListener("click", async (event) => {
     if (rollbackGrowthId) await rollbackGrowthLog(rollbackGrowthId);
     if (settingKey) await updateSetting(settingKey, settingValue);
     if (providerId) await setProviderStatus(providerId, providerAction);
+    if (llmTestId) await testLlmProvider(llmTestId);
+    if (llmDefaultId) await setDefaultLlmProvider(llmDefaultId);
+    if (llmToggleId) await toggleLlmProvider(llmToggleId, llmStatus);
     if (restoreBackupId) await restoreBackup(restoreBackupId);
     if (completeTodoId) await completeTodo(completeTodoId);
     if (panel) await loadPanel(panel);

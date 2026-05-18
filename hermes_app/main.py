@@ -28,6 +28,8 @@ from hermes_app.services.home_cards import HomeCardService
 from hermes_app.services.images import ImageService
 from hermes_app.services.inspiration import InspirationService
 from hermes_app.services.intent_router import IntentRouter
+from hermes_app.services.llm_client import LLMClient
+from hermes_app.services.llm_providers import LLMProviderService
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.maps import MapService
 from hermes_app.services.memory import MemoryService
@@ -36,6 +38,7 @@ from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
 from hermes_app.services.prd_drafts import PrdDraftService
 from hermes_app.services.proactive import ProactiveSuggestionService
+from hermes_app.services.prompt_library import PromptLibrary
 from hermes_app.services.providers import ProviderRegistry
 from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
@@ -69,13 +72,16 @@ eval_runner = EvalRunner(db, autonomy_classifier)
 growth_log_service = GrowthLogService(db)
 settings_service = SettingsService(db)
 provider_registry = ProviderRegistry(db)
+prompt_library = PromptLibrary()
+llm_provider_service = LLMProviderService(db)
+llm_client = LLMClient(llm_provider_service, prompt_library)
 backup_service = BackupService(db)
 export_service = ExportService(db)
 update_service = UpdateService(settings, settings_service)
 tool_registry = ToolRegistry(db, memory_service, reminder_service, wardrobe_service)
 action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
-skill_runtime = SkillRuntime(db, skill_registry)
+skill_runtime = SkillRuntime(db, skill_registry, llm_client)
 todo_service = TodoService(db)
 prd_draft_service = PrdDraftService(db)
 log_service = ExecutionLogService(db)
@@ -105,6 +111,7 @@ orchestrator = HermesOrchestrator(
     inspiration=InspirationService(),
     weather=weather_service,
     logs=log_service,
+    llm_client=llm_client,
 )
 
 @asynccontextmanager
@@ -134,6 +141,9 @@ app.include_router(
         growth_log_service,
         settings_service,
         provider_registry,
+        llm_provider_service,
+        llm_client,
+        prompt_library,
         backup_service,
         export_service,
         runtime_state_service,

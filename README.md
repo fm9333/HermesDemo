@@ -18,6 +18,9 @@ hermes_app/
     skills.py             MVP Skill Registry
     inspiration.py        灵感 Idea Card 生成
     logs.py               Execution Log
+    llm_providers.py      LLM Provider 配置与 API Key 本地保护保存
+    llm_client.py         OpenAI-compatible Chat Completions 调用
+    prompt_library.py     Hermes 高智能 Prompt Library
   web/
     templates/index.html  客户端页面
     static/               样式与交互脚本
@@ -60,13 +63,34 @@ python -m desktop.main
 把这段会议内容提取待办
 帮我生成一个上线清单
 把这件黑色外套加入衣橱
+帮我分析这个产品下一步怎么做
 ```
+
+## 大模型配置
+
+Hermes 现在支持 OpenAI-compatible Chat Completions 协议。启动桌面或 Web 控制台后，打开右侧“模型”面板，添加：
+
+```text
+Base URL: https://api.openai.com/v1 或本地/第三方 OpenAI-compatible 地址
+Model: 由你的服务商提供的模型 ID
+API Key: 云模型填写；本地模型可留空
+```
+
+API Key 只保存在本地数据库，接口不会回显完整密钥，只返回 `api_key_set` 和 `api_key_preview`。当前实现是本地保护保存，不等同于系统 Keychain 或 SQLCipher 强加密。
 
 ## API
 
 ```text
 GET  /api/health
 POST /api/chat
+GET  /api/llm/providers
+POST /api/llm/providers
+PATCH /api/llm/providers/{provider_id}
+POST /api/llm/providers/{provider_id}/default
+POST /api/llm/providers/{provider_id}/test
+POST /api/llm/chat
+GET  /api/llm/calls
+GET  /api/prompts
 GET  /api/memory
 GET  /api/actions/pending
 POST /api/actions/{action_id}/confirm
@@ -80,7 +104,9 @@ GET  /api/logs
 
 ## 重要边界
 
-当前版本没有接入真实 LLM，也没有接入日历、邮件、文件解析等第三方服务。现在的编排器使用规则路由和本地 mock Skill，目标是先把产品方案里的架构边界跑通。
+当前版本已接入真实 LLM Provider 配置和 OpenAI-compatible 调用，但默认不内置任何云端 API Key；用户必须在“模型”面板自行配置。LLM 只负责理解、生成草案和规划，不能直接写数据库或直接调用外部 API；执行类动作仍必须经过 Tool Registry 与 Action Gate。
+
+日历、邮件、网盘仍是占位 Provider；文件解析、天气、新闻、地图、部分 Skill 已有本地或公开接口实现。
 
 天气能力已接入 Open-Meteo Provider v1：
 
@@ -96,10 +122,10 @@ Geocoding: https://geocoding-api.open-meteo.com/v1/search
 Forecast:  https://api.open-meteo.com/v1/forecast
 ```
 
-下一步应该接入：
+下一步应该继续接入：
 
-1. LLM Adapter：把 `HermesOrchestrator` 内的规则回复替换为模型规划。
-2. Tool Registry：将 Action executor 从硬编码迁移为注册式工具。
-3. Eval Center：为 Skill Patch 和 Tool Plan 增加评测样例。
-4. Auth/User：增加真实用户、权限和多租户隔离。
-5. Provider：接入天气、日历、文件解析、图片识别等外部能力。
+1. Responses API / 工具调用协议支持。
+2. OS Keychain 或 SQLCipher 级密钥保护。
+3. 日历、邮件、网盘 OAuth Provider。
+4. 多模态图片识别和文件深度解析模型。
+5. Personal Skill 生成、版本、评测和回滚闭环。

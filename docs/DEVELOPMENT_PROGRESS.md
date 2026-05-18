@@ -320,6 +320,32 @@
   - 验证：备份恢复拒绝路径穿越式 backup id
   - 测试：`python -m compileall hermes_app desktop tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，100 passed
 
+## 阶段 9：真实大模型与高智能 Prompt
+
+- [x] OpenAI-compatible LLM Provider v1
+  - 验证：`llm_providers` 可保存模型 Provider、Base URL、模型名、温度、超时、输出 token、默认状态和文件上下文权限
+  - 验证：API Key 本地保护保存，API 返回只包含 `api_key_set` 和 `api_key_preview`，不回显完整密钥
+  - 验证：`GET/POST/PATCH/DELETE /api/llm/providers`、`POST /api/llm/providers/{id}/default` 可用
+  - 验证：客户端“模型”面板可添加、测试、启用/停用、设为默认
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，105 passed
+- [x] OpenAI Chat Completions 兼容调用 v1
+  - 验证：`LLMClient` 按 `/v1/chat/completions` 兼容格式发送 `model/messages/temperature/max_tokens`
+  - 验证：支持 OpenAI 云端、OpenRouter/LM Studio/Ollama 等 OpenAI-compatible Base URL
+  - 验证：`POST /api/llm/providers/{id}/test` 可执行连通性测试，`GET /api/llm/calls` 可查看调用审计记录
+  - 验证：未配置模型时 `/api/chat` 保持本地安全 fallback，不崩溃
+  - 测试：`python -m pytest tests\test_llm_providers.py tests\test_api.py -q` 通过，40 passed
+- [x] Hermes Prompt Library v1
+  - 验证：内置 Hermes 主智能体、深度任务规划、记忆候选、文档总结、待办提取、PRD、清单、灵感、场景、Eval Judge、Red Zone Guard 提示词
+  - 验证：提示词要求模型内部完成深度分析，但不输出隐藏推理过程，只输出可执行结论、结构化计划、风险和验收项
+  - 验证：`GET /api/prompts`、`GET /api/prompts/{prompt_id}` 可查看提示词契约
+  - 验证：客户端“提示词”和“模型调用”面板可查看配置与审计
+  - 测试：`python -m pytest tests\test_llm_providers.py -q` 通过，3 passed
+- [x] 主智能体 / Skill Runtime 接入 LLM v1
+  - 验证：`general_chat` 在默认 LLM Provider 可用时会调用真实模型并记录 `llm` card
+  - 验证：`document.summarize`、`work.todo_extract`、`content.list_generate` 在模型可用时优先走 LLM Prompt，失败或未配置时回退本地规则 Skill
+  - 验证：所有执行/写入/外发类动作仍通过 Action Gate，不允许 LLM 直接写数据库或直接调用外部 API
+  - 测试：`python -m pytest -q` 通过，105 passed
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库
