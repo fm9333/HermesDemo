@@ -779,3 +779,45 @@ Context Signal v1 支持收集、查询、过滤和归档。
 ```text
 4787665 stage 4 context signal pipeline v1
 ```
+
+## 2026-05-18 阶段 4 Opportunity Engine v1 评审
+
+范围：
+
+```text
+opportunities 数据表
+OpportunityEngine
+POST /api/opportunities/generate
+GET /api/opportunities
+POST /api/opportunities/{id}/close
+客户端机会面板
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-4-opportunity-engine-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+Opportunity Engine v1 可从 active Context Signals 生成机会点。
+weather.rain 高概率降雨信号生成带伞提醒机会。
+file.uploaded 信号生成 document.summarize Skill 推荐机会。
+机会点可关闭，避免长期干扰用户。
+去重和 Attention Policy 联动仍是后续任务。
+```
+
+提交记录：
+
+```text
+待提交：stage-4-opportunity-engine-v1
+```

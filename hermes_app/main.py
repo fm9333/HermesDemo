@@ -23,6 +23,7 @@ from hermes_app.services.intent_router import IntentRouter
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
+from hermes_app.services.opportunities import OpportunityEngine
 from hermes_app.services.reminders import ReminderService
 from hermes_app.services.scenes import SceneService
 from hermes_app.services.safety import SafetyService
@@ -51,6 +52,7 @@ file_service = FileService(db)
 image_service = ImageService(db, file_service)
 scene_service = SceneService(db)
 context_signal_service = ContextSignalService(db)
+opportunity_engine = OpportunityEngine(db, context_signal_service)
 orchestrator = HermesOrchestrator(
     intent_router=IntentRouter(),
     task_decomposer=TaskDecomposer(),
@@ -88,6 +90,7 @@ app.include_router(
         image_service,
         scene_service,
         context_signal_service,
+        opportunity_engine,
         log_service,
     )
 )

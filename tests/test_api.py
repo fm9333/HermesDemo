@@ -204,6 +204,24 @@ def test_context_signal_api_flow():
     assert archived.json()["status"] == "archived"
 
 
+def test_opportunity_api_flow():
+    signal = client.post(
+        "/api/context-signals",
+        json={"source": "weather", "signal_type": "weather.rain", "payload": {"probability": 80}},
+    ).json()
+    generated = client.post("/api/opportunities/generate")
+    assert generated.status_code == 200
+    assert any(item["signal_id"] == signal["id"] for item in generated.json())
+
+    listed = client.get("/api/opportunities")
+    assert listed.status_code == 200
+    opportunity = next(item for item in listed.json() if item["signal_id"] == signal["id"])
+
+    closed = client.post(f"/api/opportunities/{opportunity['id']}/close")
+    assert closed.status_code == 200
+    assert closed.json()["status"] == "closed"
+
+
 def test_wardrobe_action_and_crud_flow():
     response = client.post("/api/chat", json={"message": "把这件黑色外套加入衣橱"})
     assert response.status_code == 200

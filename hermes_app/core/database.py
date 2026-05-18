@@ -167,6 +167,18 @@ class Database:
                     created_at TEXT NOT NULL,
                     expires_at TEXT
                 );
+
+                CREATE TABLE IF NOT EXISTS opportunities (
+                    id TEXT PRIMARY KEY,
+                    signal_id TEXT,
+                    title TEXT NOT NULL,
+                    opportunity_type TEXT NOT NULL,
+                    priority REAL NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(signal_id) REFERENCES context_signals(id)
+                );
                 """
             )
             self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")

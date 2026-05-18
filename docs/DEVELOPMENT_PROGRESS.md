@@ -125,7 +125,10 @@
   - 验证：`/api/context-signals` 可收集、查询、归档上下文信号
   - 验证：支持按 `signal_type` 和 `status` 过滤
   - 测试：`python -m pytest -q` 通过，35 passed
-- [ ] Opportunity Engine
+- [x] Opportunity Engine v1
+  - 验证：可从 `weather.rain` 信号生成带伞提醒机会
+  - 验证：可从 `file.uploaded` 信号生成文档总结 Skill 推荐机会
+  - 测试：`python -m pytest -q` 通过，37 passed
 - [ ] Attention Policy 深化
 - [ ] 推荐卡片
 - [ ] Scene Feedback
@@ -157,5 +160,6 @@
   - commit：`e3986ff stage 3 image clothing recognition v1`
   - commit：`8af4950 stage 4 scene registry v1`
   - commit：`4787665 stage 4 context signal pipeline v1`
+  - 当前提交点：`stage-4-opportunity-engine-v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
