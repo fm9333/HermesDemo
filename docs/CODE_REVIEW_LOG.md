@@ -504,5 +504,5 @@ ImageService 使用 Pillow 验证图片有效性并读取宽高。
 提交记录：
 
 ```text
-待提交：stage-3-image-upload-v1
+3f5712b stage 3 image upload v1
 ```
