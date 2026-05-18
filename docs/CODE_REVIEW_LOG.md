@@ -1578,5 +1578,5 @@ python -m pytest -q
 
 提交记录：
 ```text
-待提交 stage 7 personalized home cards v1
+73075ce stage 7 personalized home cards v1
 ```
