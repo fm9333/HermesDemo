@@ -75,6 +75,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="evalRuns"' in response.text
     assert 'data-panel="growthLog"' in response.text
     assert 'data-panel="settings"' in response.text
+    assert 'data-panel="databaseMigrations"' in response.text
     assert 'data-panel="providers"' in response.text
     assert 'data-panel="backups"' in response.text
     assert 'id="panel-action"' in response.text
@@ -101,6 +102,14 @@ def test_backup_api(tmp_path, monkeypatch):
     listed = client.get("/api/backups")
     assert listed.status_code == 200
     assert any(item["id"] == backup["id"] for item in listed.json())
+
+
+def test_database_migrations_api():
+    response = client.get("/api/database/migrations")
+    assert response.status_code == 200
+    migration_ids = [item["id"] for item in response.json()]
+    assert "0001_core_schema" in migration_ids
+    assert "0004_release_backups" in migration_ids
 
 
 def test_reminder_action_flow():

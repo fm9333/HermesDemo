@@ -2,8 +2,17 @@ from __future__ import annotations
 
 import sqlite3
 import threading
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+
+
+MIGRATIONS = (
+    ("0001_core_schema", "Core memory, actions, settings, skills, files, and scenes schema"),
+    ("0002_inspiration_workflows", "Idea cards, todos, PRD drafts, wardrobe, and feedback schema"),
+    ("0003_proactive_integrations", "Providers, triggers, weekly reviews, news, and maps schema"),
+    ("0004_release_backups", "Release readiness support for local backup and restore"),
+)
 
 
 class Database:
@@ -72,6 +81,12 @@ class Database:
                     key TEXT PRIMARY KEY,
                     value_json TEXT NOT NULL,
                     updated_at TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS schema_migrations (
+                    id TEXT PRIMARY KEY,
+                    description TEXT NOT NULL,
+                    applied_at TEXT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS providers (
@@ -331,12 +346,25 @@ class Database:
             self._ensure_column("idea_cards", "next_steps_json", "TEXT NOT NULL DEFAULT '[]'")
             self._ensure_column("idea_cards", "score", "REAL NOT NULL DEFAULT 0")
             self._ensure_column("idea_cards", "status", "TEXT NOT NULL DEFAULT 'active'")
+            for migration_id, description in MIGRATIONS:
+                self._record_migration(migration_id, description)
             self._conn.commit()
 
     def _ensure_column(self, table: str, column: str, definition: str) -> None:
         columns = self._conn.execute(f"PRAGMA table_info({table})").fetchall()
         if column not in {row["name"] for row in columns}:
             self._conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+
+    def _record_migration(self, migration_id: str, description: str) -> None:
+        existing = self._conn.execute(
+            "SELECT id FROM schema_migrations WHERE id = ?",
+            (migration_id,),
+        ).fetchone()
+        if not existing:
+            self._conn.execute(
+                "INSERT INTO schema_migrations (id, description, applied_at) VALUES (?, ?, ?)",
+                (migration_id, description, datetime.now(timezone.utc).isoformat()),
+            )
 
     def execute(self, sql: str, params: Iterable[Any] = ()) -> sqlite3.Cursor:
         with self._lock:
@@ -353,6 +381,9 @@ class Database:
         with self._lock:
             row = self._conn.execute(sql, tuple(params)).fetchone()
             return dict(row) if row else None
+
+    def list_migrations(self) -> list[dict[str, Any]]:
+        return self.query("SELECT * FROM schema_migrations ORDER BY id")
 
     def backup_to(self, target: str | Path) -> None:
         target_path = Path(target)

@@ -268,7 +268,12 @@
 - [ ] PyInstaller 打包
 - [ ] 自动更新策略
 - [ ] 崩溃恢复
-- [ ] 数据库迁移
+- [x] 数据库迁移 v1
+  - 验证：`schema_migrations` 可记录当前本地 schema 迁移状态
+  - 验证：重复 `Database.init()` 不重复写迁移记录
+  - 验证：重复初始化不会破坏已有用户数据
+  - 验证：`GET /api/database/migrations` 和客户端迁移面板可查看迁移记录
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，79 passed
 - [x] 备份与恢复 v1
   - 验证：`BackupService` 可创建包含 SQLite 快照和 manifest 的 zip 备份
   - 验证：`BackupService.restore()` 可从备份恢复当前数据库连接
@@ -329,5 +334,6 @@
   - commit：`f6a7b8c stage 7 news provider v1`
   - commit：`8eb78ac stage 7 map provider v1`
   - commit：`c8b2bc6 stage 8 backup restore v1`
+  - commit：`待提交 stage 8 database migrations v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

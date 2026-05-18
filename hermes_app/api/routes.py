@@ -88,6 +88,10 @@ def create_api_router(
     def health() -> dict:
         return {"status": "ok", "service": "hermes"}
 
+    @router.get("/database/migrations")
+    def list_database_migrations() -> list[dict]:
+        return actions.db.list_migrations()
+
     @router.post("/chat", response_model=ChatResponse)
     def chat(request: ChatRequest) -> ChatResponse:
         return orchestrator.handle_chat(request)
