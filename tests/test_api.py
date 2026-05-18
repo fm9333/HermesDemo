@@ -7,7 +7,7 @@ os.environ.pop("HERMES_LOCAL_TOKEN", None)
 from PIL import Image
 from fastapi.testclient import TestClient
 
-from hermes_app.main import app, backup_service, map_service, news_service, weather_service
+from hermes_app.main import app, backup_service, export_service, map_service, news_service, weather_service
 
 
 client = TestClient(app)
@@ -78,6 +78,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="databaseMigrations"' in response.text
     assert 'data-panel="providers"' in response.text
     assert 'data-panel="backups"' in response.text
+    assert 'data-panel="exports"' in response.text
     assert 'id="panel-action"' in response.text
 
 
@@ -110,6 +111,22 @@ def test_database_migrations_api():
     migration_ids = [item["id"] for item in response.json()]
     assert "0001_core_schema" in migration_ids
     assert "0004_release_backups" in migration_ids
+
+
+def test_export_api(tmp_path, monkeypatch):
+    export_root = tmp_path / "api-exports"
+    export_root.mkdir()
+    monkeypatch.setattr(export_service, "root", export_root)
+
+    created = client.post("/api/exports", json={"note": "api-test", "tables": ["schema_migrations"]})
+    assert created.status_code == 200
+    export = created.json()
+    assert export["note"] == "api-test"
+    assert export["tables"] == ["schema_migrations"]
+
+    listed = client.get("/api/exports")
+    assert listed.status_code == 200
+    assert any(item["id"] == export["id"] for item in listed.json())
 
 
 def test_reminder_action_flow():

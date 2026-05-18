@@ -10,6 +10,7 @@ from hermes_app.services.autonomy import AutonomyZoneClassifier
 from hermes_app.services.backups import BackupService
 from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.evals import EvalRunner
+from hermes_app.services.exports import ExportService
 from hermes_app.services.files import FileService
 from hermes_app.services.growth import GrowthLogService
 from hermes_app.services.home_cards import HomeCardService
@@ -59,6 +60,7 @@ def create_api_router(
     settings: SettingsService,
     providers: ProviderRegistry,
     backups: BackupService,
+    exports: ExportService,
     proactive: ProactiveSuggestionService,
     triggers: TriggerService,
     weekly_reviews: WeeklyReviewService,
@@ -212,6 +214,20 @@ def create_api_router(
             return backups.restore(backup_id)
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.get("/exports")
+    def list_exports() -> list[dict]:
+        return exports.list()
+
+    @router.post("/exports")
+    def create_export(payload: dict | None = None) -> dict:
+        try:
+            return exports.create(
+                tables=(payload or {}).get("tables"),
+                note=(payload or {}).get("note", "manual"),
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     @router.get("/proactive/suggestions")
     def list_proactive_suggestions(limit: int = 20) -> list[dict]:

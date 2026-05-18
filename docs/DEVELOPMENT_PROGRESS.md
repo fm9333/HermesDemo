@@ -280,7 +280,12 @@
   - 验证：`GET /api/backups`、`POST /api/backups`、`POST /api/backups/{id}/restore` 可用
   - 验证：客户端备份面板可创建备份、列出备份并触发恢复确认
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，77 passed
-- [ ] 数据导出
+- [x] 数据导出 v1
+  - 验证：`ExportService` 可按白名单导出本地核心表为 JSON ZIP
+  - 验证：导出文件包含 `manifest.json` 和 `tables/*.json`
+  - 验证：未知表名会被拒绝，避免任意 SQL/系统表导出
+  - 验证：`GET /api/exports`、`POST /api/exports` 和客户端导出面板可用
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，82 passed
 - [ ] 性能优化
 - [ ] 端到端测试
 - [ ] 安全测试
@@ -335,5 +340,6 @@
   - commit：`8eb78ac stage 7 map provider v1`
   - commit：`c8b2bc6 stage 8 backup restore v1`
   - commit：`cdd072e stage 8 database migrations v1`
+  - commit：`待提交 stage 8 data export v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

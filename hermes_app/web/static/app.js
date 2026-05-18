@@ -49,6 +49,7 @@ const panelLabels = {
   databaseMigrations: "\u8fc1\u79fb",
   providers: "集成",
   backups: "\u5907\u4efd",
+  exports: "\u5bfc\u51fa",
   logs: "日志",
 };
 
@@ -86,6 +87,7 @@ const panelEndpoints = {
   databaseMigrations: "/api/database/migrations",
   providers: "/api/providers",
   backups: "/api/backups",
+  exports: "/api/exports",
   logs: "/api/logs",
 };
 
@@ -94,6 +96,7 @@ const panelActions = {
   news: { label: "\u5237\u65b0\u65b0\u95fb", endpoint: "/api/news/refresh" },
   maps: { label: "\u641c\u7d22\u5730\u70b9", endpoint: "/api/maps/search" },
   backups: { label: "\u521b\u5efa\u5907\u4efd", endpoint: "/api/backups" },
+  exports: { label: "\u521b\u5efa\u5bfc\u51fa", endpoint: "/api/exports" },
   opportunities: { label: "生成机会", endpoint: "/api/opportunities/generate" },
   recommendations: { label: "生成推荐", endpoint: "/api/recommendations/generate" },
   triggerRuns: { label: "运行触发", endpoint: "/api/triggers/run" },

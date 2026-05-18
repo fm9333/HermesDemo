@@ -1747,3 +1747,40 @@ python -m pytest -q
 ```text
 cdd072e stage 8 database migrations v1
 ```
+
+## 2026-05-18 阶段 8 数据导出 v1 评审
+
+范围：
+```text
+ExportService
+GET /api/exports
+POST /api/exports
+客户端导出面板
+数据导出服务和 API 测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-8-data-export-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+```text
+数据导出 v1 使用白名单表导出，避免用户通过 API 导出任意 SQLite 系统表或拼接 SQL。
+导出文件为 zip，包含 manifest.json 和 tables/*.json，便于人工审计和后续导入流程复用。
+导出目录独立于数据库，导出清单从文件系统扫描，不受数据库恢复影响。
+API 测试覆盖指定表导出和列表，服务测试覆盖 zip 内容和未知表拒绝。
+```
+
+提交记录：
+```text
+待提交 stage 8 data export v1
+```

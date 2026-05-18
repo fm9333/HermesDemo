@@ -20,6 +20,7 @@ from hermes_app.services.autonomy import AutonomyZoneClassifier
 from hermes_app.services.backups import BackupService
 from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.evals import EvalRunner
+from hermes_app.services.exports import ExportService
 from hermes_app.services.files import FileService
 from hermes_app.services.growth import GrowthLogService
 from hermes_app.services.home_cards import HomeCardService
@@ -64,6 +65,7 @@ growth_log_service = GrowthLogService(db)
 settings_service = SettingsService(db)
 provider_registry = ProviderRegistry(db)
 backup_service = BackupService(db)
+export_service = ExportService(db)
 tool_registry = ToolRegistry(db, memory_service, reminder_service, wardrobe_service)
 action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
@@ -119,6 +121,7 @@ app.include_router(
         settings_service,
         provider_registry,
         backup_service,
+        export_service,
         proactive_service,
         trigger_service,
         weekly_review_service,
