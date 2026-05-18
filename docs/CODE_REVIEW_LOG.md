@@ -126,3 +126,54 @@ setup_desktop_logging(reset=True) 支持测试隔离，避免重复 handler。
 ```text
 91aeb74 stage 1 desktop logging
 ```
+
+## 2026-05-18 阶段 2 天气 Provider v1 评审
+
+范围：
+
+```text
+weather_cache 数据表
+WeatherService
+Open-Meteo Geocoding
+Open-Meteo Forecast
+/api/weather
+/api/weather/cache
+Hermes 对话天气意图接入
+客户端天气缓存面板
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-2-weather-provider-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+WeatherService 真实查询 Beijing 返回 ok
+```
+
+评审结论：
+
+```text
+天气 Provider 不需要 API Key，适合桌面 MVP。
+Provider 错误不会让 Hermes 崩溃，会返回 provider_error 并写入缓存。
+天气查询结果写入 weather_cache，右侧天气面板可查看历史。
+对话输入如“北京天气”会直接调用 WeatherService。
+```
+
+资料来源：
+
+```text
+Open-Meteo Geocoding API: https://open-meteo.com/en/docs/geocoding-api
+Open-Meteo Forecast API: https://open-meteo.com/en/docs
+```
+
+提交记录：
+
+```text
+待提交：stage-2-weather-provider-v1
+```

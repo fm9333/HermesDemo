@@ -8,6 +8,7 @@ from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.skills import SkillRegistry
+from hermes_app.services.weather import WeatherService
 
 
 def create_api_router(
@@ -15,6 +16,7 @@ def create_api_router(
     memory: MemoryService,
     actions: ActionService,
     skills: SkillRegistry,
+    weather: WeatherService,
     logs: ExecutionLogService,
 ) -> APIRouter:
     router = APIRouter(prefix="/api")
@@ -67,6 +69,14 @@ def create_api_router(
     def list_wardrobe() -> list[dict]:
         return orchestrator.actions.db.query("SELECT * FROM wardrobe_items ORDER BY created_at DESC LIMIT 80")
 
+    @router.get("/weather")
+    def lookup_weather(location: str) -> dict:
+        return weather.lookup(location)
+
+    @router.get("/weather/cache")
+    def list_weather_cache() -> list[dict]:
+        return weather.list_cache()
+
     @router.get("/skills")
     def list_skills() -> list[dict]:
         return [skill.model_dump() for skill in skills.list()]
@@ -76,4 +86,3 @@ def create_api_router(
         return logs.list()
 
     return router
-

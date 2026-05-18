@@ -60,7 +60,9 @@
 - [x] Action Gate v1 原型
 - [x] 用户确认卡原型
 - [x] Execution Log 原型
-- [ ] 天气 Provider v1
+- [x] 天气 Provider v1
+  - 验证：Open-Meteo Geocoding + Forecast 可真实查询，`北京` 返回 `ok` 和 3 天预报
+  - 测试：`python -m pytest -q` 通过，8 passed
 
 ## GitHub / SVN 同步状态
 
@@ -73,5 +75,6 @@
 - [x] 每个已验证小功能单独提交
   - 当前提交点：`stage-1-desktop-shell-local-service`
   - commit：`91aeb74 stage 1 desktop logging`
+  - 当前提交点：`stage-2-weather-provider-v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

@@ -22,6 +22,7 @@ from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.safety import SafetyService
 from hermes_app.services.skills import SkillRegistry
+from hermes_app.services.weather import WeatherService
 
 
 settings = get_settings()
@@ -32,6 +33,7 @@ memory_service = MemoryService(db)
 action_service = ActionService(db, memory_service)
 skill_registry = SkillRegistry()
 log_service = ExecutionLogService(db)
+weather_service = WeatherService(db)
 orchestrator = HermesOrchestrator(
     intent_router=IntentRouter(),
     safety=SafetyService(),
@@ -39,6 +41,7 @@ orchestrator = HermesOrchestrator(
     actions=action_service,
     skills=skill_registry,
     inspiration=InspirationService(),
+    weather=weather_service,
     logs=log_service,
 )
 
@@ -53,7 +56,9 @@ app.add_middleware(
 WEB_DIR = Path(__file__).resolve().parent / "web"
 templates = Jinja2Templates(directory=str(WEB_DIR / "templates"))
 app.mount("/static", StaticFiles(directory=str(WEB_DIR / "static")), name="static")
-app.include_router(create_api_router(orchestrator, memory_service, action_service, skill_registry, log_service))
+app.include_router(
+    create_api_router(orchestrator, memory_service, action_service, skill_registry, weather_service, log_service)
+)
 
 
 @app.middleware("http")

@@ -80,6 +80,15 @@ class Database:
                     source TEXT NOT NULL,
                     created_at TEXT NOT NULL
                 );
+
+                CREATE TABLE IF NOT EXISTS weather_cache (
+                    id TEXT PRIMARY KEY,
+                    location TEXT NOT NULL,
+                    provider TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
                 """
             )
             self._conn.commit()
@@ -99,4 +108,3 @@ class Database:
         with self._lock:
             row = self._conn.execute(sql, tuple(params)).fetchone()
             return dict(row) if row else None
-

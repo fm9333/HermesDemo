@@ -80,7 +80,21 @@ GET  /api/logs
 
 ## 重要边界
 
-当前版本没有接入真实 LLM，也没有接入真实天气、日历、邮件、文件解析等第三方服务。现在的编排器使用规则路由和本地 mock Skill，目标是先把产品方案里的架构边界跑通。
+当前版本没有接入真实 LLM，也没有接入日历、邮件、文件解析等第三方服务。现在的编排器使用规则路由和本地 mock Skill，目标是先把产品方案里的架构边界跑通。
+
+天气能力已接入 Open-Meteo Provider v1：
+
+```text
+GET /api/weather?location=北京
+GET /api/weather/cache
+```
+
+Provider 使用 Open-Meteo 官方接口：
+
+```text
+Geocoding: https://geocoding-api.open-meteo.com/v1/search
+Forecast:  https://api.open-meteo.com/v1/forecast
+```
 
 下一步应该接入：
 

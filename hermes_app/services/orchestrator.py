@@ -11,6 +11,7 @@ from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.safety import SafetyService
 from hermes_app.services.skills import SkillRegistry
+from hermes_app.services.weather import WeatherService
 
 
 class HermesOrchestrator:
@@ -22,6 +23,7 @@ class HermesOrchestrator:
         actions: ActionService,
         skills: SkillRegistry,
         inspiration: InspirationService,
+        weather: WeatherService,
         logs: ExecutionLogService,
     ):
         self.intent_router = intent_router
@@ -30,6 +32,7 @@ class HermesOrchestrator:
         self.actions = actions
         self.skills = skills
         self.inspiration = inspiration
+        self.weather = weather
         self.logs = logs
 
     def handle_chat(self, request: ChatRequest) -> ChatResponse:
@@ -70,14 +73,14 @@ class HermesOrchestrator:
             reply = "我提取了一条记忆候选，确认后会保存到记忆中心。"
 
         elif intent == "weather_query":
-            reply = "天气查询能力已预留为外部服务 Skill。当前 MVP 返回查询计划，不直接访问第三方天气源。"
-            cards.append(
-                {
-                    "type": "external_service",
-                    "title": "weather.lookup",
-                    "payload": {"query": message, "status": "provider_pending"},
-                }
-            )
+            location = self._parse_weather_location(message)
+            if not location:
+                reply = "你想查询哪个城市或地点的天气？"
+                cards.append({"type": "needs_input", "title": "天气查询", "payload": {"field": "location"}})
+            else:
+                weather = self.weather.lookup(location)
+                reply = weather.get("summary") or weather.get("message") or "天气查询已完成。"
+                cards.append({"type": "weather", "title": "天气", "payload": weather})
 
         elif intent == "wardrobe_add":
             payload = self._parse_wardrobe(message)
@@ -168,3 +171,8 @@ class HermesOrchestrator:
 
         return {"name": message.strip(" ，。"), "category": category, "color": color}
 
+    def _parse_weather_location(self, message: str) -> str:
+        value = message.strip()
+        for token in ("帮我看看", "查询", "查一下", "看看", "天气", "下雨", "降雨", "气温", "怎么样", "如何"):
+            value = value.replace(token, "")
+        return value.strip(" ，。？?：:")

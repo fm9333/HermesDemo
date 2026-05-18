@@ -4,7 +4,7 @@ os.environ["HERMES_DB"] = ":memory:"
 
 from fastapi.testclient import TestClient
 
-from hermes_app.main import app
+from hermes_app.main import app, weather_service
 
 
 client = TestClient(app)
@@ -46,3 +46,21 @@ def test_memory_action_flow():
     memory_items = client.get("/api/memory").json()
     assert any("科技新闻" in item["value"] for item in memory_items)
 
+
+def test_weather_chat_flow(monkeypatch):
+    monkeypatch.setattr(
+        weather_service,
+        "lookup",
+        lambda location: {
+            "status": "ok",
+            "summary": f"{location} 当前 20°C，晴。",
+            "current": {"temperature": 20, "summary": "晴"},
+        },
+    )
+
+    response = client.post("/api/chat", json={"message": "北京天气"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["intent"] == "weather_query"
+    assert data["cards"][0]["type"] == "weather"
+    assert "北京 当前 20°C" in data["reply"]
