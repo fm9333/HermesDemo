@@ -87,7 +87,10 @@
   - 验证：`POST /api/skills/{skill_id}/run` 可运行 Skill 并写入 `skill_runs`
   - 验证：`GET /api/skills/runs` 可查看运行历史
   - 测试：`python -m pytest -q` 通过，21 passed
-- [ ] 文件上传
+- [x] 文件上传 v1
+  - 验证：`POST /api/files/upload` 可保存文件到本地文件库并写入 `files`
+  - 验证：`GET /api/files` 可查看上传记录
+  - 测试：`python -m pytest -q` 通过，23 passed
 - [ ] 图片上传
 - [ ] document.summarize 真实文档解析
 - [ ] image.clothing_recognition 真实图片识别
@@ -112,5 +115,6 @@
   - commit：`bdabf9f stage 2 reminder center v1`
   - commit：`ee3659d stage 2 wardrobe center v1`
   - commit：`b43fb37 stage 3 skill runtime v1`
+  - 当前提交点：`stage-3-file-upload-v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

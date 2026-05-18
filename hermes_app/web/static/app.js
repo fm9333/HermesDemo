@@ -23,6 +23,7 @@ const panelLabels = {
   wardrobe: "衣橱",
   skills: "技能",
   skillRuns: "技能运行",
+  files: "文件",
   tools: "工具",
   logs: "日志",
 };
@@ -36,6 +37,7 @@ const panelEndpoints = {
   wardrobe: "/api/wardrobe",
   skills: "/api/skills",
   skillRuns: "/api/skills/runs",
+  files: "/api/files",
   tools: "/api/tools",
   logs: "/api/logs",
 };

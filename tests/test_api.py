@@ -120,6 +120,20 @@ def test_skill_run_api_records_result():
     assert any(run["skill_id"] == "content.list_generate" for run in runs)
 
 
+def test_file_upload_api():
+    response = client.post(
+        "/api/files/upload",
+        files={"file": ("meeting.txt", b"hello", "text/plain")},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["filename"] == "meeting.txt"
+    assert data["size"] == 5
+
+    files = client.get("/api/files").json()
+    assert any(item["id"] == data["id"] for item in files)
+
+
 def test_wardrobe_action_and_crud_flow():
     response = client.post("/api/chat", json={"message": "把这件黑色外套加入衣橱"})
     assert response.status_code == 200

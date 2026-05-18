@@ -15,6 +15,7 @@ from hermes_app.api.routes import create_api_router
 from hermes_app.core.config import get_settings
 from hermes_app.core.database import Database
 from hermes_app.services.actions import ActionService
+from hermes_app.services.files import FileService
 from hermes_app.services.inspiration import InspirationService
 from hermes_app.services.intent_router import IntentRouter
 from hermes_app.services.logs import ExecutionLogService
@@ -43,6 +44,7 @@ skill_registry = SkillRegistry()
 skill_runtime = SkillRuntime(db, skill_registry)
 log_service = ExecutionLogService(db)
 weather_service = WeatherService(db)
+file_service = FileService(db)
 orchestrator = HermesOrchestrator(
     intent_router=IntentRouter(),
     task_decomposer=TaskDecomposer(),
@@ -68,7 +70,16 @@ WEB_DIR = Path(__file__).resolve().parent / "web"
 templates = Jinja2Templates(directory=str(WEB_DIR / "templates"))
 app.mount("/static", StaticFiles(directory=str(WEB_DIR / "static")), name="static")
 app.include_router(
-    create_api_router(orchestrator, memory_service, action_service, skill_registry, skill_runtime, weather_service, log_service)
+    create_api_router(
+        orchestrator,
+        memory_service,
+        action_service,
+        skill_registry,
+        skill_runtime,
+        weather_service,
+        file_service,
+        log_service,
+    )
 )
 
 

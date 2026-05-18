@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from hermes_app.schemas import ChatRequest, ChatResponse, ConfirmActionResponse
 from hermes_app.services.actions import ActionService
+from hermes_app.services.files import FileService
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
@@ -21,6 +22,7 @@ def create_api_router(
     skills: SkillRegistry,
     skill_runtime: SkillRuntime,
     weather: WeatherService,
+    files: FileService,
     logs: ExecutionLogService,
 ) -> APIRouter:
     reminder_service = ReminderService(actions.db)
@@ -182,6 +184,22 @@ def create_api_router(
     @router.get("/skills/runs")
     def list_skill_runs(skill_id: str | None = None) -> list[dict]:
         return skill_runtime.list_runs(skill_id=skill_id)
+
+    @router.post("/files/upload")
+    async def upload_file(file: UploadFile = File(...)) -> dict:
+        data = await file.read()
+        return files.save_upload(file.filename or "upload.bin", file.content_type or "application/octet-stream", data)
+
+    @router.get("/files")
+    def list_files() -> list[dict]:
+        return files.list()
+
+    @router.get("/files/{file_id}")
+    def get_file(file_id: str) -> dict:
+        item = files.get(file_id)
+        if not item:
+            raise HTTPException(status_code=404, detail="File not found.")
+        return item
 
     @router.get("/logs")
     def list_logs() -> list[dict]:

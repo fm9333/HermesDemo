@@ -424,3 +424,44 @@ Skill Runtime 保留输入、输出、状态和创建时间，后续可接 Eval 
 ```text
 b43fb37 stage 3 skill runtime v1
 ```
+
+## 2026-05-18 阶段 3 File Upload v1 评审
+
+范围：
+
+```text
+files 数据表
+FileService
+POST /api/files/upload
+GET /api/files
+GET /api/files/{id}
+客户端文件面板
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-3-file-upload-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+上传文件保存到本地文件库，不依赖外部服务。
+文件名经过安全清洗，避免路径穿越。
+文件记录保留 content_type、size、storage_path、status 和 created_at。
+该能力为后续 document.summarize 真实文件解析提供基础。
+```
+
+提交记录：
+
+```text
+待提交：stage-3-file-upload-v1
+```
