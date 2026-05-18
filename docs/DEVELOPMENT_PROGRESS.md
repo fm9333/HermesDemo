@@ -247,6 +247,6 @@
   - commit：`03ea6c3 stage 6 autonomy zone classifier v1`
   - commit：`e2b3163 stage 6 eval runner v1`
   - commit：`8dd90b7 stage 6 growth log v1`
-  - commit：`待提交 stage 6 yellow zone queue v1`
+  - commit：`1e377b6 stage 6 yellow zone queue v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
