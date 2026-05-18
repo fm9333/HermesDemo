@@ -1851,7 +1851,9 @@ python -m pytest -q
 PyInstaller 打包 v1 明确以 desktop/main.py 作为桌面入口，并打包 hermes_app/web 本地 UI 资源。
 spec 添加 uvicorn 相关 hiddenimports，降低嵌入式 FastAPI 服务在冻结环境中缺模块的风险。
 构建脚本固定调用 packaging/hermes_desktop.spec，避免手工命令遗漏资源。
-当前验证覆盖配置和脚本可检查性；真实产物安装、签名和冒烟测试会在后续发布任务中继续完成。
+已在当前 Windows 环境完成一次实际 PyInstaller 构建，产物位于 dist/HermesDesktop/HermesDesktop.exe，且包含 _internal/hermes_app/web 本地 UI 资源。
+构建日志仍提示全局环境 PySide6/NumPy 2.x 兼容 warning；requirements-desktop.txt 已固定 numpy<2，正式打包环境必须按该依赖安装。
+当前验证覆盖配置、脚本和产物结构；安装器、签名和完整 GUI 冒烟测试会在后续发布任务中继续完成。
 ```
 
 提交记录：

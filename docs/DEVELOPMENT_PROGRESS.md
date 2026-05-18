@@ -269,6 +269,8 @@
   - 验证：`packaging/hermes_desktop.spec` 指向 `desktop/main.py` 桌面入口
   - 验证：spec 会打包 `hermes_app/web` 本地 UI 资源和参考文档
   - 验证：`scripts/build_desktop.ps1` 可调用 PyInstaller spec
+  - 验证：`powershell -ExecutionPolicy Bypass -File scripts\build_desktop.ps1` 可生成 `dist/HermesDesktop/HermesDesktop.exe`
+  - 验证：打包产物包含 `_internal/hermes_app/web` 本地 UI 资源
   - 验证：`requirements-desktop.txt` 包含 PyInstaller 和 PySide6 桌面依赖
   - 测试：`python -m compileall hermes_app desktop tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，88 passed
 - [x] 自动更新策略 v1

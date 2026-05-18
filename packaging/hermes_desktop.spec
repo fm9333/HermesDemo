@@ -3,7 +3,7 @@
 from pathlib import Path
 
 
-project_root = Path(SPECPATH).parent.parent
+project_root = Path(SPECPATH).parent
 
 datas = [
     (str(project_root / "hermes_app" / "web"), "hermes_app/web"),
