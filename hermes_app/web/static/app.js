@@ -35,6 +35,7 @@ const panelLabels = {
   images: "图片",
   tools: "工具",
   autonomy: "自治",
+  evalRuns: "评测",
   logs: "日志",
 };
 
@@ -58,12 +59,14 @@ const panelEndpoints = {
   images: "/api/images",
   tools: "/api/tools",
   autonomy: "/api/autonomy/zones",
+  evalRuns: "/api/eval/runs",
   logs: "/api/logs",
 };
 
 const panelActions = {
   opportunities: { label: "生成机会", endpoint: "/api/opportunities/generate" },
   recommendations: { label: "生成推荐", endpoint: "/api/recommendations/generate" },
+  evalRuns: { label: "运行评测", endpoint: "/api/eval/suites/autonomy.zone.basic/run" },
 };
 
 function escapeHtml(value) {

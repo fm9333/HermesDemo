@@ -8,6 +8,7 @@ from hermes_app.schemas import ChatRequest, ChatResponse, ConfirmActionResponse,
 from hermes_app.services.actions import ActionService
 from hermes_app.services.autonomy import AutonomyZoneClassifier
 from hermes_app.services.context_signals import ContextSignalService
+from hermes_app.services.evals import EvalRunner
 from hermes_app.services.files import FileService
 from hermes_app.services.images import ImageService
 from hermes_app.services.logs import ExecutionLogService
@@ -43,6 +44,7 @@ def _deserialize_idea(row: dict) -> dict:
 def create_api_router(
     orchestrator: HermesOrchestrator,
     autonomy: AutonomyZoneClassifier,
+    eval_runner: EvalRunner,
     memory: MemoryService,
     actions: ActionService,
     skills: SkillRegistry,
@@ -83,6 +85,21 @@ def create_api_router(
     @router.post("/autonomy/classify")
     def classify_autonomy_zone(payload: dict) -> dict:
         return autonomy.classify(payload)
+
+    @router.get("/eval/suites")
+    def list_eval_suites() -> list[dict]:
+        return eval_runner.list_suites()
+
+    @router.get("/eval/runs")
+    def list_eval_runs(suite_id: str | None = None) -> list[dict]:
+        return eval_runner.list_runs(suite_id=suite_id)
+
+    @router.post("/eval/suites/{suite_id}/run")
+    def run_eval_suite(suite_id: str) -> dict:
+        try:
+            return eval_runner.run(suite_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     @router.get("/memory")
     def list_memory() -> list[dict]:

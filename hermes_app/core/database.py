@@ -68,6 +68,15 @@ class Database:
                     created_at TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS eval_runs (
+                    id TEXT PRIMARY KEY,
+                    suite_id TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    score REAL NOT NULL,
+                    results_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS reminders (
                     id TEXT PRIMARY KEY,
                     title TEXT NOT NULL,

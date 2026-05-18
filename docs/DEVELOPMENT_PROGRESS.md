@@ -189,7 +189,12 @@
   - 验证：`GET /api/autonomy/zones`、`POST /api/autonomy/classify` 可用
   - 验证：客户端自治面板可查看 Green/Yellow/Red 规则
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，47 passed
-- [ ] Eval Runner v1
+- [x] Eval Runner v1
+  - 验证：`eval_runs` 可记录评测套件运行结果
+  - 验证：内置 `autonomy.zone.basic` 套件覆盖 Green/Yellow/Red 三类边界
+  - 验证：`GET /api/eval/suites`、`POST /api/eval/suites/{suite_id}/run`、`GET /api/eval/runs` 可用
+  - 验证：客户端评测面板可运行并查看评测记录
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，49 passed
 - [ ] Growth Log v1
 - [ ] Yellow Zone 确认页
 - [ ] Red Zone 拦截强化
@@ -231,5 +236,6 @@
   - commit：`7eb185d stage 5 idea to scene v1`
   - commit：`90b237f stage 5 inspiration preference candidate v1`
   - commit：`03ea6c3 stage 6 autonomy zone classifier v1`
+  - commit：`待提交 stage 6 eval runner v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

@@ -18,6 +18,7 @@ from hermes_app.services.actions import ActionService
 from hermes_app.services.attention import AttentionPolicy
 from hermes_app.services.autonomy import AutonomyZoneClassifier
 from hermes_app.services.context_signals import ContextSignalService
+from hermes_app.services.evals import EvalRunner
 from hermes_app.services.files import FileService
 from hermes_app.services.images import ImageService
 from hermes_app.services.inspiration import InspirationService
@@ -48,6 +49,7 @@ memory_service = MemoryService(db)
 reminder_service = ReminderService(db)
 wardrobe_service = WardrobeService(db)
 autonomy_classifier = AutonomyZoneClassifier()
+eval_runner = EvalRunner(db, autonomy_classifier)
 tool_registry = ToolRegistry(db, memory_service, reminder_service, wardrobe_service)
 action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
@@ -92,6 +94,7 @@ app.include_router(
     create_api_router(
         orchestrator,
         autonomy_classifier,
+        eval_runner,
         memory_service,
         action_service,
         skill_registry,

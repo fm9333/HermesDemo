@@ -33,6 +33,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="todos"' in response.text
     assert 'data-panel="prdDrafts"' in response.text
     assert 'data-panel="autonomy"' in response.text
+    assert 'data-panel="evalRuns"' in response.text
     assert 'id="panel-action"' in response.text
 
 
@@ -133,6 +134,21 @@ def test_autonomy_zone_api():
     assert classified.status_code == 200
     assert classified.json()["zone"] == "red"
     assert classified.json()["allowed_actions"] == ["suggest_only"]
+
+
+def test_eval_runner_api():
+    suites = client.get("/api/eval/suites")
+    assert suites.status_code == 200
+    assert any(item["suite_id"] == "autonomy.zone.basic" for item in suites.json())
+
+    run = client.post("/api/eval/suites/autonomy.zone.basic/run")
+    assert run.status_code == 200
+    assert run.json()["status"] == "passed"
+    assert run.json()["score"] == 1
+
+    runs = client.get("/api/eval/runs?suite_id=autonomy.zone.basic")
+    assert runs.status_code == 200
+    assert any(item["id"] == run.json()["id"] for item in runs.json())
 
 
 def test_tools_api_lists_action_tool_registry():
