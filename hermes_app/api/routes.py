@@ -6,6 +6,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from hermes_app.schemas import ChatRequest, ChatResponse, ConfirmActionResponse, MemoryCandidate
 from hermes_app.services.actions import ActionService
+from hermes_app.services.autonomy import AutonomyZoneClassifier
 from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.files import FileService
 from hermes_app.services.images import ImageService
@@ -41,6 +42,7 @@ def _deserialize_idea(row: dict) -> dict:
 
 def create_api_router(
     orchestrator: HermesOrchestrator,
+    autonomy: AutonomyZoneClassifier,
     memory: MemoryService,
     actions: ActionService,
     skills: SkillRegistry,
@@ -73,6 +75,14 @@ def create_api_router(
         intent = orchestrator.intent_router.route(request.message)
         risk_level = orchestrator.safety.classify(request.message, intent)
         return orchestrator.task_decomposer.decompose(request.message, intent, risk_level).model_dump()
+
+    @router.get("/autonomy/zones")
+    def list_autonomy_zones() -> list[dict]:
+        return autonomy.list_zones()
+
+    @router.post("/autonomy/classify")
+    def classify_autonomy_zone(payload: dict) -> dict:
+        return autonomy.classify(payload)
 
     @router.get("/memory")
     def list_memory() -> list[dict]:

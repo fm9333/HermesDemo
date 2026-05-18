@@ -34,6 +34,7 @@ const panelLabels = {
   files: "文件",
   images: "图片",
   tools: "工具",
+  autonomy: "自治",
   logs: "日志",
 };
 
@@ -56,6 +57,7 @@ const panelEndpoints = {
   files: "/api/files",
   images: "/api/images",
   tools: "/api/tools",
+  autonomy: "/api/autonomy/zones",
   logs: "/api/logs",
 };
 

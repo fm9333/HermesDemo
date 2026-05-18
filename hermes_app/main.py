@@ -16,6 +16,7 @@ from hermes_app.core.config import get_settings
 from hermes_app.core.database import Database
 from hermes_app.services.actions import ActionService
 from hermes_app.services.attention import AttentionPolicy
+from hermes_app.services.autonomy import AutonomyZoneClassifier
 from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.files import FileService
 from hermes_app.services.images import ImageService
@@ -46,6 +47,7 @@ db.init()
 memory_service = MemoryService(db)
 reminder_service = ReminderService(db)
 wardrobe_service = WardrobeService(db)
+autonomy_classifier = AutonomyZoneClassifier()
 tool_registry = ToolRegistry(db, memory_service, reminder_service, wardrobe_service)
 action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
@@ -89,6 +91,7 @@ app.mount("/static", StaticFiles(directory=str(WEB_DIR / "static")), name="stati
 app.include_router(
     create_api_router(
         orchestrator,
+        autonomy_classifier,
         memory_service,
         action_service,
         skill_registry,

@@ -1126,3 +1126,45 @@ python -m pytest -q
 ```text
 90b237f stage 5 inspiration preference candidate v1
 ```
+
+## 2026-05-18 阶段 6 Autonomy Zone Classifier v1 评审
+
+范围：
+
+```text
+AutonomyZoneClassifier
+GET /api/autonomy/zones
+POST /api/autonomy/classify
+客户端自治规则面板
+Autonomy Zone 服务和 API 测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-6-autonomy-zone-classifier-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+Autonomy Zone Classifier v1 明确区分 Green、Yellow、Red 三类自主边界。
+Green Zone 只允许低风险优化进入 Draft 或候选区。
+Yellow Zone 对数据、偏好、提醒策略等影响用户体验的变更要求确认。
+Red Zone 对高风险、敏感、外发或不可逆动作只允许 suggest_only，不允许自主执行。
+该分类器将作为后续 Eval Runner、Growth Log 和自主优化确认页的安全基础。
+```
+
+提交记录：
+
+```text
+待提交 stage 6 autonomy zone classifier v1
+```

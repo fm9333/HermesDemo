@@ -32,6 +32,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="sceneFeedback"' in response.text
     assert 'data-panel="todos"' in response.text
     assert 'data-panel="prdDrafts"' in response.text
+    assert 'data-panel="autonomy"' in response.text
     assert 'id="panel-action"' in response.text
 
 
@@ -118,6 +119,20 @@ def test_decompose_api():
     data = response.json()
     assert data["intent"] == "memory_update"
     assert data["steps"][0]["target"] == "memory_candidate_pipeline"
+
+
+def test_autonomy_zone_api():
+    zones = client.get("/api/autonomy/zones")
+    assert zones.status_code == 200
+    assert {item["zone"] for item in zones.json()} == {"green", "yellow", "red"}
+
+    classified = client.post(
+        "/api/autonomy/classify",
+        json={"proposal_type": "tool_plan", "risk_level": "low", "summary": "导出并分享隐私数据"},
+    )
+    assert classified.status_code == 200
+    assert classified.json()["zone"] == "red"
+    assert classified.json()["allowed_actions"] == ["suggest_only"]
 
 
 def test_tools_api_lists_action_tool_registry():

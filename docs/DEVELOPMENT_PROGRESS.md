@@ -180,6 +180,21 @@
   - 验证：客户端 Idea 面板可生成“记住偏好”确认卡
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，45 passed
 
+## 阶段 6：安全、Eval、自主进化
+
+- [x] Autonomy Zone Classifier v1
+  - 验证：Green Zone 低风险优化可自动进入 Draft 或候选区
+  - 验证：Yellow Zone 影响数据/偏好/提醒策略时必须确认
+  - 验证：Red Zone 高风险、敏感、外发或不可逆动作只能建议，不能自主执行
+  - 验证：`GET /api/autonomy/zones`、`POST /api/autonomy/classify` 可用
+  - 验证：客户端自治面板可查看 Green/Yellow/Red 规则
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，47 passed
+- [ ] Eval Runner v1
+- [ ] Growth Log v1
+- [ ] Yellow Zone 确认页
+- [ ] Red Zone 拦截强化
+- [ ] 安全策略设置
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库
@@ -215,5 +230,6 @@
   - commit：`6164f3b stage 5 idea to prd v1`
   - commit：`7eb185d stage 5 idea to scene v1`
   - commit：`90b237f stage 5 inspiration preference candidate v1`
+  - commit：`待提交 stage 6 autonomy zone classifier v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
