@@ -373,6 +373,7 @@
   - commit：`5330923 stage 8 data export v1`
   - commit：`7641b3b stage 8 crash recovery v1`
   - commit：`f98a2ad stage 8 pyinstaller packaging v1`
+  - commit：`2953dec verify pyinstaller desktop build`
   - commit：`acdfee4 stage 8 update strategy v1`
   - commit：`b753ec1 stage 8 performance indexes v1`
   - commit：`b35e163 stage 8 e2e release flow v1`
