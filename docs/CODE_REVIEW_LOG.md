@@ -381,5 +381,5 @@ WardrobeService 为后续图片识别、穿搭建议和 Scene 联动提供服务
 提交记录：
 
 ```text
-待提交：stage-2-wardrobe-center-v1
+ee3659d stage 2 wardrobe center v1
 ```
