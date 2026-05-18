@@ -177,3 +177,43 @@ Open-Meteo Forecast API: https://open-meteo.com/en/docs
 ```text
 c67d12c stage 2 weather provider v1
 ```
+
+## 2026-05-18 阶段 2 Task Decomposer v1 评审
+
+范围：
+
+```text
+TaskPlan / TaskStep schema
+TaskDecomposer 服务
+/api/decompose
+/api/chat task_plan 输出
+客户端 Task Plan 展示
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-2-task-decomposer-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+每个对话请求现在都有结构化任务计划。
+中风险及以上步骤会标记 requires_confirmation。
+天气、记忆、提醒、衣橱、灵感和 MVP Skills 都有明确步骤。
+Task Plan 只描述和规划，不直接绕过 Action Gate。
+```
+
+提交记录：
+
+```text
+待提交：stage-2-task-decomposer-v1
+```

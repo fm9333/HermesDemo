@@ -71,6 +71,16 @@ function addMessage(role, body, data) {
       });
     }
 
+    if (data.task_plan) {
+      cards.insertAdjacentHTML(
+        "beforeend",
+        `<div class="result-card">
+          <p class="card-title">Task Plan · ${escapeHtml(data.task_plan.intent)}</p>
+          <pre>${asJson(data.task_plan)}</pre>
+        </div>`
+      );
+    }
+
     if (data.memory_candidates?.length) {
       data.memory_candidates.forEach((candidate) => {
         cards.insertAdjacentHTML(

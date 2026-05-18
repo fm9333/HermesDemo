@@ -11,6 +11,7 @@ from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.safety import SafetyService
 from hermes_app.services.skills import SkillRegistry
+from hermes_app.services.task_decomposer import TaskDecomposer
 from hermes_app.services.weather import WeatherService
 
 
@@ -18,6 +19,7 @@ class HermesOrchestrator:
     def __init__(
         self,
         intent_router: IntentRouter,
+        task_decomposer: TaskDecomposer,
         safety: SafetyService,
         memory: MemoryService,
         actions: ActionService,
@@ -27,6 +29,7 @@ class HermesOrchestrator:
         logs: ExecutionLogService,
     ):
         self.intent_router = intent_router
+        self.task_decomposer = task_decomposer
         self.safety = safety
         self.memory = memory
         self.actions = actions
@@ -39,6 +42,7 @@ class HermesOrchestrator:
         message = request.message.strip()
         intent = self.intent_router.route(message)
         risk_level = self.safety.classify(message, intent)
+        task_plan = self.task_decomposer.decompose(message, intent, risk_level)
 
         cards: list[dict] = []
         memory_candidates = []
@@ -126,6 +130,7 @@ class HermesOrchestrator:
             "reply": reply,
             "intent": intent,
             "risk_level": risk_level,
+            "task_plan": task_plan.model_dump(),
             "cards": cards,
             "memory_candidates": [candidate.model_dump() for candidate in memory_candidates],
             "actions": [action.model_dump() for action in pending_actions],

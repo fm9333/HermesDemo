@@ -35,6 +35,7 @@ class ChatResponse(BaseModel):
     reply: str
     intent: str
     risk_level: RiskLevel
+    task_plan: "TaskPlan | None" = None
     cards: list[dict[str, Any]] = Field(default_factory=list)
     memory_candidates: list[MemoryCandidate] = Field(default_factory=list)
     actions: list[PendingAction] = Field(default_factory=list)
@@ -58,3 +59,20 @@ class SkillContract(BaseModel):
     requires_eval_before_activation: bool
     rollback_supported: bool
 
+
+class TaskStep(BaseModel):
+    id: str
+    title: str
+    kind: str
+    target: str
+    risk_level: RiskLevel
+    requires_confirmation: bool = False
+    status: Literal["planned", "blocked", "ready"] = "planned"
+
+
+class TaskPlan(BaseModel):
+    plan_id: str
+    intent: str
+    summary: str
+    risk_level: RiskLevel
+    steps: list[TaskStep]

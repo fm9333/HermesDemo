@@ -52,7 +52,9 @@
 
 - [x] 主对话入口原型
 - [x] Intent Router v1 原型
-- [x] Task Decomposer 占位
+- [x] Task Decomposer v1
+  - 验证：`/api/decompose` 可返回结构化计划；`/api/chat` 响应包含 `task_plan`
+  - 测试：`python -m pytest -q` 通过，11 passed
 - [x] Memory Candidate Pipeline v1 原型
 - [x] 记忆中心原型
 - [x] 提醒创建原型
@@ -76,5 +78,6 @@
   - 当前提交点：`stage-1-desktop-shell-local-service`
   - commit：`91aeb74 stage 1 desktop logging`
   - commit：`c67d12c stage 2 weather provider v1`
+  - 当前提交点：`stage-2-task-decomposer-v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

@@ -29,6 +29,12 @@ def create_api_router(
     def chat(request: ChatRequest) -> ChatResponse:
         return orchestrator.handle_chat(request)
 
+    @router.post("/decompose")
+    def decompose(request: ChatRequest) -> dict:
+        intent = orchestrator.intent_router.route(request.message)
+        risk_level = orchestrator.safety.classify(request.message, intent)
+        return orchestrator.task_decomposer.decompose(request.message, intent, risk_level).model_dump()
+
     @router.get("/memory")
     def list_memory() -> list[dict]:
         return memory.list()

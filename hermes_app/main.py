@@ -22,6 +22,7 @@ from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.safety import SafetyService
 from hermes_app.services.skills import SkillRegistry
+from hermes_app.services.task_decomposer import TaskDecomposer
 from hermes_app.services.weather import WeatherService
 
 
@@ -36,6 +37,7 @@ log_service = ExecutionLogService(db)
 weather_service = WeatherService(db)
 orchestrator = HermesOrchestrator(
     intent_router=IntentRouter(),
+    task_decomposer=TaskDecomposer(),
     safety=SafetyService(),
     memory=memory_service,
     actions=action_service,

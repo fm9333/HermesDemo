@@ -21,6 +21,7 @@ def test_reminder_action_flow():
     assert response.status_code == 200
     data = response.json()
     assert data["intent"] == "create_reminder"
+    assert data["task_plan"]["intent"] == "create_reminder"
     assert data["actions"][0]["action_type"] == "reminder.create"
 
     action_id = data["actions"][0]["id"]
@@ -62,5 +63,14 @@ def test_weather_chat_flow(monkeypatch):
     assert response.status_code == 200
     data = response.json()
     assert data["intent"] == "weather_query"
+    assert data["task_plan"]["steps"][1]["target"] == "weather.lookup"
     assert data["cards"][0]["type"] == "weather"
     assert "北京 当前 20°C" in data["reply"]
+
+
+def test_decompose_api():
+    response = client.post("/api/decompose", json={"message": "记住我喜欢科技新闻"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["intent"] == "memory_update"
+    assert data["steps"][0]["target"] == "memory_candidate_pipeline"
