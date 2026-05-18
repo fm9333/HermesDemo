@@ -63,9 +63,13 @@
 
 ## GitHub / SVN 同步状态
 
-- [ ] 当前目录初始化 Git 仓库
-- [ ] 绑定远程仓库 `https://github.com/fm9333/HermesDemo.git`
-- [ ] 首次提交
-- [ ] 每个已验证小功能单独提交
+- [x] 当前目录初始化 Git 仓库
+- [x] 绑定远程仓库 `https://github.com/fm9333/HermesDemo.git`
+- [x] 首次提交
+  - commit：`f3e3241 stage 1 desktop shell and local service`
+- [x] 推送 GitHub `main`
+  - 远程：`origin/main`
+- [x] 每个已验证小功能单独提交
+  - 当前提交点：`stage-1-desktop-shell-local-service`
 
-备注：当前目录还不是 Git 仓库；等你新项目目录创建完成后，需要在目标目录初始化并绑定远程仓库。当前已形成第一个可提交点：`stage-1-desktop-shell-local-service`。
+备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

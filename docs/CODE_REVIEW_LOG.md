@@ -79,5 +79,11 @@ DesktopServiceManager 会恢复环境变量，避免测试污染。
 ```text
 当前全局 Python 环境中的 PySide6 会输出 NumPy 2.x 兼容性警告；requirements-desktop.txt 已固定 numpy<2，正式桌面环境需按该依赖安装。
 尚未实现桌面日志滚动文件。
-尚未初始化 Git 仓库和推送 GitHub。
+已初始化 Git 仓库并推送 GitHub main 分支。
+```
+
+提交记录：
+
+```text
+f3e3241 stage 1 desktop shell and local service
 ```
