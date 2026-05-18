@@ -88,6 +88,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="updates"' in response.text
     assert 'data-panel="performance"' in response.text
     assert 'data-panel="providers"' in response.text
+    assert 'data-panel="personalSkills"' in response.text
     assert 'data-panel="llmProviders"' in response.text
     assert 'data-panel="prompts"' in response.text
     assert 'data-panel="llmCalls"' in response.text
@@ -529,7 +530,8 @@ def test_yellow_zone_pending_queue():
     assert rejected.json()["status"] == "rejected"
 
 
-def test_skill_run_api_records_result():
+def test_skill_run_api_records_result(monkeypatch):
+    monkeypatch.setattr(llm_client, "_post_json", lambda provider, payload: (_ for _ in ()).throw(RuntimeError("skip llm")))
     response = client.post("/api/skills/content.list_generate/run", json={"message": "帮我生成上线清单"})
     assert response.status_code == 200
     data = response.json()
@@ -538,6 +540,44 @@ def test_skill_run_api_records_result():
 
     runs = client.get("/api/skills/runs").json()
     assert any(run["skill_id"] == "content.list_generate" for run in runs)
+
+
+def test_personal_skill_api_flow(monkeypatch):
+    monkeypatch.setattr(llm_client, "_post_json", lambda provider, payload: (_ for _ in ()).throw(RuntimeError("skip llm")))
+    skill_run = client.post("/api/skills/content.list_generate/run", json={"message": "帮我生成上线清单"})
+    assert skill_run.status_code == 200
+
+    created = client.post(
+        "/api/personal-skills/drafts",
+        json={"source_run_id": skill_run.json()["run_id"], "title": "上线清单个人技能"},
+    )
+    assert created.status_code == 200
+    draft = created.json()
+    assert draft["status"] == "draft"
+    assert draft["eval_status"] == "not_run"
+
+    blocked = client.post(f"/api/personal-skills/{draft['id']}/activate")
+    assert blocked.status_code == 409
+
+    evaluated = client.post(f"/api/personal-skills/{draft['id']}/evaluate")
+    assert evaluated.status_code == 200
+    assert evaluated.json()["eval_status"] == "passed"
+
+    activated = client.post(f"/api/personal-skills/{draft['id']}/activate")
+    assert activated.status_code == 200
+    assert activated.json()["status"] == "active"
+
+    listed = client.get("/api/personal-skills?status=active")
+    assert listed.status_code == 200
+    assert any(item["id"] == draft["id"] for item in listed.json())
+
+    versions = client.get(f"/api/personal-skills/{draft['id']}/versions")
+    assert versions.status_code == 200
+    assert versions.json()[0]["version"] == 1
+
+    archived = client.post(f"/api/personal-skills/{draft['id']}/archive")
+    assert archived.status_code == 200
+    assert archived.json()["status"] == "archived"
 
 
 def test_file_upload_api():

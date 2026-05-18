@@ -14,6 +14,7 @@ MIGRATIONS = (
     ("0004_release_backups", "Release readiness support for local backup and restore"),
     ("0005_performance_indexes", "Indexes for common status, source, and history queries"),
     ("0006_llm_provider_config", "OpenAI-compatible LLM provider configuration and prompt library support"),
+    ("0007_personal_skill_drafts", "Personal skill draft, eval, activation, and lifecycle records"),
 )
 
 
@@ -277,6 +278,37 @@ class Database:
                     created_at TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS personal_skills (
+                    id TEXT PRIMARY KEY,
+                    skill_id TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    description TEXT NOT NULL,
+                    autonomy_zone TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    source_run_id TEXT,
+                    prompt_template TEXT NOT NULL,
+                    output_contract_json TEXT NOT NULL,
+                    eval_status TEXT NOT NULL,
+                    eval_report_json TEXT NOT NULL,
+                    version INTEGER NOT NULL,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    activated_at TEXT,
+                    archived_at TEXT
+                );
+
+                CREATE TABLE IF NOT EXISTS personal_skill_versions (
+                    id TEXT PRIMARY KEY,
+                    personal_skill_id TEXT NOT NULL,
+                    version INTEGER NOT NULL,
+                    status TEXT NOT NULL,
+                    prompt_template TEXT NOT NULL,
+                    output_contract_json TEXT NOT NULL,
+                    eval_report_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(personal_skill_id) REFERENCES personal_skills(id)
+                );
+
                 CREATE TABLE IF NOT EXISTS files (
                     id TEXT PRIMARY KEY,
                     filename TEXT NOT NULL,
@@ -391,6 +423,8 @@ class Database:
                     ON map_places(query, created_at);
                 CREATE INDEX IF NOT EXISTS idx_llm_calls_provider_created
                     ON llm_calls(provider_id, created_at);
+                CREATE INDEX IF NOT EXISTS idx_personal_skills_status_created
+                    ON personal_skills(status, created_at);
                 """
             )
             self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")

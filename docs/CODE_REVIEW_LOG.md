@@ -2104,3 +2104,43 @@ python -m pytest -q
 ```text
 146a3e0 stage 10 gap audit and cloud file guard
 ```
+
+## 2026-05-18 阶段 11 Personal Skill Draft v1 评审
+
+范围：
+```text
+personal_skills schema
+personal_skill_versions schema
+PersonalSkillService
+Personal Skill API
+客户端个人技能面板
+服务层与 API 测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-11-personal-skill-drafts-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest tests\test_personal_skills.py tests\test_api.py -q
+python -m pytest -q
+```
+
+评审结论：
+```text
+Personal Skill Draft v1 建立了个人技能从草案、评测、激活到归档的第一条可审计生命周期。
+草案可手动创建，也可从历史 Skill Run 沉淀，保留来源输入和输出样例。
+激活前必须通过基础评测门禁；Red Zone 技能不能自动激活。
+版本表记录草案创建时的 Prompt、输出契约和评测报告，为后续 Skill Patch、版本对比和回滚打基础。
+客户端个人技能面板已支持新建、评测、激活、归档，但 Skill Curator、自动 Patch 生成和运行时动态调用仍是后续 P0。
+```
+
+测试结果：
+```text
+110 passed, 2 warnings
+```

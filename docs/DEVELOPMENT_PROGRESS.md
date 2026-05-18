@@ -359,6 +359,21 @@
   - 验证：本地 OpenAI-compatible Provider 可处理本地文件上下文
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，107 passed
 
+## 阶段 11：Personal Skill Draft
+
+- [x] Personal Skill Draft 数据模型 v1
+  - 验证：`personal_skills` 可记录草案、公开 skill_id、描述、自治分区、来源 Skill Run、Prompt、输出契约、评测状态、版本、生效/归档时间
+  - 验证：`personal_skill_versions` 可记录版本快照
+- [x] Personal Skill API v1
+  - 验证：`GET /api/personal-skills`、`POST /api/personal-skills/drafts`、`GET /api/personal-skills/{id}` 可用
+  - 验证：`POST /api/personal-skills/{id}/evaluate` 可运行基础门禁
+  - 验证：未通过评测时 `POST /api/personal-skills/{id}/activate` 返回 409，不允许激活
+  - 验证：评测通过后可激活，激活后可归档，版本接口可查看历史
+- [x] Personal Skill 客户端面板 v1
+  - 验证：左侧导航新增“个人”面板
+  - 验证：客户端可新建草案、评测、激活、归档
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，110 passed
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库

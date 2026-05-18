@@ -23,6 +23,7 @@ from hermes_app.services.memory import MemoryService
 from hermes_app.services.news import NewsService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
+from hermes_app.services.personal_skills import PersonalSkillService
 from hermes_app.services.prd_drafts import PrdDraftService
 from hermes_app.services.proactive import ProactiveSuggestionService
 from hermes_app.services.prompt_library import PromptLibrary
@@ -79,6 +80,7 @@ def create_api_router(
     actions: ActionService,
     skills: SkillRegistry,
     skill_runtime: SkillRuntime,
+    personal_skills: PersonalSkillService,
     todos: TodoService,
     prd_drafts: PrdDraftService,
     weather: WeatherService,
@@ -636,6 +638,66 @@ def create_api_router(
     @router.get("/skills")
     def list_skills() -> list[dict]:
         return [skill.model_dump() for skill in skills.list()]
+
+    @router.get("/personal-skills")
+    def list_personal_skills(status: str | None = None) -> list[dict]:
+        return personal_skills.list(status=status)
+
+    @router.post("/personal-skills/drafts")
+    def create_personal_skill_draft(payload: dict) -> dict:
+        try:
+            if payload.get("source_run_id"):
+                return personal_skills.create_from_skill_run(
+                    payload["source_run_id"],
+                    title=payload.get("title"),
+                )
+            return personal_skills.create_draft(
+                title=payload.get("title", ""),
+                description=payload.get("description", ""),
+                prompt_template=payload.get("prompt_template", ""),
+                output_contract=payload.get("output_contract", {}),
+                autonomy_zone=payload.get("autonomy_zone", "green"),
+            )
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @router.get("/personal-skills/{skill_id}")
+    def get_personal_skill(skill_id: str) -> dict:
+        skill = personal_skills.get(skill_id)
+        if not skill:
+            raise HTTPException(status_code=404, detail="Personal skill not found.")
+        return skill
+
+    @router.get("/personal-skills/{skill_id}/versions")
+    def list_personal_skill_versions(skill_id: str) -> list[dict]:
+        if not personal_skills.get(skill_id):
+            raise HTTPException(status_code=404, detail="Personal skill not found.")
+        return personal_skills.versions(skill_id)
+
+    @router.post("/personal-skills/{skill_id}/evaluate")
+    def evaluate_personal_skill(skill_id: str) -> dict:
+        try:
+            return personal_skills.evaluate(skill_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.post("/personal-skills/{skill_id}/activate")
+    def activate_personal_skill(skill_id: str) -> dict:
+        try:
+            return personal_skills.activate(skill_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+    @router.post("/personal-skills/{skill_id}/archive")
+    def archive_personal_skill(skill_id: str) -> dict:
+        try:
+            return personal_skills.archive(skill_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     @router.post("/skills/{skill_id}/run")
     def run_skill(skill_id: str, request: ChatRequest) -> dict:

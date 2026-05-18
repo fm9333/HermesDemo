@@ -36,6 +36,7 @@ const panelLabels = {
   maps: "\u5730\u56fe",
   wardrobe: "衣橱",
   skills: "技能",
+  personalSkills: "个人技能",
   llmProviders: "模型",
   prompts: "提示词",
   llmCalls: "模型调用",
@@ -80,6 +81,7 @@ const panelEndpoints = {
   maps: "/api/maps/places",
   wardrobe: "/api/wardrobe",
   skills: "/api/skills",
+  personalSkills: "/api/personal-skills",
   llmProviders: "/api/llm/providers",
   prompts: "/api/prompts",
   llmCalls: "/api/llm/calls",
@@ -115,6 +117,7 @@ const panelActions = {
   triggerRuns: { label: "运行触发", endpoint: "/api/triggers/run" },
   evalRuns: { label: "运行评测", endpoint: "/api/eval/suites/autonomy.zone.basic/run" },
   llmProviders: { label: "添加模型", endpoint: "/api/llm/providers" },
+  personalSkills: { label: "新建草案", endpoint: "/api/personal-skills/drafts" },
 };
 
 function escapeHtml(value) {
@@ -269,6 +272,20 @@ async function runPanelAction() {
       is_default: true,
     });
   }
+  if (activePanel === "personalSkills") {
+    const title = window.prompt("个人技能名称");
+    if (!title?.trim()) return;
+    const description = window.prompt("技能说明", "从重复任务中沉淀的个人技能草案");
+    const promptTemplate = window.prompt("技能提示词", "请按用户偏好稳定输出结构化结果");
+    if (!promptTemplate?.trim()) return;
+    options.body = JSON.stringify({
+      title: title.trim(),
+      description: description || "",
+      prompt_template: promptTemplate.trim(),
+      autonomy_zone: "green",
+      output_contract: { format: "json", required: ["title"] },
+    });
+  }
   const data = await requestJson(action.endpoint, options);
   addMessage("assistant", `${action.label}完成`, { cards: [{ title: action.label, payload: data }] });
   await loadPanel(activePanel);
@@ -363,6 +380,24 @@ async function toggleLlmProvider(providerId, status) {
   await loadPanel(activePanel);
 }
 
+async function evaluatePersonalSkill(skillId) {
+  const data = await requestJson(`/api/personal-skills/${skillId}/evaluate`, { method: "POST" });
+  addMessage("assistant", `个人技能评测：${data.eval_status}`, { cards: [{ title: "个人技能评测", payload: data }] });
+  await loadPanel(activePanel);
+}
+
+async function activatePersonalSkill(skillId) {
+  const data = await requestJson(`/api/personal-skills/${skillId}/activate`, { method: "POST" });
+  addMessage("assistant", `个人技能已激活：${data.title}`);
+  await loadPanel(activePanel);
+}
+
+async function archivePersonalSkill(skillId) {
+  const data = await requestJson(`/api/personal-skills/${skillId}/archive`, { method: "POST" });
+  addMessage("assistant", `个人技能已归档：${data.title}`);
+  await loadPanel(activePanel);
+}
+
 async function restoreBackup(backupId) {
   if (!window.confirm("\u786e\u8ba4\u6062\u590d\u8fd9\u4e2a\u5907\u4efd\uff1f")) return;
   const data = await requestJson(`/api/backups/${backupId}/restore`, { method: "POST" });
@@ -443,6 +478,15 @@ function renderPanelItem(item, panel) {
       </button>`
     );
   }
+  if (panel === "personalSkills") {
+    if (item.status === "draft") {
+      controls.push(`<button class="action-button" data-personal-skill-eval="${item.id}">评测</button>`);
+      controls.push(`<button class="action-button" data-personal-skill-activate="${item.id}">激活</button>`);
+    }
+    if (item.status !== "archived") {
+      controls.push(`<button class="action-button reject" data-personal-skill-archive="${item.id}">归档</button>`);
+    }
+  }
   if (panel === "backups") {
     controls.push(`<button class="action-button reject" data-restore-backup="${item.id}">\u6062\u590d</button>`);
   }
@@ -516,6 +560,9 @@ document.addEventListener("click", async (event) => {
   const llmDefaultId = event.target.dataset?.llmDefault;
   const llmToggleId = event.target.dataset?.llmToggle;
   const llmStatus = event.target.dataset?.llmStatus;
+  const personalSkillEvalId = event.target.dataset?.personalSkillEval;
+  const personalSkillActivateId = event.target.dataset?.personalSkillActivate;
+  const personalSkillArchiveId = event.target.dataset?.personalSkillArchive;
   const restoreBackupId = event.target.dataset?.restoreBackup;
   const completeTodoId = event.target.dataset?.completeTodo;
   const panel = event.target.dataset?.panel;
@@ -536,6 +583,9 @@ document.addEventListener("click", async (event) => {
     if (llmTestId) await testLlmProvider(llmTestId);
     if (llmDefaultId) await setDefaultLlmProvider(llmDefaultId);
     if (llmToggleId) await toggleLlmProvider(llmToggleId, llmStatus);
+    if (personalSkillEvalId) await evaluatePersonalSkill(personalSkillEvalId);
+    if (personalSkillActivateId) await activatePersonalSkill(personalSkillActivateId);
+    if (personalSkillArchiveId) await archivePersonalSkill(personalSkillArchiveId);
     if (restoreBackupId) await restoreBackup(restoreBackupId);
     if (completeTodoId) await completeTodo(completeTodoId);
     if (panel) await loadPanel(panel);
