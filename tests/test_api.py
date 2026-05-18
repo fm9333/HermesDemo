@@ -162,6 +162,12 @@ def test_image_upload_api():
     images = client.get("/api/images").json()
     assert any(item["id"] == data["id"] for item in images)
 
+    recognized = client.post(f"/api/images/{data['id']}/recognize-clothing")
+    assert recognized.status_code == 200
+    result = recognized.json()
+    assert result["candidate"]["category"] == "outerwear"
+    assert result["action"]["action_type"] == "wardrobe.add"
+
 
 def test_wardrobe_action_and_crud_flow():
     response = client.post("/api/chat", json={"message": "把这件黑色外套加入衣橱"})

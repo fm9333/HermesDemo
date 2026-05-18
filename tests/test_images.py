@@ -26,3 +26,16 @@ def test_image_service_saves_image_metadata(tmp_path):
     assert item["height"] == 3
     assert item["status"] == "uploaded"
 
+
+def test_image_service_recognizes_basic_clothing_candidate(tmp_path):
+    db = Database(tmp_path / "images.db")
+    db.init()
+    files = FileService(db, root=tmp_path / "store")
+    service = ImageService(db, files)
+
+    item = service.save_upload("coat.png", "image/png", _png_bytes())
+    candidate = service.recognize_clothing(item["id"])
+
+    assert candidate["category"] == "outerwear"
+    assert candidate["color"] == "红色"
+    assert candidate["wardrobe_payload"]["name"] == "红色外套"

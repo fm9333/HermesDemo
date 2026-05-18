@@ -232,6 +232,20 @@ def create_api_router(
             raise HTTPException(status_code=404, detail="Image not found.")
         return item
 
+    @router.post("/images/{image_id}/recognize-clothing")
+    def recognize_clothing(image_id: str) -> dict:
+        try:
+            candidate = images.recognize_clothing(image_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        action = actions.create_pending(
+            "wardrobe.add",
+            candidate["wardrobe_payload"],
+            "medium",
+            "图片衣物识别结果需要确认后加入衣橱。",
+        )
+        return {"candidate": candidate, "action": action.model_dump()}
+
     @router.get("/logs")
     def list_logs() -> list[dict]:
         return logs.list()

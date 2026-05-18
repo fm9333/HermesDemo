@@ -103,7 +103,10 @@
   - 验证：`FileService.extract_text` 支持 PDF/DOCX
   - 验证：`/api/files/{file_id}/summarize` 统一走 TXT/MD/PDF/DOCX 提取
   - 测试：`python -m pytest -q` 通过，30 passed
-- [ ] image.clothing_recognition 真实图片识别
+- [x] image.clothing_recognition v1
+  - 验证：可基于图片像素颜色和文件名生成衣橱候选
+  - 验证：识别结果通过 `wardrobe.add` 创建待确认 Action
+  - 测试：`python -m pytest -q` 通过，31 passed
 - [x] work.todo_extract v1
   - 验证：可从中文文本中提取“请、需要、确认、修复”等待办候选
   - 测试：`python -m pytest -q` 通过，27 passed
@@ -135,5 +138,6 @@
   - commit：`9831ab9 stage 3 work todo extract v1`
   - commit：`1c6e89d stage 3 content list generate v1`
   - commit：`c9f3503 stage 3 document summarize pdf docx v1`
+  - 当前提交点：`stage-3-image-clothing-recognition-v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

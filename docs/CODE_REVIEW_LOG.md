@@ -656,3 +656,41 @@ PDF v1 使用 pypdf，支持文本层 PDF；扫描版 PDF OCR 不在本次范围
 ```text
 c9f3503 stage 3 document summarize pdf docx v1
 ```
+
+## 2026-05-18 阶段 3 image.clothing_recognition v1 评审
+
+范围：
+
+```text
+ImageService.recognize_clothing
+POST /api/images/{image_id}/recognize-clothing
+wardrobe.add 待确认 Action
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-3-image-clothing-recognition-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+v1 使用本地像素颜色和文件名启发式识别，不调用云端视觉模型。
+识别结果只生成衣橱候选，不直接写入衣橱。
+加入衣橱必须通过 Action Gate 确认，符合 Yellow Zone 策略。
+后续可替换为真实视觉模型或多模态 LLM。
+```
+
+提交记录：
+
+```text
+待提交：stage-3-image-clothing-recognition-v1
+```
