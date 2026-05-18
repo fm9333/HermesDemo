@@ -7,6 +7,7 @@ from hermes_app.services.actions import ActionService
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
+from hermes_app.services.reminders import ReminderService
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.weather import WeatherService
 
@@ -19,6 +20,7 @@ def create_api_router(
     weather: WeatherService,
     logs: ExecutionLogService,
 ) -> APIRouter:
+    reminder_service = ReminderService(actions.db)
     router = APIRouter(prefix="/api")
 
     @router.get("/health")
@@ -88,8 +90,40 @@ def create_api_router(
         return action.model_dump()
 
     @router.get("/reminders")
-    def list_reminders() -> list[dict]:
-        return orchestrator.actions.db.query("SELECT * FROM reminders ORDER BY created_at DESC LIMIT 80")
+    def list_reminders(status: str | None = None) -> list[dict]:
+        return reminder_service.list(status=status)
+
+    @router.get("/reminders/{reminder_id}")
+    def get_reminder(reminder_id: str) -> dict:
+        item = reminder_service.get(reminder_id)
+        if not item:
+            raise HTTPException(status_code=404, detail="Reminder not found.")
+        return item
+
+    @router.patch("/reminders/{reminder_id}")
+    def update_reminder(reminder_id: str, payload: dict) -> dict:
+        try:
+            return reminder_service.update(
+                reminder_id,
+                title=payload.get("title"),
+                due_at_text=payload.get("due_at_text"),
+            )
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.post("/reminders/{reminder_id}/complete")
+    def complete_reminder(reminder_id: str) -> dict:
+        try:
+            return reminder_service.set_status(reminder_id, "completed")
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.delete("/reminders/{reminder_id}")
+    def delete_reminder(reminder_id: str) -> dict:
+        try:
+            return reminder_service.set_status(reminder_id, "deleted")
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     @router.get("/ideas")
     def list_ideas() -> list[dict]:

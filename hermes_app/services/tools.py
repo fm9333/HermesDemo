@@ -7,12 +7,14 @@ from uuid import uuid4
 from hermes_app.core.database import Database
 from hermes_app.schemas import MemoryCandidate, ToolDefinition
 from hermes_app.services.memory import MemoryService
+from hermes_app.services.reminders import ReminderService
 
 
 class ToolRegistry:
-    def __init__(self, db: Database, memory_service: MemoryService):
+    def __init__(self, db: Database, memory_service: MemoryService, reminder_service: ReminderService | None = None):
         self.db = db
         self.memory_service = memory_service
+        self.reminder_service = reminder_service or ReminderService(db)
         self._definitions = {
             "reminder.create": ToolDefinition(
                 tool_id="reminder.create",
@@ -80,22 +82,12 @@ class ToolRegistry:
         return executor(payload)
 
     def _create_reminder(self, payload: dict) -> dict:
-        reminder_id = str(uuid4())
-        self.db.execute(
-            """
-            INSERT INTO reminders (id, title, due_at_text, source, status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?)
-            """,
-            (
-                reminder_id,
-                payload.get("title", "未命名提醒"),
-                payload.get("due_at_text", "待补充时间"),
-                "hermes",
-                "active",
-                _now(),
-            ),
+        reminder = self.reminder_service.create(
+            payload.get("title", "未命名提醒"),
+            payload.get("due_at_text", "待补充时间"),
+            source="hermes",
         )
-        return {"reminder_id": reminder_id, "status": "created"}
+        return {"reminder_id": reminder.get("id"), "status": "created"}
 
     def _write_memory(self, payload: dict) -> dict:
         candidate = MemoryCandidate(**payload)
@@ -144,4 +136,3 @@ class ToolRegistry:
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
-

@@ -20,6 +20,7 @@ from hermes_app.services.intent_router import IntentRouter
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
+from hermes_app.services.reminders import ReminderService
 from hermes_app.services.safety import SafetyService
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.task_decomposer import TaskDecomposer
@@ -32,7 +33,8 @@ db = Database(settings.database_path)
 db.init()
 
 memory_service = MemoryService(db)
-tool_registry = ToolRegistry(db, memory_service)
+reminder_service = ReminderService(db)
+tool_registry = ToolRegistry(db, memory_service, reminder_service)
 action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
 log_service = ExecutionLogService(db)

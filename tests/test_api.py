@@ -30,7 +30,18 @@ def test_reminder_action_flow():
     assert confirmed.json()["result"]["status"] == "created"
 
     reminders = client.get("/api/reminders").json()
-    assert any("带伞" in item["title"] for item in reminders)
+    reminder = next(item for item in reminders if "带伞" in item["title"])
+
+    detail = client.get(f"/api/reminders/{reminder['id']}")
+    assert detail.status_code == 200
+
+    updated = client.patch(f"/api/reminders/{reminder['id']}", json={"title": "明天带伞和雨衣"})
+    assert updated.status_code == 200
+    assert updated.json()["title"] == "明天带伞和雨衣"
+
+    completed = client.post(f"/api/reminders/{reminder['id']}/complete")
+    assert completed.status_code == 200
+    assert completed.json()["status"] == "completed"
 
 
 def test_memory_action_flow():
