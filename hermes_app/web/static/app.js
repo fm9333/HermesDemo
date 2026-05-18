@@ -26,6 +26,7 @@ const panelLabels = {
   opportunities: "机会",
   recommendations: "推荐",
   ideas: "灵感",
+  prdDrafts: "PRD",
   weather: "天气",
   wardrobe: "衣橱",
   skills: "技能",
@@ -47,6 +48,7 @@ const panelEndpoints = {
   opportunities: "/api/opportunities",
   recommendations: "/api/recommendations",
   ideas: "/api/ideas",
+  prdDrafts: "/api/prd-drafts",
   weather: "/api/weather/cache",
   wardrobe: "/api/wardrobe",
   skills: "/api/skills",
@@ -219,6 +221,12 @@ async function convertIdeaToTodo(ideaId) {
   await loadPanel("todos");
 }
 
+async function convertIdeaToPrd(ideaId) {
+  const data = await requestJson(`/api/ideas/${ideaId}/to-prd`, { method: "POST" });
+  addMessage("assistant", `PRD 草案已生成：${data.title}`);
+  await loadPanel("prdDrafts");
+}
+
 async function completeTodo(todoId) {
   const data = await requestJson(`/api/todos/${todoId}/complete`, { method: "POST" });
   addMessage("assistant", `待办已完成：${data.title}`);
@@ -232,6 +240,7 @@ function renderPanelItem(item, panel) {
   const controls = [];
   if (panel === "ideas") {
     controls.push(`<button class="action-button" data-idea-to-todo="${item.id}">转待办</button>`);
+    controls.push(`<button class="action-button" data-idea-to-prd="${item.id}">转 PRD</button>`);
   }
   if (panel === "todos" && item.status === "open") {
     controls.push(`<button class="action-button" data-complete-todo="${item.id}">完成</button>`);
@@ -293,6 +302,7 @@ document.addEventListener("click", async (event) => {
   const positiveSceneId = event.target.dataset?.sceneFeedbackPositive;
   const misfireSceneId = event.target.dataset?.sceneFeedbackMisfire;
   const ideaToTodoId = event.target.dataset?.ideaToTodo;
+  const ideaToPrdId = event.target.dataset?.ideaToPrd;
   const completeTodoId = event.target.dataset?.completeTodo;
   const panel = event.target.dataset?.panel;
 
@@ -303,6 +313,7 @@ document.addEventListener("click", async (event) => {
     if (positiveSceneId) await recordSceneFeedback(positiveSceneId, "positive");
     if (misfireSceneId) await recordSceneFeedback(misfireSceneId, "misfire");
     if (ideaToTodoId) await convertIdeaToTodo(ideaToTodoId);
+    if (ideaToPrdId) await convertIdeaToPrd(ideaToPrdId);
     if (completeTodoId) await completeTodo(completeTodoId);
     if (panel) await loadPanel(panel);
   } catch (error) {

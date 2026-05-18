@@ -87,6 +87,16 @@ class Database:
                     completed_at TEXT
                 );
 
+                CREATE TABLE IF NOT EXISTS prd_drafts (
+                    id TEXT PRIMARY KEY,
+                    idea_id TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    body TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(idea_id) REFERENCES idea_cards(id)
+                );
+
                 CREATE TABLE IF NOT EXISTS idea_cards (
                     id TEXT PRIMARY KEY,
                     title TEXT NOT NULL,

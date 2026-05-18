@@ -25,6 +25,7 @@ from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
+from hermes_app.services.prd_drafts import PrdDraftService
 from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
 from hermes_app.services.scenes import SceneService
@@ -50,6 +51,7 @@ action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
 skill_runtime = SkillRuntime(db, skill_registry)
 todo_service = TodoService(db)
+prd_draft_service = PrdDraftService(db)
 log_service = ExecutionLogService(db)
 weather_service = WeatherService(db)
 file_service = FileService(db)
@@ -92,6 +94,7 @@ app.include_router(
         skill_registry,
         skill_runtime,
         todo_service,
+        prd_draft_service,
         weather_service,
         file_service,
         image_service,

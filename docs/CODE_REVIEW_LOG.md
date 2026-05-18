@@ -1000,3 +1000,47 @@ Idea 转待办 v1 会把结构化 Idea Card 的 next_steps 转为本地 todo_ite
 ```text
 9d6d4f4 stage 5 idea to todo v1
 ```
+
+## 2026-05-18 阶段 5 Idea 转 PRD 草案 v1 评审
+
+范围：
+
+```text
+prd_drafts 数据表
+PrdDraftService
+POST /api/ideas/{id}/to-prd
+GET /api/prd-drafts
+GET /api/prd-drafts/{id}
+客户端 Idea 面板转 PRD 操作
+客户端 PRD 草案面板
+PRD Draft 和 API 测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-5-idea-to-prd-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+Idea 转 PRD 草案 v1 会把结构化 Idea Card 转为 Markdown 风格 PRD。
+草案覆盖背景、目标用户、核心假设、MVP 范围、反方挑战、风险和下一步。
+同一 Idea 重复转换返回已有 PRD 草案，避免重复生成。
+客户端已提供 Idea 面板转 PRD 和 PRD 草案面板查看入口。
+```
+
+提交记录：
+
+```text
+待提交 stage 5 idea to prd v1
+```

@@ -13,6 +13,7 @@ from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
+from hermes_app.services.prd_drafts import PrdDraftService
 from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
 from hermes_app.services.scenes import SceneService
@@ -45,6 +46,7 @@ def create_api_router(
     skills: SkillRegistry,
     skill_runtime: SkillRuntime,
     todos: TodoService,
+    prd_drafts: PrdDraftService,
     weather: WeatherService,
     files: FileService,
     images: ImageService,
@@ -184,6 +186,25 @@ def create_api_router(
             existing = todos.get_by_source_title("idea", idea_id, title)
             created.append(existing or todos.create(title, source="idea", source_id=idea_id))
         return {"idea_id": idea_id, "todos": created}
+
+    @router.post("/ideas/{idea_id}/to-prd")
+    def convert_idea_to_prd(idea_id: str) -> dict:
+        row = orchestrator.actions.db.query_one("SELECT * FROM idea_cards WHERE id = ?", (idea_id,))
+        if not row:
+            raise HTTPException(status_code=404, detail="Idea not found.")
+        idea = _deserialize_idea(row)
+        return prd_drafts.create_from_idea(idea)
+
+    @router.get("/prd-drafts")
+    def list_prd_drafts(status: str | None = None) -> list[dict]:
+        return prd_drafts.list(status=status)
+
+    @router.get("/prd-drafts/{draft_id}")
+    def get_prd_draft(draft_id: str) -> dict:
+        draft = prd_drafts.get(draft_id)
+        if not draft:
+            raise HTTPException(status_code=404, detail="PRD draft not found.")
+        return draft
 
     @router.get("/todos")
     def list_todos(status: str | None = None) -> list[dict]:

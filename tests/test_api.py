@@ -31,6 +31,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="recommendations"' in response.text
     assert 'data-panel="sceneFeedback"' in response.text
     assert 'data-panel="todos"' in response.text
+    assert 'data-panel="prdDrafts"' in response.text
     assert 'id="panel-action"' in response.text
 
 
@@ -219,6 +220,19 @@ def test_inspiration_chat_saves_structured_idea_card():
     completed = client.post(f"/api/todos/{todos[0]['id']}/complete")
     assert completed.status_code == 200
     assert completed.json()["status"] == "completed"
+
+    prd = client.post(f"/api/ideas/{idea_id}/to-prd")
+    assert prd.status_code == 200
+    assert prd.json()["idea_id"] == idea_id
+    assert "## MVP 范围" in prd.json()["body"]
+
+    prd_again = client.post(f"/api/ideas/{idea_id}/to-prd")
+    assert prd_again.status_code == 200
+    assert prd_again.json()["id"] == prd.json()["id"]
+
+    prd_detail = client.get(f"/api/prd-drafts/{prd.json()['id']}")
+    assert prd_detail.status_code == 200
+    assert prd_detail.json()["id"] == prd.json()["id"]
 
 
 def test_scene_api_and_chat_flow():
