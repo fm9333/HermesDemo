@@ -64,7 +64,10 @@
   - 验证：提醒可创建、查询详情、更新、完成、删除归档
   - 验证：创建仍通过 Action Gate 和 Tool Registry
   - 测试：`python -m pytest -q` 通过，17 passed
-- [x] 衣橱基础管理原型
+- [x] Wardrobe Center v1
+  - 验证：衣橱条目可创建、查询详情、更新、归档
+  - 验证：创建仍通过 Action Gate 和 Tool Registry
+  - 测试：`python -m pytest -q` 通过，19 passed
 - [x] Action Gate v1 原型
 - [x] 用户确认卡原型
 - [x] App Tool 白名单 / Tool Registry v1
@@ -92,5 +95,6 @@
   - commit：`827b28f stage 2 memory candidate pipeline`
   - commit：`93cdbc8 stage 2 tool registry v1`
   - commit：`bdabf9f stage 2 reminder center v1`
+  - 当前提交点：`stage-2-wardrobe-center-v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

@@ -25,6 +25,7 @@ from hermes_app.services.safety import SafetyService
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.task_decomposer import TaskDecomposer
 from hermes_app.services.tools import ToolRegistry
+from hermes_app.services.wardrobe import WardrobeService
 from hermes_app.services.weather import WeatherService
 
 
@@ -34,7 +35,8 @@ db.init()
 
 memory_service = MemoryService(db)
 reminder_service = ReminderService(db)
-tool_registry = ToolRegistry(db, memory_service, reminder_service)
+wardrobe_service = WardrobeService(db)
+tool_registry = ToolRegistry(db, memory_service, reminder_service, wardrobe_service)
 action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
 log_service = ExecutionLogService(db)

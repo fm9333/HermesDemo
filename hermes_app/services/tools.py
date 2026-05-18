@@ -8,13 +8,21 @@ from hermes_app.core.database import Database
 from hermes_app.schemas import MemoryCandidate, ToolDefinition
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.reminders import ReminderService
+from hermes_app.services.wardrobe import WardrobeService
 
 
 class ToolRegistry:
-    def __init__(self, db: Database, memory_service: MemoryService, reminder_service: ReminderService | None = None):
+    def __init__(
+        self,
+        db: Database,
+        memory_service: MemoryService,
+        reminder_service: ReminderService | None = None,
+        wardrobe_service: WardrobeService | None = None,
+    ):
         self.db = db
         self.memory_service = memory_service
         self.reminder_service = reminder_service or ReminderService(db)
+        self.wardrobe_service = wardrobe_service or WardrobeService(db)
         self._definitions = {
             "reminder.create": ToolDefinition(
                 tool_id="reminder.create",
@@ -116,22 +124,13 @@ class ToolRegistry:
         return {"idea_id": idea_id, "status": "saved"}
 
     def _add_wardrobe_item(self, payload: dict) -> dict:
-        item_id = str(uuid4())
-        self.db.execute(
-            """
-            INSERT INTO wardrobe_items (id, name, category, color, source, created_at)
-            VALUES (?, ?, ?, ?, ?, ?)
-            """,
-            (
-                item_id,
-                payload.get("name", "未命名衣物"),
-                payload.get("category", "unknown"),
-                payload.get("color", "unknown"),
-                "hermes",
-                _now(),
-            ),
+        item = self.wardrobe_service.create(
+            payload.get("name", "未命名衣物"),
+            category=payload.get("category", "unknown"),
+            color=payload.get("color", "unknown"),
+            source="hermes",
         )
-        return {"wardrobe_item_id": item_id, "status": "created"}
+        return {"wardrobe_item_id": item.get("id"), "status": "created"}
 
 
 def _now() -> str:

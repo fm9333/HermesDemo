@@ -9,6 +9,7 @@ from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.reminders import ReminderService
 from hermes_app.services.skills import SkillRegistry
+from hermes_app.services.wardrobe import WardrobeService
 from hermes_app.services.weather import WeatherService
 
 
@@ -21,6 +22,7 @@ def create_api_router(
     logs: ExecutionLogService,
 ) -> APIRouter:
     reminder_service = ReminderService(actions.db)
+    wardrobe_service = WardrobeService(actions.db)
     router = APIRouter(prefix="/api")
 
     @router.get("/health")
@@ -130,8 +132,34 @@ def create_api_router(
         return orchestrator.actions.db.query("SELECT * FROM idea_cards ORDER BY created_at DESC LIMIT 80")
 
     @router.get("/wardrobe")
-    def list_wardrobe() -> list[dict]:
-        return orchestrator.actions.db.query("SELECT * FROM wardrobe_items ORDER BY created_at DESC LIMIT 80")
+    def list_wardrobe(status: str | None = None) -> list[dict]:
+        return wardrobe_service.list(status=status)
+
+    @router.get("/wardrobe/{item_id}")
+    def get_wardrobe_item(item_id: str) -> dict:
+        item = wardrobe_service.get(item_id)
+        if not item:
+            raise HTTPException(status_code=404, detail="Wardrobe item not found.")
+        return item
+
+    @router.patch("/wardrobe/{item_id}")
+    def update_wardrobe_item(item_id: str, payload: dict) -> dict:
+        try:
+            return wardrobe_service.update(
+                item_id,
+                name=payload.get("name"),
+                category=payload.get("category"),
+                color=payload.get("color"),
+            )
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.delete("/wardrobe/{item_id}")
+    def archive_wardrobe_item(item_id: str) -> dict:
+        try:
+            return wardrobe_service.set_status(item_id, "archived")
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     @router.get("/weather")
     def lookup_weather(location: str) -> dict:

@@ -107,3 +107,26 @@ def test_tools_api_lists_action_tool_registry():
     tool_ids = {tool["tool_id"] for tool in response.json()}
     assert "reminder.create" in tool_ids
     assert "wardrobe.add" in tool_ids
+
+
+def test_wardrobe_action_and_crud_flow():
+    response = client.post("/api/chat", json={"message": "把这件黑色外套加入衣橱"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["intent"] == "wardrobe_add"
+    assert data["actions"][0]["action_type"] == "wardrobe.add"
+
+    action_id = data["actions"][0]["id"]
+    confirmed = client.post(f"/api/actions/{action_id}/confirm")
+    assert confirmed.status_code == 200
+
+    items = client.get("/api/wardrobe").json()
+    item = next(item for item in items if "黑色外套" in item["name"])
+
+    updated = client.patch(f"/api/wardrobe/{item['id']}", json={"name": "黑色通勤外套"})
+    assert updated.status_code == 200
+    assert updated.json()["name"] == "黑色通勤外套"
+
+    archived = client.delete(f"/api/wardrobe/{item['id']}")
+    assert archived.status_code == 200
+    assert archived.json()["status"] == "archived"

@@ -91,6 +91,7 @@ class Database:
                     category TEXT NOT NULL,
                     color TEXT NOT NULL,
                     source TEXT NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'active',
                     created_at TEXT NOT NULL
                 );
 
@@ -104,7 +105,13 @@ class Database:
                 );
                 """
             )
+            self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")
             self._conn.commit()
+
+    def _ensure_column(self, table: str, column: str, definition: str) -> None:
+        columns = self._conn.execute(f"PRAGMA table_info({table})").fetchall()
+        if column not in {row["name"] for row in columns}:
+            self._conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
 
     def execute(self, sql: str, params: Iterable[Any] = ()) -> sqlite3.Cursor:
         with self._lock:
