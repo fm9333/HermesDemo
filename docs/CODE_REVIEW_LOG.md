@@ -422,5 +422,5 @@ Skill Runtime 保留输入、输出、状态和创建时间，后续可接 Eval 
 提交记录：
 
 ```text
-待提交：stage-3-skill-runtime-v1
+b43fb37 stage 3 skill runtime v1
 ```
