@@ -353,3 +353,25 @@ class Database:
         with self._lock:
             row = self._conn.execute(sql, tuple(params)).fetchone()
             return dict(row) if row else None
+
+    def backup_to(self, target: str | Path) -> None:
+        target_path = Path(target)
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        with self._lock:
+            destination = sqlite3.connect(str(target_path))
+            try:
+                self._conn.backup(destination)
+            finally:
+                destination.close()
+
+    def restore_from(self, source: str | Path) -> None:
+        source_path = Path(source)
+        if not source_path.exists():
+            raise FileNotFoundError(str(source_path))
+        source_connection = sqlite3.connect(str(source_path))
+        try:
+            with self._lock:
+                source_connection.backup(self._conn)
+                self._conn.commit()
+        finally:
+            source_connection.close()

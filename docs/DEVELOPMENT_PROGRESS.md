@@ -263,6 +263,23 @@
   - 验证：客户端地图面板可手动搜索并查看缓存地点
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，74 passed
 
+## 阶段 8：打包、稳定性和正式发布
+
+- [ ] PyInstaller 打包
+- [ ] 自动更新策略
+- [ ] 崩溃恢复
+- [ ] 数据库迁移
+- [x] 备份与恢复 v1
+  - 验证：`BackupService` 可创建包含 SQLite 快照和 manifest 的 zip 备份
+  - 验证：`BackupService.restore()` 可从备份恢复当前数据库连接
+  - 验证：`GET /api/backups`、`POST /api/backups`、`POST /api/backups/{id}/restore` 可用
+  - 验证：客户端备份面板可创建备份、列出备份并触发恢复确认
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，77 passed
+- [ ] 数据导出
+- [ ] 性能优化
+- [ ] 端到端测试
+- [ ] 安全测试
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库
@@ -311,5 +328,6 @@
   - commit：`73075ce stage 7 personalized home cards v1`
   - commit：`f6a7b8c stage 7 news provider v1`
   - commit：`8eb78ac stage 7 map provider v1`
+  - commit：`待提交 stage 8 backup restore v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

@@ -1668,3 +1668,43 @@ Nominatim Usage Policy: https://operations.osmfoundation.org/policies/nominatim/
 ```text
 8eb78ac stage 7 map provider v1
 ```
+
+## 2026-05-18 阶段 8 备份与恢复 v1 评审
+
+范围：
+```text
+Database backup_to / restore_from
+BackupService
+GET /api/backups
+POST /api/backups
+POST /api/backups/{id}/restore
+客户端备份面板
+备份与恢复服务和 API 测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-8-backup-restore-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+```text
+备份与恢复 v1 使用 SQLite 官方 backup API 创建一致性快照，避免直接复制正在使用的数据库文件。
+备份文件为 zip，包含 hermes.db 和 manifest.json，便于后续加入版本、加密和数据迁移信息。
+备份清单从文件系统扫描，不依赖数据库内记录，恢复旧数据库后仍能看到备份文件。
+恢复接口会校验 backup_id，拒绝路径穿越；客户端恢复前有确认提示。
+API 测试覆盖创建和列表，服务测试覆盖恢复后数据回滚到备份状态。
+```
+
+提交记录：
+```text
+待提交 stage 8 backup restore v1
+```

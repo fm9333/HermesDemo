@@ -7,7 +7,7 @@ os.environ.pop("HERMES_LOCAL_TOKEN", None)
 from PIL import Image
 from fastapi.testclient import TestClient
 
-from hermes_app.main import app, map_service, news_service, weather_service
+from hermes_app.main import app, backup_service, map_service, news_service, weather_service
 
 
 client = TestClient(app)
@@ -76,6 +76,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="growthLog"' in response.text
     assert 'data-panel="settings"' in response.text
     assert 'data-panel="providers"' in response.text
+    assert 'data-panel="backups"' in response.text
     assert 'id="panel-action"' in response.text
 
 
@@ -85,6 +86,21 @@ def test_home_cards_api():
     cards = response.json()
     assert cards
     assert {"id", "type", "title", "priority", "route", "payload"}.issubset(cards[0])
+
+
+def test_backup_api(tmp_path, monkeypatch):
+    backup_root = tmp_path / "api-backups"
+    backup_root.mkdir()
+    monkeypatch.setattr(backup_service, "root", backup_root)
+
+    created = client.post("/api/backups", json={"note": "api-test"})
+    assert created.status_code == 200
+    backup = created.json()
+    assert backup["note"] == "api-test"
+
+    listed = client.get("/api/backups")
+    assert listed.status_code == 200
+    assert any(item["id"] == backup["id"] for item in listed.json())
 
 
 def test_reminder_action_flow():

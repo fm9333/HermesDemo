@@ -7,6 +7,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from hermes_app.schemas import ChatRequest, ChatResponse, ConfirmActionResponse, MemoryCandidate
 from hermes_app.services.actions import ActionService
 from hermes_app.services.autonomy import AutonomyZoneClassifier
+from hermes_app.services.backups import BackupService
 from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.evals import EvalRunner
 from hermes_app.services.files import FileService
@@ -57,6 +58,7 @@ def create_api_router(
     growth_logs: GrowthLogService,
     settings: SettingsService,
     providers: ProviderRegistry,
+    backups: BackupService,
     proactive: ProactiveSuggestionService,
     triggers: TriggerService,
     weekly_reviews: WeeklyReviewService,
@@ -189,6 +191,21 @@ def create_api_router(
     def disconnect_provider(provider_id: str) -> dict:
         try:
             return providers.disconnect(provider_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.get("/backups")
+    def list_backups() -> list[dict]:
+        return backups.list()
+
+    @router.post("/backups")
+    def create_backup(payload: dict | None = None) -> dict:
+        return backups.create(note=(payload or {}).get("note", "manual"))
+
+    @router.post("/backups/{backup_id}/restore")
+    def restore_backup(backup_id: str) -> dict:
+        try:
+            return backups.restore(backup_id)
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 

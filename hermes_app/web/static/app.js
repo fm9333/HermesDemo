@@ -47,6 +47,7 @@ const panelLabels = {
   growthLog: "成长",
   settings: "设置",
   providers: "集成",
+  backups: "\u5907\u4efd",
   logs: "日志",
 };
 
@@ -82,6 +83,7 @@ const panelEndpoints = {
   growthLog: "/api/growth-log",
   settings: "/api/settings",
   providers: "/api/providers",
+  backups: "/api/backups",
   logs: "/api/logs",
 };
 
@@ -89,6 +91,7 @@ const panelActions = {
   weeklyReviews: { label: "\u751f\u6210\u590d\u76d8", endpoint: "/api/weekly-reviews/generate" },
   news: { label: "\u5237\u65b0\u65b0\u95fb", endpoint: "/api/news/refresh" },
   maps: { label: "\u641c\u7d22\u5730\u70b9", endpoint: "/api/maps/search" },
+  backups: { label: "\u521b\u5efa\u5907\u4efd", endpoint: "/api/backups" },
   opportunities: { label: "生成机会", endpoint: "/api/opportunities/generate" },
   recommendations: { label: "生成推荐", endpoint: "/api/recommendations/generate" },
   triggerRuns: { label: "运行触发", endpoint: "/api/triggers/run" },
@@ -301,6 +304,13 @@ async function setProviderStatus(providerId, action) {
   await loadPanel(activePanel);
 }
 
+async function restoreBackup(backupId) {
+  if (!window.confirm("\u786e\u8ba4\u6062\u590d\u8fd9\u4e2a\u5907\u4efd\uff1f")) return;
+  const data = await requestJson(`/api/backups/${backupId}/restore`, { method: "POST" });
+  addMessage("assistant", `\u5907\u4efd\u5df2\u6062\u590d\uff1a${data.backup.id}`);
+  await loadPanel(activePanel);
+}
+
 async function completeTodo(todoId) {
   const data = await requestJson(`/api/todos/${todoId}/complete`, { method: "POST" });
   addMessage("assistant", `待办已完成：${data.title}`);
@@ -360,6 +370,9 @@ function renderPanelItem(item, panel) {
         ${action === "connect" ? "连接" : "断开"}
       </button>`
     );
+  }
+  if (panel === "backups") {
+    controls.push(`<button class="action-button reject" data-restore-backup="${item.id}">\u6062\u590d</button>`);
   }
   if (panel === "scenes") {
     controls.push(`<button class="action-button" data-scene-feedback-positive="${item.id}">有效</button>`);
@@ -426,6 +439,7 @@ document.addEventListener("click", async (event) => {
   const settingValue = event.target.dataset?.settingValue;
   const providerId = event.target.dataset?.providerId;
   const providerAction = event.target.dataset?.providerAction;
+  const restoreBackupId = event.target.dataset?.restoreBackup;
   const completeTodoId = event.target.dataset?.completeTodo;
   const panel = event.target.dataset?.panel;
 
@@ -442,6 +456,7 @@ document.addEventListener("click", async (event) => {
     if (rollbackGrowthId) await rollbackGrowthLog(rollbackGrowthId);
     if (settingKey) await updateSetting(settingKey, settingValue);
     if (providerId) await setProviderStatus(providerId, providerAction);
+    if (restoreBackupId) await restoreBackup(restoreBackupId);
     if (completeTodoId) await completeTodo(completeTodoId);
     if (panel) await loadPanel(panel);
   } catch (error) {
