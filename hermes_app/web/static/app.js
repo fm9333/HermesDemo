@@ -29,6 +29,7 @@ const panelLabels = {
   triggerRuns: "触发",
   ideas: "灵感",
   prdDrafts: "PRD",
+  weeklyReviews: "\u590d\u76d8",
   weather: "天气",
   wardrobe: "衣橱",
   skills: "技能",
@@ -60,6 +61,7 @@ const panelEndpoints = {
   triggerRuns: "/api/triggers/history",
   ideas: "/api/ideas",
   prdDrafts: "/api/prd-drafts",
+  weeklyReviews: "/api/weekly-reviews",
   weather: "/api/weather/cache",
   wardrobe: "/api/wardrobe",
   skills: "/api/skills",
@@ -78,6 +80,7 @@ const panelEndpoints = {
 };
 
 const panelActions = {
+  weeklyReviews: { label: "\u751f\u6210\u590d\u76d8", endpoint: "/api/weekly-reviews/generate" },
   opportunities: { label: "生成机会", endpoint: "/api/opportunities/generate" },
   recommendations: { label: "生成推荐", endpoint: "/api/recommendations/generate" },
   triggerRuns: { label: "运行触发", endpoint: "/api/triggers/run" },

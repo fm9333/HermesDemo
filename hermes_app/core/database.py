@@ -113,6 +113,16 @@ class Database:
                     created_at TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS weekly_reviews (
+                    id TEXT PRIMARY KEY,
+                    week_start TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    summary TEXT NOT NULL,
+                    highlights_json TEXT NOT NULL,
+                    next_actions_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS reminders (
                     id TEXT PRIMARY KEY,
                     title TEXT NOT NULL,

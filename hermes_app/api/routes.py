@@ -29,6 +29,7 @@ from hermes_app.services.todos import TodoService
 from hermes_app.services.triggers import TriggerService
 from hermes_app.services.wardrobe import WardrobeService
 from hermes_app.services.weather import WeatherService
+from hermes_app.services.weekly_reviews import WeeklyReviewService
 
 
 def _decode_json_list(value: str | None) -> list:
@@ -55,6 +56,7 @@ def create_api_router(
     providers: ProviderRegistry,
     proactive: ProactiveSuggestionService,
     triggers: TriggerService,
+    weekly_reviews: WeeklyReviewService,
     memory: MemoryService,
     actions: ActionService,
     skills: SkillRegistry,
@@ -195,6 +197,14 @@ def create_api_router(
     @router.get("/triggers/history")
     def list_trigger_runs() -> list[dict]:
         return triggers.list_runs()
+
+    @router.post("/weekly-reviews/generate")
+    def generate_weekly_review() -> dict:
+        return weekly_reviews.generate()
+
+    @router.get("/weekly-reviews")
+    def list_weekly_reviews() -> list[dict]:
+        return weekly_reviews.list()
 
     @router.get("/memory")
     def list_memory() -> list[dict]:

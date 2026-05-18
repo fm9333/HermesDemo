@@ -238,7 +238,12 @@
   - 验证：`GET /api/triggers/history` 可查看触发历史
   - 验证：客户端触发面板可手动运行触发并查看历史
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，62 passed
-- [ ] 每周灵感复盘
+- [x] 每周灵感复盘 v1
+  - 验证：`weekly_reviews` 可持久化每周复盘标题、摘要、亮点和下一步行动
+  - 验证：`POST /api/weekly-reviews/generate` 可从最近 Idea Card 生成复盘
+  - 验证：`GET /api/weekly-reviews` 可查看历史复盘
+  - 验证：客户端复盘面板可生成复盘并查看历史记录
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，65 passed
 - [ ] 个性化首页卡片
 - [ ] 新闻 Provider
 - [ ] 地图 Provider
@@ -287,5 +292,6 @@
   - commit：`c2d829b stage 7 provider registry v1`
   - commit：`cc5dcf2 stage 7 proactive suggestions v1`
   - commit：`5451de5 stage 7 lightweight triggers v1`
+  - commit：`待提交 stage 7 weekly review v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

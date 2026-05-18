@@ -1505,3 +1505,41 @@ python -m pytest -q
 ```text
 5451de5 stage 7 lightweight triggers v1
 ```
+
+## 2026-05-18 阶段 7 每周灵感复盘 v1 评审
+
+范围：
+```text
+weekly_reviews 数据表
+WeeklyReviewService
+POST /api/weekly-reviews/generate
+GET /api/weekly-reviews
+客户端复盘面板
+Weekly Review 服务和 API 测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-7-weekly-review-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+```text
+每周灵感复盘 v1 将最近 Idea Card 汇总为可持久化的周复盘记录，保留 week_start、summary、highlights 和 next_actions，便于后续首页卡片、通知摘要和长期成长日志复用。
+生成接口不会修改原始 Idea Card，只新增 weekly_reviews 快照，风险边界较低。
+空灵感库场景会给出下一步补充行动，避免客户端出现不可解释的空结果。
+客户端新增复盘面板和生成按钮，形成查看历史与主动生成的闭环。
+```
+
+提交记录：
+```text
+待提交 stage 7 weekly review v1
+```

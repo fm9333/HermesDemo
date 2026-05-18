@@ -44,6 +44,7 @@ from hermes_app.services.triggers import TriggerService
 from hermes_app.services.tools import ToolRegistry
 from hermes_app.services.wardrobe import WardrobeService
 from hermes_app.services.weather import WeatherService
+from hermes_app.services.weekly_reviews import WeeklyReviewService
 
 
 settings = get_settings()
@@ -75,6 +76,7 @@ attention_policy = AttentionPolicy()
 recommendation_service = RecommendationService(db, opportunity_engine, attention_policy)
 proactive_service = ProactiveSuggestionService(recommendation_service, todo_service, provider_registry)
 trigger_service = TriggerService(db, opportunity_engine, recommendation_service, proactive_service)
+weekly_review_service = WeeklyReviewService(db)
 orchestrator = HermesOrchestrator(
     intent_router=IntentRouter(),
     task_decomposer=TaskDecomposer(),
@@ -110,6 +112,7 @@ app.include_router(
         provider_registry,
         proactive_service,
         trigger_service,
+        weekly_review_service,
         memory_service,
         action_service,
         skill_registry,

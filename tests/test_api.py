@@ -31,6 +31,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="recommendations"' in response.text
     assert 'data-panel="proactive"' in response.text
     assert 'data-panel="triggerRuns"' in response.text
+    assert 'data-panel="weeklyReviews"' in response.text
     assert 'data-panel="sceneFeedback"' in response.text
     assert 'data-panel="todos"' in response.text
     assert 'data-panel="prdDrafts"' in response.text
@@ -231,6 +232,27 @@ def test_trigger_run_api():
     history = client.get("/api/triggers/history")
     assert history.status_code == 200
     assert any(item["id"] == run.json()["id"] for item in history.json())
+
+
+def test_weekly_review_api():
+    response = client.post("/api/chat", json={"message": "帮我反方挑战 每周灵感复盘"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["intent"] == "inspiration"
+
+    confirmed = client.post(f"/api/actions/{data['actions'][0]['id']}/confirm")
+    assert confirmed.status_code == 200
+
+    generated = client.post("/api/weekly-reviews/generate")
+    assert generated.status_code == 200
+    review = generated.json()
+    assert review["summary"]
+    assert review["highlights"]
+    assert review["next_actions"]
+
+    listed = client.get("/api/weekly-reviews")
+    assert listed.status_code == 200
+    assert any(item["id"] == review["id"] for item in listed.json())
 
 
 def test_tools_api_lists_action_tool_registry():
