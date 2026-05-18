@@ -2006,5 +2006,5 @@ Red Zone 测试确认危险请求不会进入 Action Gate。
 
 提交记录：
 ```text
-待提交 stage 8 security release tests v1
+5dc399a stage 8 security release tests v1
 ```
