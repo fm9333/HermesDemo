@@ -699,6 +699,58 @@ def create_api_router(
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 
+    @router.post("/personal-skills/{skill_id}/rollback")
+    def rollback_personal_skill(skill_id: str) -> dict:
+        try:
+            return personal_skills.rollback(skill_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+    @router.get("/personal-skill-patches")
+    def list_personal_skill_patches(
+        skill_id: str | None = None,
+        status: str | None = None,
+    ) -> list[dict]:
+        return personal_skills.list_patches(skill_id=skill_id, status=status)
+
+    @router.post("/personal-skills/{skill_id}/patches")
+    def create_personal_skill_patch(skill_id: str, payload: dict) -> dict:
+        try:
+            return personal_skills.create_patch(
+                skill_id,
+                reason=payload.get("reason", ""),
+                proposed_prompt_template=payload.get("proposed_prompt_template"),
+                proposed_output_contract=payload.get("proposed_output_contract"),
+            )
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @router.get("/personal-skills/{skill_id}/patches")
+    def list_personal_skill_patches_for_skill(skill_id: str) -> list[dict]:
+        if not personal_skills.get(skill_id):
+            raise HTTPException(status_code=404, detail="Personal skill not found.")
+        return personal_skills.list_patches(skill_id=skill_id)
+
+    @router.post("/personal-skill-patches/{patch_id}/evaluate")
+    def evaluate_personal_skill_patch(patch_id: str) -> dict:
+        try:
+            return personal_skills.evaluate_patch(patch_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.post("/personal-skill-patches/{patch_id}/apply")
+    def apply_personal_skill_patch(patch_id: str) -> dict:
+        try:
+            return personal_skills.apply_patch(patch_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+
     @router.post("/skills/{skill_id}/run")
     def run_skill(skill_id: str, request: ChatRequest) -> dict:
         return skill_runtime.run(skill_id, request.message)

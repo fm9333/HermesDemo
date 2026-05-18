@@ -374,6 +374,24 @@
   - 验证：客户端可新建草案、评测、激活、归档
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，110 passed
 
+## 阶段 12：Skill Patch 与回滚
+
+- [x] Skill Patch 数据模型 v1
+  - 验证：`personal_skill_patches` 可记录目标技能、目标版本、补丁状态、原因、候选 Prompt、候选输出契约、评测报告和应用时间
+  - 验证：迁移记录新增 `0008_skill_patches`
+- [x] Skill Patch 评测与应用 v1
+  - 验证：补丁必须评测通过后才能应用
+  - 验证：补丁会检查目标版本是否仍是当前版本，过期补丁评测失败
+  - 验证：应用补丁会更新 Personal Skill 的 Prompt、输出契约、评测报告和版本号
+  - 验证：应用补丁会写入 `personal_skill_versions` 版本快照
+- [x] Personal Skill 回滚 v1
+  - 验证：可回滚到上一可用版本，并作为新版本写入版本历史
+  - 验证：无上一版本时回滚返回 409
+- [x] Skill Patch API 与客户端 v1
+  - 验证：`GET /api/personal-skill-patches`、`POST /api/personal-skills/{id}/patches`、`POST /api/personal-skill-patches/{id}/evaluate`、`POST /api/personal-skill-patches/{id}/apply` 可用
+  - 验证：客户端新增“补丁”面板，个人技能面板支持新补丁和回滚
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，113 passed
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库

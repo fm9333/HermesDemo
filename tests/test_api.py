@@ -89,6 +89,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="performance"' in response.text
     assert 'data-panel="providers"' in response.text
     assert 'data-panel="personalSkills"' in response.text
+    assert 'data-panel="skillPatches"' in response.text
     assert 'data-panel="llmProviders"' in response.text
     assert 'data-panel="prompts"' in response.text
     assert 'data-panel="llmCalls"' in response.text
@@ -578,6 +579,44 @@ def test_personal_skill_api_flow(monkeypatch):
     archived = client.post(f"/api/personal-skills/{draft['id']}/archive")
     assert archived.status_code == 200
     assert archived.json()["status"] == "archived"
+
+
+def test_personal_skill_patch_api_flow(monkeypatch):
+    monkeypatch.setattr(llm_client, "_post_json", lambda provider, payload: (_ for _ in ()).throw(RuntimeError("skip llm")))
+    skill_run = client.post("/api/skills/content.list_generate/run", json={"message": "帮我生成上线清单"})
+    draft = client.post(
+        "/api/personal-skills/drafts",
+        json={"source_run_id": skill_run.json()["run_id"], "title": "上线补丁技能"},
+    ).json()
+    client.post(f"/api/personal-skills/{draft['id']}/evaluate")
+    active = client.post(f"/api/personal-skills/{draft['id']}/activate").json()
+
+    created = client.post(
+        f"/api/personal-skills/{active['id']}/patches",
+        json={
+            "reason": "加入发布后监控",
+            "proposed_prompt_template": active["prompt_template"] + "\n补充发布后监控。",
+        },
+    )
+    assert created.status_code == 200
+    patch = created.json()
+    assert patch["status"] == "draft"
+
+    evaluated = client.post(f"/api/personal-skill-patches/{patch['id']}/evaluate")
+    assert evaluated.status_code == 200
+    assert evaluated.json()["eval_status"] == "passed"
+
+    applied = client.post(f"/api/personal-skill-patches/{patch['id']}/apply")
+    assert applied.status_code == 200
+    assert applied.json()["skill"]["version"] == active["version"] + 1
+
+    patches = client.get(f"/api/personal-skills/{active['id']}/patches")
+    assert patches.status_code == 200
+    assert any(item["id"] == patch["id"] and item["status"] == "applied" for item in patches.json())
+
+    rolled_back = client.post(f"/api/personal-skills/{active['id']}/rollback")
+    assert rolled_back.status_code == 200
+    assert rolled_back.json()["version"] == active["version"] + 2
 
 
 def test_file_upload_api():
