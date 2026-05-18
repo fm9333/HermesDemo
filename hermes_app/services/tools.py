@@ -110,14 +110,27 @@ class ToolRegistry:
         idea_id = str(uuid4())
         self.db.execute(
             """
-            INSERT INTO idea_cards (id, title, body, tags_json, created_at)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO idea_cards
+                (id, title, body, tags_json, direction, target_user, pain_point, core_assumption,
+                 counter_challenge, analogy, mvp_plan, risks_json, next_steps_json, score, status, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 idea_id,
                 payload.get("title", "Untitled Idea"),
                 payload.get("body", ""),
                 json.dumps(payload.get("tags", []), ensure_ascii=False),
+                payload.get("direction", ""),
+                payload.get("target_user", ""),
+                payload.get("pain_point", ""),
+                payload.get("core_assumption", ""),
+                payload.get("counter_challenge", ""),
+                payload.get("analogy", ""),
+                payload.get("mvp_plan", ""),
+                json.dumps(payload.get("risks", []), ensure_ascii=False),
+                json.dumps(payload.get("next_steps", []), ensure_ascii=False),
+                float(payload.get("score", 0) or 0),
+                payload.get("status", "active"),
                 _now(),
             ),
         )

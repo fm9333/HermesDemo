@@ -82,6 +82,17 @@ class Database:
                     title TEXT NOT NULL,
                     body TEXT NOT NULL,
                     tags_json TEXT NOT NULL,
+                    direction TEXT NOT NULL DEFAULT '',
+                    target_user TEXT NOT NULL DEFAULT '',
+                    pain_point TEXT NOT NULL DEFAULT '',
+                    core_assumption TEXT NOT NULL DEFAULT '',
+                    counter_challenge TEXT NOT NULL DEFAULT '',
+                    analogy TEXT NOT NULL DEFAULT '',
+                    mvp_plan TEXT NOT NULL DEFAULT '',
+                    risks_json TEXT NOT NULL DEFAULT '[]',
+                    next_steps_json TEXT NOT NULL DEFAULT '[]',
+                    score REAL NOT NULL DEFAULT 0,
+                    status TEXT NOT NULL DEFAULT 'active',
                     created_at TEXT NOT NULL
                 );
 
@@ -205,6 +216,17 @@ class Database:
                 """
             )
             self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")
+            self._ensure_column("idea_cards", "direction", "TEXT NOT NULL DEFAULT ''")
+            self._ensure_column("idea_cards", "target_user", "TEXT NOT NULL DEFAULT ''")
+            self._ensure_column("idea_cards", "pain_point", "TEXT NOT NULL DEFAULT ''")
+            self._ensure_column("idea_cards", "core_assumption", "TEXT NOT NULL DEFAULT ''")
+            self._ensure_column("idea_cards", "counter_challenge", "TEXT NOT NULL DEFAULT ''")
+            self._ensure_column("idea_cards", "analogy", "TEXT NOT NULL DEFAULT ''")
+            self._ensure_column("idea_cards", "mvp_plan", "TEXT NOT NULL DEFAULT ''")
+            self._ensure_column("idea_cards", "risks_json", "TEXT NOT NULL DEFAULT '[]'")
+            self._ensure_column("idea_cards", "next_steps_json", "TEXT NOT NULL DEFAULT '[]'")
+            self._ensure_column("idea_cards", "score", "REAL NOT NULL DEFAULT 0")
+            self._ensure_column("idea_cards", "status", "TEXT NOT NULL DEFAULT 'active'")
             self._conn.commit()
 
     def _ensure_column(self, table: str, column: str, definition: str) -> None:

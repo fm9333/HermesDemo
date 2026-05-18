@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from hermes_app.schemas import ChatRequest, ChatResponse, ConfirmActionResponse
@@ -18,6 +20,21 @@ from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.wardrobe import WardrobeService
 from hermes_app.services.weather import WeatherService
+
+
+def _decode_json_list(value: str | None) -> list:
+    try:
+        data = json.loads(value or "[]")
+    except json.JSONDecodeError:
+        return []
+    return data if isinstance(data, list) else []
+
+
+def _deserialize_idea(row: dict) -> dict:
+    row["tags"] = _decode_json_list(row.pop("tags_json", "[]"))
+    row["risks"] = _decode_json_list(row.pop("risks_json", "[]"))
+    row["next_steps"] = _decode_json_list(row.pop("next_steps_json", "[]"))
+    return row
 
 
 def create_api_router(
@@ -143,7 +160,15 @@ def create_api_router(
 
     @router.get("/ideas")
     def list_ideas() -> list[dict]:
-        return orchestrator.actions.db.query("SELECT * FROM idea_cards ORDER BY created_at DESC LIMIT 80")
+        rows = orchestrator.actions.db.query("SELECT * FROM idea_cards ORDER BY created_at DESC LIMIT 80")
+        return [_deserialize_idea(row) for row in rows]
+
+    @router.get("/ideas/{idea_id}")
+    def get_idea(idea_id: str) -> dict:
+        row = orchestrator.actions.db.query_one("SELECT * FROM idea_cards WHERE id = ?", (idea_id,))
+        if not row:
+            raise HTTPException(status_code=404, detail="Idea not found.")
+        return _deserialize_idea(row)
 
     @router.get("/wardrobe")
     def list_wardrobe(status: str | None = None) -> list[dict]:

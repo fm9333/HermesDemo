@@ -146,6 +146,20 @@
   - 验证：客户端场景面板可标记“有效/误触发”，反馈面板可查看记录
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，41 passed
 
+## 阶段 5：灵感智能体
+
+- [x] Inspiration Agent v1 / Idea Card v1
+  - 验证：灵感对话可生成结构化 Idea Card
+  - 验证：支持 `divergent`、`challenge`、`first_principles`、`analogy`、`convergence`、`scenario` 模式识别
+  - 验证：Idea Card 覆盖方向、目标用户、痛点、核心假设、反方挑战、跨域类比、MVP 方案、风险、下一步、评分
+  - 验证：`idea.save` 可将结构化字段保存到 `idea_cards`
+  - 验证：`GET /api/ideas`、`GET /api/ideas/{id}` 返回解析后的 `tags`、`risks`、`next_steps`
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，43 passed
+- [ ] Idea 转待办
+- [ ] Idea 转 PRD 草案
+- [ ] Idea 转 Scene 草案
+- [ ] 灵感偏好写入确认
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库
@@ -176,5 +190,6 @@
   - commit：`3479a07 stage 4 opportunity engine v1`
   - commit：`dbafd42 stage 4 attention recommendations v1`
   - commit：`77ae698 stage 4 scene feedback v1`
+  - commit：`待提交 stage 5 inspiration idea card v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

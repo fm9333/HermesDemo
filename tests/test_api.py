@@ -177,6 +177,32 @@ def test_image_upload_api():
     assert result["action"]["action_type"] == "wardrobe.add"
 
 
+def test_inspiration_chat_saves_structured_idea_card():
+    response = client.post("/api/chat", json={"message": "帮我反方挑战 桌面智能体灵感工作室"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["intent"] == "inspiration"
+    assert data["actions"][0]["action_type"] == "idea.save"
+    card = data["cards"][0]
+    assert card["type"] == "idea_card"
+    assert card["mode"] == "challenge"
+    assert card["risks"]
+    assert card["next_steps"]
+
+    confirmed = client.post(f"/api/actions/{data['actions'][0]['id']}/confirm")
+    assert confirmed.status_code == 200
+    idea_id = confirmed.json()["result"]["idea_id"]
+
+    detail = client.get(f"/api/ideas/{idea_id}")
+    assert detail.status_code == 200
+    idea = detail.json()
+    assert idea["id"] == idea_id
+    assert idea["direction"] == "桌面智能体工作室"
+    assert idea["risks"]
+    assert idea["next_steps"]
+    assert "idea-card" in idea["tags"]
+
+
 def test_scene_api_and_chat_flow():
     response = client.post("/api/scenes", json={"name": "雨天通勤提醒", "output_type": "reminder"})
     assert response.status_code == 200
