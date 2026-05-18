@@ -83,6 +83,10 @@ class ActionService:
             item = self.memory_service.save(candidate, source="action_confirmation")
             return {"memory_id": item.get("id"), "status": "saved"}
 
+        if action.action_type == "memory.confirm_candidate":
+            item = self.memory_service.confirm_candidate(payload["candidate_id"])
+            return {"memory_id": item.get("id"), "status": "saved"}
+
         if action.action_type == "idea.save":
             idea_id = str(uuid4())
             self.db.execute(
@@ -130,4 +134,3 @@ class ActionService:
             reason=row["reason"],
             created_at=row["created_at"],
         )
-

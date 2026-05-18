@@ -39,6 +39,7 @@ def test_memory_action_flow():
     data = response.json()
     assert data["intent"] == "memory_update"
     assert data["memory_candidates"][0]["memory_type"] == "preference"
+    assert data["actions"][0]["action_type"] == "memory.confirm_candidate"
 
     action_id = data["actions"][0]["id"]
     confirmed = client.post(f"/api/actions/{action_id}/confirm")
@@ -46,6 +47,19 @@ def test_memory_action_flow():
 
     memory_items = client.get("/api/memory").json()
     assert any("科技新闻" in item["value"] for item in memory_items)
+
+    candidates = client.get("/api/memory/candidates").json()
+    assert any(item["status"] == "confirmed" and "科技新闻" in item["value"] for item in candidates)
+
+
+def test_reject_memory_candidate_api():
+    response = client.post("/api/chat", json={"message": "记住我最近少吃辣"})
+    assert response.status_code == 200
+    candidate_id = response.json()["actions"][0]["payload"]["candidate_id"]
+
+    rejected = client.post(f"/api/memory/candidates/{candidate_id}/reject")
+    assert rejected.status_code == 200
+    assert rejected.json()["status"] == "rejected"
 
 
 def test_weather_chat_flow(monkeypatch):

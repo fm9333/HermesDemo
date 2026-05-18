@@ -21,6 +21,14 @@ class MemoryCandidate(BaseModel):
     confidence: float = Field(default=0.72, ge=0, le=1)
 
 
+class MemoryCandidateRecord(MemoryCandidate):
+    id: str
+    status: Literal["pending", "confirmed", "rejected"]
+    source: str
+    reason: str
+    created_at: str
+
+
 class PendingAction(BaseModel):
     id: str
     action_type: str

@@ -16,6 +16,7 @@ if (bootToken) {
 
 const panelLabels = {
   memory: "记忆",
+  memoryCandidates: "记忆候选",
   reminders: "提醒",
   ideas: "灵感",
   weather: "天气",
@@ -26,6 +27,7 @@ const panelLabels = {
 
 const panelEndpoints = {
   memory: "/api/memory",
+  memoryCandidates: "/api/memory/candidates",
   reminders: "/api/reminders",
   ideas: "/api/ideas",
   weather: "/api/weather/cache",

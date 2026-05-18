@@ -55,7 +55,10 @@
 - [x] Task Decomposer v1
   - 验证：`/api/decompose` 可返回结构化计划；`/api/chat` 响应包含 `task_plan`
   - 测试：`python -m pytest -q` 通过，11 passed
-- [x] Memory Candidate Pipeline v1 原型
+- [x] Memory Candidate Pipeline v1
+  - 验证：候选记忆可创建、列表查询、确认、拒绝
+  - 验证：Action Gate 通过 `memory.confirm_candidate` 写入长期记忆
+  - 测试：`python -m pytest -q` 通过，13 passed
 - [x] 记忆中心原型
 - [x] 提醒创建原型
 - [x] 衣橱基础管理原型
@@ -79,5 +82,6 @@
   - commit：`91aeb74 stage 1 desktop logging`
   - commit：`c67d12c stage 2 weather provider v1`
   - commit：`3a76b06 stage 2 task decomposer v1`
+  - 当前提交点：`stage-2-memory-candidate-pipeline`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

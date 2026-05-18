@@ -39,6 +39,26 @@ def create_api_router(
     def list_memory() -> list[dict]:
         return memory.list()
 
+    @router.get("/memory/candidates")
+    def list_memory_candidates(status: str | None = None) -> list[dict]:
+        return memory.list_candidates(status=status)
+
+    @router.post("/memory/candidates/{candidate_id}/confirm")
+    def confirm_memory_candidate(candidate_id: str) -> dict:
+        try:
+            return memory.confirm_candidate(candidate_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+    @router.post("/memory/candidates/{candidate_id}/reject")
+    def reject_memory_candidate(candidate_id: str) -> dict:
+        try:
+            return memory.reject_candidate(candidate_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
     @router.delete("/memory/{memory_id}")
     def delete_memory(memory_id: str) -> dict:
         return {"deleted": memory.delete(memory_id)}

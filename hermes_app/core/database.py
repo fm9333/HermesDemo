@@ -34,6 +34,19 @@ class Database:
                     expires_at TEXT
                 );
 
+                CREATE TABLE IF NOT EXISTS memory_candidates (
+                    id TEXT PRIMARY KEY,
+                    memory_type TEXT NOT NULL,
+                    key TEXT NOT NULL,
+                    value TEXT NOT NULL,
+                    sensitivity TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    reason TEXT NOT NULL,
+                    confidence REAL NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS pending_actions (
                     id TEXT PRIMARY KEY,
                     action_type TEXT NOT NULL,

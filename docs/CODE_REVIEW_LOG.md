@@ -217,3 +217,45 @@ Task Plan 只描述和规划，不直接绕过 Action Gate。
 ```text
 3a76b06 stage 2 task decomposer v1
 ```
+
+## 2026-05-18 阶段 2 Memory Candidate Pipeline v1 评审
+
+范围：
+
+```text
+memory_candidates 数据表
+MemoryService 候选创建、确认、拒绝
+/api/memory/candidates
+/api/memory/candidates/{id}/confirm
+/api/memory/candidates/{id}/reject
+Action Gate memory.confirm_candidate
+客户端记忆候选面板
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-2-memory-candidate-pipeline。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+记忆写入不再直接依赖临时 payload，而是先进入候选区。
+用户可以通过 Action Gate 确认候选写入长期记忆。
+候选可以被拒绝，被拒绝后不能再次确认。
+候选记录保留来源、原因、敏感性、置信度和状态，方便审计。
+```
+
+提交记录：
+
+```text
+待提交：stage-2-memory-candidate-pipeline
+```

@@ -65,16 +65,22 @@ class HermesOrchestrator:
 
         elif intent == "memory_update":
             candidate = self.memory.extract_candidate(message)
+            candidate_record = self.memory.create_candidate(
+                candidate,
+                source="chat",
+                reason="用户表达了需要 Hermes 记住的信息。",
+            )
             memory_candidates.append(candidate)
             pending_actions.append(
                 self.actions.create_pending(
-                    "memory.write",
-                    candidate.model_dump(),
+                    "memory.confirm_candidate",
+                    {"candidate_id": candidate_record["id"]},
                     risk_level,
                     "写入长期记忆需要用户可见、可撤销。",
                 )
             )
             reply = "我提取了一条记忆候选，确认后会保存到记忆中心。"
+            cards.append({"type": "memory_candidate", "title": "记忆候选", "payload": candidate_record})
 
         elif intent == "weather_query":
             location = self._parse_weather_location(message)
