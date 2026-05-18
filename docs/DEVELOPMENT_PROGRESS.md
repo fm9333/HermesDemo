@@ -280,6 +280,6 @@
   - commit：`3328566 stage 6 red zone blocking v1`
   - commit：`826bfd5 stage 6 safety settings v1`
   - commit：`c2d829b stage 7 provider registry v1`
-  - commit：`待提交 stage 7 proactive suggestions v1`
+  - commit：`cc5dcf2 stage 7 proactive suggestions v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
