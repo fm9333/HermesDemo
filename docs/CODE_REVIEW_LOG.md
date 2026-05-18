@@ -615,5 +615,5 @@ python -m pytest -q
 提交记录：
 
 ```text
-待提交：stage-3-content-list-generate-v1
+1c6e89d stage 3 content list generate v1
 ```
