@@ -124,5 +124,5 @@ setup_desktop_logging(reset=True) 支持测试隔离，避免重复 handler。
 提交记录：
 
 ```text
-待提交：stage-1-desktop-logging
+91aeb74 stage 1 desktop logging
 ```
