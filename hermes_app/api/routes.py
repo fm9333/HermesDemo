@@ -33,6 +33,7 @@ from hermes_app.services.reminders import ReminderService
 from hermes_app.services.runtime_state import RuntimeStateService
 from hermes_app.services.scenes import SceneService
 from hermes_app.services.settings import SettingsService
+from hermes_app.services.skill_curator import SkillCuratorService
 from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.todos import TodoService
@@ -81,6 +82,7 @@ def create_api_router(
     skills: SkillRegistry,
     skill_runtime: SkillRuntime,
     personal_skills: PersonalSkillService,
+    skill_curator: SkillCuratorService,
     todos: TodoService,
     prd_drafts: PrdDraftService,
     weather: WeatherService,
@@ -750,6 +752,18 @@ def create_api_router(
             raise HTTPException(status_code=404, detail=str(exc)) from exc
         except ValueError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+    @router.get("/skill-curator/suggestions")
+    def list_skill_curator_suggestions() -> list[dict]:
+        return skill_curator.suggest()
+
+    @router.post("/skill-curator/run")
+    def run_skill_curator() -> dict:
+        return skill_curator.run()
+
+    @router.get("/skill-curator/runs")
+    def list_skill_curator_runs(limit: int = 50) -> list[dict]:
+        return skill_curator.list_runs(limit=limit)
 
     @router.post("/skills/{skill_id}/run")
     def run_skill(skill_id: str, request: ChatRequest) -> dict:

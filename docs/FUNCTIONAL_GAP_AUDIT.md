@@ -38,6 +38,7 @@
 | Skills | MVP 完成 | document、image、todo、list 四类 |
 | Personal Skill Draft | v1 完成 | 草案、来源 Skill Run、评测门禁、激活、归档、版本记录 |
 | Skill Patch | v1 完成 | 补丁、评测、版本冲突检查、应用、版本记录、回滚 |
+| Skill Curator | v1 完成 | 重复技能、未评测草案、失败补丁、高频变更、来源弱追踪建议 |
 | Inspiration | v1 完成 | Idea Card、转 Todo/PRD/Scene |
 | Scene | v1 完成 | Scene、Signal、Opportunity、Recommendation、Feedback |
 | Autonomy / Eval | 基础完成 | Zone、Eval Runner、Growth Log、Red Zone |
@@ -48,7 +49,6 @@
 
 | 缺口 | 严重度 | 原因 |
 |---|---:|---|
-| Skill Curator 未闭环 | P0 | Personal Skill Draft 和 Patch 已有 v1，但自动治理、合并、降级和价值评估仍缺 |
 | 完整 Skills 清单未实现 | P0 | 合同、账单、归档、照片分类、日程、邮件、表格等缺失 |
 | 云模型处理文件权限刚补 v1，还需 UI 策略完善 | P0 | 商用必须默认阻断敏感文件外发 |
 | API Key 不是 OS Keychain/SQLCipher 级加密 | P0 | 当前只是本地保护保存 |
@@ -80,14 +80,13 @@ python -m pytest -q
 最新结果：
 
 ```text
-113 passed, 2 warnings
+116 passed, 2 warnings
 ```
 
 ## 下一步开发顺序
 
 1. 完成云模型文件权限 UI 和策略审计。
-2. 实现 Skill Curator。
-3. 补全完整 Skills 清单中的高价值技能。
-4. 接入日历、邮件、网盘真实 Provider。
-5. 升级密钥存储到 OS Keychain 或 SQLCipher。
-6. 补正式安装器、签名、更新校验和 GUI 冒烟测试。
+2. 补全完整 Skills 清单中的高价值技能。
+3. 接入日历、邮件、网盘真实 Provider。
+4. 升级密钥存储到 OS Keychain 或 SQLCipher。
+5. 补正式安装器、签名、更新校验和 GUI 冒烟测试。

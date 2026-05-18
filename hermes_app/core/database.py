@@ -16,6 +16,7 @@ MIGRATIONS = (
     ("0006_llm_provider_config", "OpenAI-compatible LLM provider configuration and prompt library support"),
     ("0007_personal_skill_drafts", "Personal skill draft, eval, activation, and lifecycle records"),
     ("0008_skill_patches", "Personal skill patch evaluation, application, and rollback support"),
+    ("0009_skill_curator", "Skill Curator run records and personal skill governance suggestions"),
 )
 
 
@@ -326,6 +327,14 @@ class Database:
                     FOREIGN KEY(personal_skill_id) REFERENCES personal_skills(id)
                 );
 
+                CREATE TABLE IF NOT EXISTS skill_curator_runs (
+                    id TEXT PRIMARY KEY,
+                    status TEXT NOT NULL,
+                    suggestions_json TEXT NOT NULL,
+                    summary TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS files (
                     id TEXT PRIMARY KEY,
                     filename TEXT NOT NULL,
@@ -444,6 +453,8 @@ class Database:
                     ON personal_skills(status, created_at);
                 CREATE INDEX IF NOT EXISTS idx_personal_skill_patches_skill_created
                     ON personal_skill_patches(personal_skill_id, created_at);
+                CREATE INDEX IF NOT EXISTS idx_skill_curator_runs_created
+                    ON skill_curator_runs(created_at);
                 """
             )
             self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")

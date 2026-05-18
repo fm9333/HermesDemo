@@ -90,6 +90,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="providers"' in response.text
     assert 'data-panel="personalSkills"' in response.text
     assert 'data-panel="skillPatches"' in response.text
+    assert 'data-panel="skillCurator"' in response.text
     assert 'data-panel="llmProviders"' in response.text
     assert 'data-panel="prompts"' in response.text
     assert 'data-panel="llmCalls"' in response.text
@@ -617,6 +618,31 @@ def test_personal_skill_patch_api_flow(monkeypatch):
     rolled_back = client.post(f"/api/personal-skills/{active['id']}/rollback")
     assert rolled_back.status_code == 200
     assert rolled_back.json()["version"] == active["version"] + 2
+
+
+def test_skill_curator_api_flow():
+    created = client.post(
+        "/api/personal-skills/drafts",
+        json={
+            "title": "治理测试技能",
+            "description": "curator api",
+            "prompt_template": "输出治理测试。",
+            "output_contract": {"format": "json"},
+        },
+    )
+    assert created.status_code == 200
+
+    suggestions = client.get("/api/skill-curator/suggestions")
+    assert suggestions.status_code == 200
+    assert any(item["type"] == "unevaluated_draft" and created.json()["id"] in item["skill_ids"] for item in suggestions.json())
+
+    run = client.post("/api/skill-curator/run")
+    assert run.status_code == 200
+    assert run.json()["status"] == "attention_needed"
+
+    runs = client.get("/api/skill-curator/runs")
+    assert runs.status_code == 200
+    assert any(item["id"] == run.json()["id"] for item in runs.json())
 
 
 def test_file_upload_api():

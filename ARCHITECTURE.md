@@ -33,6 +33,7 @@ Domain Services
   LLMClient: 调用 `/v1/chat/completions` 兼容接口，只生成回复或草案。
   PromptLibrary: 管理 Hermes 主智能体、任务规划、Skill、Eval 和 Safety 提示词。
   PersonalSkillService: 管理 Personal Skill 草案、补丁、评测门禁、激活、版本、回滚和归档。
+  SkillCuratorService: 检查重复技能、未评测草案、失败补丁、高频变更和来源弱追踪。
   InspirationService: 生成 Idea Card。
   SafetyService: 风险分级与 Autonomy Zone 判断。
 

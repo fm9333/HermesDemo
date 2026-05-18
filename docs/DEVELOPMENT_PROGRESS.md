@@ -392,6 +392,22 @@
   - 验证：客户端新增“补丁”面板，个人技能面板支持新补丁和回滚
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，113 passed
 
+## 阶段 13：Skill Curator
+
+- [x] Skill Curator 运行记录 v1
+  - 验证：`skill_curator_runs` 可记录治理状态、建议列表、摘要和运行时间
+  - 验证：迁移记录新增 `0009_skill_curator`
+- [x] Skill Curator 建议引擎 v1
+  - 验证：可识别重复 Personal Skill
+  - 验证：可识别未评测草案
+  - 验证：可识别失败 Skill Patch
+  - 验证：可识别高频版本变更技能
+  - 验证：可识别缺少来源运行记录的 active 技能
+- [x] Skill Curator API 与客户端 v1
+  - 验证：`GET /api/skill-curator/suggestions`、`POST /api/skill-curator/run`、`GET /api/skill-curator/runs` 可用
+  - 验证：客户端新增“治理”面板，可运行治理并查看历史
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，116 passed
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库

@@ -111,6 +111,9 @@ GET  /api/personal-skill-patches
 POST /api/personal-skills/{skill_id}/patches
 POST /api/personal-skill-patches/{patch_id}/evaluate
 POST /api/personal-skill-patches/{patch_id}/apply
+GET  /api/skill-curator/suggestions
+POST /api/skill-curator/run
+GET  /api/skill-curator/runs
 GET  /api/logs
 ```
 
@@ -140,4 +143,4 @@ Forecast:  https://api.open-meteo.com/v1/forecast
 2. OS Keychain 或 SQLCipher 级密钥保护。
 3. 日历、邮件、网盘 OAuth Provider。
 4. 多模态图片识别和文件深度解析模型。
-5. Skill Patch 自动生成、Curator 治理和价值评估闭环。
+5. 完整 Skills、真实外部 Provider、密钥强保护和正式商用发布链路。

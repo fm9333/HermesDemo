@@ -38,6 +38,7 @@ const panelLabels = {
   skills: "技能",
   personalSkills: "个人技能",
   skillPatches: "技能补丁",
+  skillCurator: "技能治理",
   llmProviders: "模型",
   prompts: "提示词",
   llmCalls: "模型调用",
@@ -84,6 +85,7 @@ const panelEndpoints = {
   skills: "/api/skills",
   personalSkills: "/api/personal-skills",
   skillPatches: "/api/personal-skill-patches",
+  skillCurator: "/api/skill-curator/runs",
   llmProviders: "/api/llm/providers",
   prompts: "/api/prompts",
   llmCalls: "/api/llm/calls",
@@ -120,6 +122,7 @@ const panelActions = {
   evalRuns: { label: "运行评测", endpoint: "/api/eval/suites/autonomy.zone.basic/run" },
   llmProviders: { label: "添加模型", endpoint: "/api/llm/providers" },
   personalSkills: { label: "新建草案", endpoint: "/api/personal-skills/drafts" },
+  skillCurator: { label: "运行治理", endpoint: "/api/skill-curator/run" },
 };
 
 function escapeHtml(value) {

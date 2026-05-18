@@ -47,6 +47,7 @@ from hermes_app.services.runtime_state import RuntimeStateService
 from hermes_app.services.scenes import SceneService
 from hermes_app.services.safety import SafetyService
 from hermes_app.services.settings import SettingsService
+from hermes_app.services.skill_curator import SkillCuratorService
 from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.task_decomposer import TaskDecomposer
@@ -84,6 +85,7 @@ action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
 skill_runtime = SkillRuntime(db, skill_registry, llm_client)
 personal_skill_service = PersonalSkillService(db)
+skill_curator_service = SkillCuratorService(db)
 todo_service = TodoService(db)
 prd_draft_service = PrdDraftService(db)
 log_service = ExecutionLogService(db)
@@ -159,6 +161,7 @@ app.include_router(
         skill_registry,
         skill_runtime,
         personal_skill_service,
+        skill_curator_service,
         todo_service,
         prd_draft_service,
         weather_service,

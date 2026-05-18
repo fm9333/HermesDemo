@@ -2196,3 +2196,42 @@ Skill Curator、自动补丁生成和价值/成功率治理仍是后续 P0。
 ```text
 2f3824d stage 12 skill patches v1
 ```
+
+## 2026-05-18 阶段 13 Skill Curator v1 评审
+
+范围：
+```text
+skill_curator_runs schema
+SkillCuratorService
+Skill Curator API
+客户端治理面板
+服务层与 API 测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-13-skill-curator-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest tests\test_skill_curator.py tests\test_api.py -q
+python -m pytest -q
+```
+
+评审结论：
+```text
+Skill Curator v1 为 Personal Skill 和 Skill Patch 增加了治理层。
+当前治理建议覆盖重复技能、未评测草案、失败补丁、高频版本变更和来源弱追踪。
+治理运行会写入 skill_curator_runs，保留建议快照和摘要，便于后续首页提醒、成长日志和审计复用。
+客户端治理面板已支持手动运行治理并查看历史。
+当前 v1 只生成建议，不自动合并、删除或降级技能，符合安全边界；自动治理动作仍需后续接入 Action Gate。
+```
+
+测试结果：
+```text
+116 passed, 2 warnings
+```
