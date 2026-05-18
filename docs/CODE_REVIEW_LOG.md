@@ -2054,3 +2054,8 @@ LLM 仍不能直接写数据库或直接调用外部 API，执行类动作继续
 ```text
 105 passed, 2 warnings
 ```
+
+提交记录：
+```text
+06a5ae9 stage 9 llm provider and prompts v1
+```
