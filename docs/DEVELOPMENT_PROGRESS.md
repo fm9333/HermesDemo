@@ -271,7 +271,12 @@
   - 验证：`scripts/build_desktop.ps1` 可调用 PyInstaller spec
   - 验证：`requirements-desktop.txt` 包含 PyInstaller 和 PySide6 桌面依赖
   - 测试：`python -m compileall hermes_app desktop tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，88 passed
-- [ ] 自动更新策略
+- [x] 自动更新策略 v1
+  - 验证：设置项支持 `auto_update_enabled`、`update_channel`、`update_manifest_url`
+  - 验证：`UpdateService` 可读取本地/远程 manifest 并比较版本
+  - 验证：更新检查会尊重 stable/beta 渠道
+  - 验证：`GET /api/updates/status`、`POST /api/updates/check` 和客户端更新面板可用
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，92 passed
 - [x] 崩溃恢复 v1
   - 验证：`RuntimeStateService` 可记录运行中、心跳和干净关闭状态
   - 验证：启动时可检测上次 `running` 且未干净关闭的异常退出
@@ -353,5 +358,6 @@
   - commit：`5330923 stage 8 data export v1`
   - commit：`7641b3b stage 8 crash recovery v1`
   - commit：`f98a2ad stage 8 pyinstaller packaging v1`
+  - commit：`待提交 stage 8 update strategy v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

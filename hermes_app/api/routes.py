@@ -33,6 +33,7 @@ from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.todos import TodoService
 from hermes_app.services.triggers import TriggerService
+from hermes_app.services.updates import UpdateService
 from hermes_app.services.wardrobe import WardrobeService
 from hermes_app.services.weather import WeatherService
 from hermes_app.services.weekly_reviews import WeeklyReviewService
@@ -63,6 +64,7 @@ def create_api_router(
     backups: BackupService,
     exports: ExportService,
     runtime_state: RuntimeStateService,
+    updates: UpdateService,
     proactive: ProactiveSuggestionService,
     triggers: TriggerService,
     weekly_reviews: WeeklyReviewService,
@@ -99,6 +101,14 @@ def create_api_router(
     @router.get("/runtime/recovery")
     def runtime_recovery_status() -> dict:
         return runtime_state.heartbeat()
+
+    @router.get("/updates/status")
+    def update_status() -> dict:
+        return updates.status()
+
+    @router.post("/updates/check")
+    def check_updates(payload: dict | None = None) -> dict:
+        return updates.check(manifest_url=(payload or {}).get("manifest_url"))
 
     @router.post("/chat", response_model=ChatResponse)
     def chat(request: ChatRequest) -> ChatResponse:

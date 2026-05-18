@@ -13,6 +13,9 @@ class SettingsService:
         "red_zone_policy": "block",
         "eval_required_for_drafts": True,
         "notifications_enabled": True,
+        "auto_update_enabled": False,
+        "update_channel": "stable",
+        "update_manifest_url": "",
     }
 
     def __init__(self, db: Database):
@@ -54,8 +57,12 @@ class SettingsService:
         default = self.defaults[key]
         if isinstance(default, bool) and not isinstance(value, bool):
             raise ValueError(f"{key} must be boolean.")
+        if isinstance(default, str) and not isinstance(value, str):
+            raise ValueError(f"{key} must be string.")
         if key == "red_zone_policy" and value not in {"block", "confirm_only"}:
             raise ValueError("red_zone_policy must be block or confirm_only.")
+        if key == "update_channel" and value not in {"stable", "beta"}:
+            raise ValueError("update_channel must be stable or beta.")
 
     def _deserialize(self, row: dict) -> dict:
         return {

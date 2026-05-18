@@ -77,6 +77,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="settings"' in response.text
     assert 'data-panel="databaseMigrations"' in response.text
     assert 'data-panel="runtimeRecovery"' in response.text
+    assert 'data-panel="updates"' in response.text
     assert 'data-panel="providers"' in response.text
     assert 'data-panel="backups"' in response.text
     assert 'data-panel="exports"' in response.text
@@ -121,6 +122,20 @@ def test_runtime_recovery_api():
     assert data["state"]["status"] == "running"
     assert data["recovery"]["status"] in {"clean", "recovered"}
     assert data["state_path"]
+
+
+def test_updates_api(tmp_path):
+    manifest = tmp_path / "update-manifest.json"
+    manifest.write_text('{"version":"0.2.0","channel":"stable","url":"https://example.com/Hermes.exe"}')
+    client.patch("/api/settings/update_manifest_url", json={"value": str(manifest)})
+
+    status = client.get("/api/updates/status")
+    assert status.status_code == 200
+    assert status.json()["manifest_url"] == str(manifest)
+
+    checked = client.post("/api/updates/check")
+    assert checked.status_code == 200
+    assert checked.json()["status"] == "update_available"
 
 
 def test_export_api(tmp_path, monkeypatch):

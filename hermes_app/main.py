@@ -49,6 +49,7 @@ from hermes_app.services.task_decomposer import TaskDecomposer
 from hermes_app.services.todos import TodoService
 from hermes_app.services.triggers import TriggerService
 from hermes_app.services.tools import ToolRegistry
+from hermes_app.services.updates import UpdateService
 from hermes_app.services.wardrobe import WardrobeService
 from hermes_app.services.weather import WeatherService
 from hermes_app.services.weekly_reviews import WeeklyReviewService
@@ -70,6 +71,7 @@ settings_service = SettingsService(db)
 provider_registry = ProviderRegistry(db)
 backup_service = BackupService(db)
 export_service = ExportService(db)
+update_service = UpdateService(settings, settings_service)
 tool_registry = ToolRegistry(db, memory_service, reminder_service, wardrobe_service)
 action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
@@ -135,6 +137,7 @@ app.include_router(
         backup_service,
         export_service,
         runtime_state_service,
+        update_service,
         proactive_service,
         trigger_service,
         weekly_review_service,
