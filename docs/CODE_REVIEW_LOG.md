@@ -215,5 +215,5 @@ Task Plan 只描述和规划，不直接绕过 Action Gate。
 提交记录：
 
 ```text
-待提交：stage-2-task-decomposer-v1
+3a76b06 stage 2 task decomposer v1
 ```

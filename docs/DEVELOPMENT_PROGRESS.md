@@ -78,6 +78,6 @@
   - 当前提交点：`stage-1-desktop-shell-local-service`
   - commit：`91aeb74 stage 1 desktop logging`
   - commit：`c67d12c stage 2 weather provider v1`
-  - 当前提交点：`stage-2-task-decomposer-v1`
+  - commit：`3a76b06 stage 2 task decomposer v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
