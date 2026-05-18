@@ -255,7 +255,13 @@
   - 验证：`GET /api/news`、`GET /api/news/{id}` 可查看新闻列表和详情
   - 验证：客户端新闻面板可刷新并查看本地缓存新闻
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，71 passed
-- [ ] 地图 Provider
+- [x] 地图 Provider v1
+  - 验证：`map.nominatim` 默认 Provider 可配置端点、权限和使用策略链接，默认断开
+  - 验证：`POST /api/maps/search` 在 Provider 连接后可手动搜索地点并缓存结果
+  - 验证：重复搜索同一 query 优先返回本地缓存，不重复访问外部服务
+  - 验证：`GET /api/maps/places`、`GET /api/maps/places/{id}` 可查看地点缓存和详情
+  - 验证：客户端地图面板可手动搜索并查看缓存地点
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，74 passed
 
 ## GitHub / SVN 同步状态
 
@@ -304,5 +310,6 @@
   - commit：`e235bb9 stage 7 weekly review v1`
   - commit：`73075ce stage 7 personalized home cards v1`
   - commit：`f6a7b8c stage 7 news provider v1`
+  - commit：`待提交 stage 7 map provider v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

@@ -136,6 +136,22 @@ class Database:
                     fetched_at TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS map_places (
+                    id TEXT PRIMARY KEY,
+                    provider_id TEXT NOT NULL,
+                    query TEXT NOT NULL,
+                    display_name TEXT NOT NULL,
+                    lat REAL NOT NULL,
+                    lon REAL NOT NULL,
+                    category TEXT NOT NULL,
+                    place_type TEXT NOT NULL,
+                    importance REAL NOT NULL,
+                    address_json TEXT NOT NULL,
+                    bounding_box_json TEXT NOT NULL,
+                    raw_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS reminders (
                     id TEXT PRIMARY KEY,
                     title TEXT NOT NULL,

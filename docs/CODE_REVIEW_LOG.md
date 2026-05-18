@@ -1621,3 +1621,50 @@ Provider 状态为 disconnected 时刷新会返回 disabled，不会继续访问
 ```text
 f6a7b8c stage 7 news provider v1
 ```
+
+## 2026-05-18 阶段 7 地图 Provider v1 评审
+
+范围：
+```text
+map_places 数据表
+ProviderRegistry map.nominatim 默认 Provider
+MapService 手动搜索、Nominatim 请求和本地缓存
+POST /api/maps/search
+GET /api/maps/places
+GET /api/maps/places/{id}
+客户端地图面板
+地图 Provider 服务和 API 测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-7-map-provider-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+```text
+地图 Provider v1 默认断开，用户需要先在 Provider 面板连接后才能发起外部搜索，避免无意识调用公共地理编码服务。
+搜索只由用户手动触发，不做自动补全、后台轮询或批量地理编码，符合当前桌面 MVP 的低频使用边界。
+相同 query 优先使用本地 map_places 缓存，减少重复请求并满足 Nominatim 对客户端缓存的要求。
+请求使用明确 User-Agent，Provider 配置保留 Nominatim usage_policy 链接，后续可切换到自建或商业地理编码端点。
+地点缓存保留 display_name、坐标、地址、边界框和原始响应，足够支撑后续地图卡片、通勤场景和位置提醒。
+```
+
+资料来源：
+```text
+Nominatim Search API: https://nominatim.org/release-docs/latest/api/Search/
+Nominatim Usage Policy: https://operations.osmfoundation.org/policies/nominatim/
+```
+
+提交记录：
+```text
+待提交 stage 7 map provider v1
+```

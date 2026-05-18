@@ -54,6 +54,20 @@ class ProviderRegistry:
                 ],
             },
         },
+        {
+            "provider_id": "map.nominatim",
+            "name": "OpenStreetMap Nominatim",
+            "provider_type": "map",
+            "status": "disconnected",
+            "permissions": ["maps.search", "maps.cache"],
+            "config": {
+                "auth": "none",
+                "endpoint": "https://nominatim.openstreetmap.org/search",
+                "usage_policy": "https://operations.osmfoundation.org/policies/nominatim/",
+                "manual_search_only": True,
+                "max_limit": 5,
+            },
+        },
     ]
 
     def __init__(self, db: Database):

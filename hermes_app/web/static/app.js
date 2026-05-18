@@ -33,6 +33,7 @@ const panelLabels = {
   weeklyReviews: "\u590d\u76d8",
   weather: "天气",
   news: "\u65b0\u95fb",
+  maps: "\u5730\u56fe",
   wardrobe: "衣橱",
   skills: "技能",
   skillRuns: "技能运行",
@@ -67,6 +68,7 @@ const panelEndpoints = {
   weeklyReviews: "/api/weekly-reviews",
   weather: "/api/weather/cache",
   news: "/api/news",
+  maps: "/api/maps/places",
   wardrobe: "/api/wardrobe",
   skills: "/api/skills",
   skillRuns: "/api/skills/runs",
@@ -86,6 +88,7 @@ const panelEndpoints = {
 const panelActions = {
   weeklyReviews: { label: "\u751f\u6210\u590d\u76d8", endpoint: "/api/weekly-reviews/generate" },
   news: { label: "\u5237\u65b0\u65b0\u95fb", endpoint: "/api/news/refresh" },
+  maps: { label: "\u641c\u7d22\u5730\u70b9", endpoint: "/api/maps/search" },
   opportunities: { label: "生成机会", endpoint: "/api/opportunities/generate" },
   recommendations: { label: "生成推荐", endpoint: "/api/recommendations/generate" },
   triggerRuns: { label: "运行触发", endpoint: "/api/triggers/run" },
@@ -219,7 +222,13 @@ async function rejectAction(actionId) {
 async function runPanelAction() {
   const action = panelActions[activePanel];
   if (!action) return;
-  const data = await requestJson(action.endpoint, { method: "POST" });
+  const options = { method: "POST" };
+  if (activePanel === "maps") {
+    const query = window.prompt("\u641c\u7d22\u5730\u70b9");
+    if (!query?.trim()) return;
+    options.body = JSON.stringify({ query: query.trim() });
+  }
+  const data = await requestJson(action.endpoint, options);
   addMessage("assistant", `${action.label}完成`, { cards: [{ title: action.label, payload: data }] });
   await loadPanel(activePanel);
 }

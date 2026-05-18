@@ -14,6 +14,7 @@ from hermes_app.services.growth import GrowthLogService
 from hermes_app.services.home_cards import HomeCardService
 from hermes_app.services.images import ImageService
 from hermes_app.services.logs import ExecutionLogService
+from hermes_app.services.maps import MapService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.news import NewsService
 from hermes_app.services.orchestrator import HermesOrchestrator
@@ -68,6 +69,7 @@ def create_api_router(
     prd_drafts: PrdDraftService,
     weather: WeatherService,
     news: NewsService,
+    maps: MapService,
     files: FileService,
     images: ImageService,
     scenes: SceneService,
@@ -472,6 +474,24 @@ def create_api_router(
         item = news.get(article_id)
         if not item:
             raise HTTPException(status_code=404, detail="News article not found.")
+        return item
+
+    @router.get("/maps/places")
+    def list_map_places(limit: int = 50) -> list[dict]:
+        return maps.list(limit=limit)
+
+    @router.post("/maps/search")
+    def search_maps(payload: dict) -> dict:
+        try:
+            return maps.search(payload.get("query", ""), limit=payload.get("limit", 5))
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @router.get("/maps/places/{place_id}")
+    def get_map_place(place_id: str) -> dict:
+        item = maps.get(place_id)
+        if not item:
+            raise HTTPException(status_code=404, detail="Map place not found.")
         return item
 
     @router.get("/skills")

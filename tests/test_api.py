@@ -7,7 +7,7 @@ os.environ.pop("HERMES_LOCAL_TOKEN", None)
 from PIL import Image
 from fastapi.testclient import TestClient
 
-from hermes_app.main import app, news_service, weather_service
+from hermes_app.main import app, map_service, news_service, weather_service
 
 
 client = TestClient(app)
@@ -33,6 +33,23 @@ NEWS_RSS = b"""<?xml version="1.0" encoding="UTF-8"?>
 """
 
 
+MAP_JSON = b"""[
+  {
+    "place_id": 2,
+    "osm_type": "node",
+    "osm_id": 456,
+    "display_name": "Shanghai, China",
+    "lat": "31.2322758",
+    "lon": "121.4692071",
+    "category": "place",
+    "type": "city",
+    "importance": 0.8,
+    "boundingbox": ["30.66", "31.87", "120.85", "122.12"],
+    "address": {"city": "Shanghai", "country": "China"}
+  }
+]"""
+
+
 def test_health():
     response = client.get("/api/health")
     assert response.status_code == 200
@@ -48,6 +65,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="triggerRuns"' in response.text
     assert 'data-panel="weeklyReviews"' in response.text
     assert 'data-panel="news"' in response.text
+    assert 'data-panel="maps"' in response.text
     assert 'data-panel="sceneFeedback"' in response.text
     assert 'data-panel="todos"' in response.text
     assert 'data-panel="prdDrafts"' in response.text
@@ -161,6 +179,25 @@ def test_news_api(monkeypatch):
     detail = client.get(f"/api/news/{article['id']}")
     assert detail.status_code == 200
     assert detail.json()["url"] == "https://example.com/api-news"
+
+
+def test_maps_api(monkeypatch):
+    client.post("/api/providers/map.nominatim/connect", json={"config": {"consent": "unit-test"}})
+    monkeypatch.setattr(map_service, "_fetch", lambda query, limit, provider: MAP_JSON)
+
+    searched = client.post("/api/maps/search", json={"query": "Shanghai", "limit": 1})
+    assert searched.status_code == 200
+    assert searched.json()["status"] in {"ok", "cached"}
+    place = searched.json()["places"][0]
+    assert place["display_name"] == "Shanghai, China"
+
+    listed = client.get("/api/maps/places")
+    assert listed.status_code == 200
+    assert any(item["id"] == place["id"] for item in listed.json())
+
+    detail = client.get(f"/api/maps/places/{place['id']}")
+    assert detail.status_code == 200
+    assert detail.json()["address"]["country"] == "China"
 
 
 def test_decompose_api():
