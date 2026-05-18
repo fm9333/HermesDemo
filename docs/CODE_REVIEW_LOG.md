@@ -864,5 +864,5 @@ Recommendation Cards v1 会把 open opportunities 转为可查询、可忽略的
 提交记录：
 
 ```text
-待提交 stage 4 attention recommendations v1
+dbafd42 stage 4 attention recommendations v1
 ```
