@@ -4,6 +4,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from hermes_app.schemas import ChatRequest, ChatResponse, ConfirmActionResponse
 from hermes_app.services.actions import ActionService
+from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.files import FileService
 from hermes_app.services.images import ImageService
 from hermes_app.services.logs import ExecutionLogService
@@ -27,6 +28,7 @@ def create_api_router(
     files: FileService,
     images: ImageService,
     scenes: SceneService,
+    context_signals: ContextSignalService,
     logs: ExecutionLogService,
 ) -> APIRouter:
     reminder_service = ReminderService(actions.db)
@@ -263,6 +265,26 @@ def create_api_router(
     @router.get("/scenes/runs")
     def list_scene_runs(scene_id: str | None = None) -> list[dict]:
         return scenes.list_runs(scene_id=scene_id)
+
+    @router.post("/context-signals")
+    def collect_context_signal(payload: dict) -> dict:
+        return context_signals.collect(
+            source=payload.get("source", "manual"),
+            signal_type=payload.get("signal_type", "manual"),
+            payload=payload.get("payload", {}),
+            expires_at=payload.get("expires_at"),
+        )
+
+    @router.get("/context-signals")
+    def list_context_signals(status: str | None = None, signal_type: str | None = None) -> list[dict]:
+        return context_signals.list(status=status, signal_type=signal_type)
+
+    @router.post("/context-signals/{signal_id}/archive")
+    def archive_context_signal(signal_id: str) -> dict:
+        try:
+            return context_signals.archive(signal_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     @router.get("/scenes/{scene_id}")
     def get_scene(scene_id: str) -> dict:

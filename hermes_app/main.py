@@ -15,6 +15,7 @@ from hermes_app.api.routes import create_api_router
 from hermes_app.core.config import get_settings
 from hermes_app.core.database import Database
 from hermes_app.services.actions import ActionService
+from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.files import FileService
 from hermes_app.services.images import ImageService
 from hermes_app.services.inspiration import InspirationService
@@ -49,6 +50,7 @@ weather_service = WeatherService(db)
 file_service = FileService(db)
 image_service = ImageService(db, file_service)
 scene_service = SceneService(db)
+context_signal_service = ContextSignalService(db)
 orchestrator = HermesOrchestrator(
     intent_router=IntentRouter(),
     task_decomposer=TaskDecomposer(),
@@ -85,6 +87,7 @@ app.include_router(
         file_service,
         image_service,
         scene_service,
+        context_signal_service,
         log_service,
     )
 )

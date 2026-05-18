@@ -186,6 +186,24 @@ def test_scene_api_and_chat_flow():
     assert data["cards"][0]["type"] == "scene"
 
 
+def test_context_signal_api_flow():
+    response = client.post(
+        "/api/context-signals",
+        json={"source": "weather", "signal_type": "weather.rain", "payload": {"probability": 80}},
+    )
+    assert response.status_code == 200
+    signal = response.json()
+    assert signal["payload"]["probability"] == 80
+
+    listed = client.get("/api/context-signals?signal_type=weather.rain")
+    assert listed.status_code == 200
+    assert any(item["id"] == signal["id"] for item in listed.json())
+
+    archived = client.post(f"/api/context-signals/{signal['id']}/archive")
+    assert archived.status_code == 200
+    assert archived.json()["status"] == "archived"
+
+
 def test_wardrobe_action_and_crud_flow():
     response = client.post("/api/chat", json={"message": "把这件黑色外套加入衣橱"})
     assert response.status_code == 200
