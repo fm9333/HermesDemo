@@ -506,3 +506,41 @@ ImageService 使用 Pillow 验证图片有效性并读取宽高。
 ```text
 3f5712b stage 3 image upload v1
 ```
+
+## 2026-05-18 阶段 3 document.summarize 文本文件解析 v1 评审
+
+范围：
+
+```text
+FileService.read_text
+POST /api/files/{file_id}/summarize
+SkillRuntime document.summarize 集成
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-3-document-summarize-text-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+v1 仅允许 text/plain、text/markdown、.txt、.md，避免误读二进制文件。
+读取上限 200KB，避免桌面端一次性处理过大文件。
+摘要调用走 SkillRuntime 并写入 skill_runs，后续可进入 Eval 和 Curator。
+PDF/DOCX 解析仍是后续任务，未在本次范围内标记完成。
+```
+
+提交记录：
+
+```text
+待提交：stage-3-document-summarize-text-v1
+```

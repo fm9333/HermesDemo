@@ -142,6 +142,11 @@ def test_file_upload_api():
     files = client.get("/api/files").json()
     assert any(item["id"] == data["id"] for item in files)
 
+    summary = client.post(f"/api/files/{data['id']}/summarize")
+    assert summary.status_code == 200
+    assert summary.json()["skill_id"] == "document.summarize"
+    assert summary.json()["status"] == "ok"
+
 
 def test_image_upload_api():
     response = client.post(

@@ -95,7 +95,11 @@
   - 验证：`POST /api/images/upload` 仅接受有效图片，保存文件并写入 `images`
   - 验证：记录图片宽高、content_type、file_id、status
   - 测试：`python -m pytest -q` 通过，25 passed
-- [ ] document.summarize 真实文档解析
+- [x] document.summarize 文本文件解析 v1
+  - 验证：上传 `.txt/.md` 后可调用 `/api/files/{file_id}/summarize`
+  - 验证：摘要通过 SkillRuntime 写入 `skill_runs`
+  - 测试：`python -m pytest -q` 通过，26 passed
+- [ ] document.summarize PDF/DOCX 解析
 - [ ] image.clothing_recognition 真实图片识别
 - [ ] work.todo_extract 深化
 - [ ] content.list_generate 深化
@@ -120,5 +124,6 @@
   - commit：`b43fb37 stage 3 skill runtime v1`
   - commit：`ae947bb stage 3 file upload v1`
   - commit：`3f5712b stage 3 image upload v1`
+  - 当前提交点：`stage-3-document-summarize-text-v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

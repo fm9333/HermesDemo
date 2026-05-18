@@ -14,3 +14,12 @@ def test_file_service_saves_upload(tmp_path):
     assert item["status"] == "uploaded"
     assert len(service.list()) == 1
 
+
+def test_file_service_reads_text_upload(tmp_path):
+    db = Database(tmp_path / "files.db")
+    db.init()
+    service = FileService(db, root=tmp_path / "store")
+
+    item = service.save_upload("meeting.md", "text/markdown", "结论：继续推进".encode("utf-8"))
+
+    assert service.read_text(item["id"]) == "结论：继续推进"

@@ -203,6 +203,16 @@ def create_api_router(
             raise HTTPException(status_code=404, detail="File not found.")
         return item
 
+    @router.post("/files/{file_id}/summarize")
+    def summarize_file(file_id: str) -> dict:
+        try:
+            text = files.read_text(file_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        return skill_runtime.run("document.summarize", text)
+
     @router.post("/images/upload")
     async def upload_image(file: UploadFile = File(...)) -> dict:
         data = await file.read()

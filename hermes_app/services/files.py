@@ -45,6 +45,18 @@ class FileService:
     def get(self, file_id: str) -> dict | None:
         return self.db.query_one("SELECT * FROM files WHERE id = ?", (file_id,))
 
+    def read_text(self, file_id: str, max_bytes: int = 200_000) -> str:
+        record = self.get(file_id)
+        if not record:
+            raise KeyError(f"File not found: {file_id}")
+        path = Path(record["storage_path"])
+        if record["content_type"] not in {"text/plain", "text/markdown"} and path.suffix.lower() not in {".txt", ".md"}:
+            raise ValueError("Only text or markdown files can be summarized in v1.")
+        data = path.read_bytes()
+        if len(data) > max_bytes:
+            data = data[:max_bytes]
+        return data.decode("utf-8", errors="replace")
+
 
 def _default_file_root() -> Path:
     explicit = os.getenv("HERMES_FILES_DIR")
@@ -59,4 +71,3 @@ def _default_file_root() -> Path:
 def _safe_filename(filename: str) -> str:
     name = Path(filename or "upload.bin").name
     return re.sub(r"[^A-Za-z0-9._\-\u4e00-\u9fff]", "_", name) or "upload.bin"
-
