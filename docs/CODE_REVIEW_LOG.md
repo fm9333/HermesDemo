@@ -1042,5 +1042,5 @@ Idea 转 PRD 草案 v1 会把结构化 Idea Card 转为 Markdown 风格 PRD。
 提交记录：
 
 ```text
-待提交 stage 5 idea to prd v1
+6164f3b stage 5 idea to prd v1
 ```

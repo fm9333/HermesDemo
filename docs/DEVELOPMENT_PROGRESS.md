@@ -203,6 +203,6 @@
   - commit：`77ae698 stage 4 scene feedback v1`
   - commit：`650fd6f stage 5 inspiration idea card v1`
   - commit：`9d6d4f4 stage 5 idea to todo v1`
-  - commit：`待提交 stage 5 idea to prd v1`
+  - commit：`6164f3b stage 5 idea to prd v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
