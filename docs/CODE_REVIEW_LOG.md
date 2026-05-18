@@ -777,5 +777,5 @@ Context Signal v1 支持收集、查询、过滤和归档。
 提交记录：
 
 ```text
-待提交：stage-4-context-signal-pipeline-v1
+4787665 stage 4 context signal pipeline v1
 ```
