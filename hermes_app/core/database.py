@@ -122,6 +122,18 @@ class Database:
                     status TEXT NOT NULL,
                     created_at TEXT NOT NULL
                 );
+
+                CREATE TABLE IF NOT EXISTS images (
+                    id TEXT PRIMARY KEY,
+                    file_id TEXT NOT NULL,
+                    filename TEXT NOT NULL,
+                    width INTEGER,
+                    height INTEGER,
+                    content_type TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(file_id) REFERENCES files(id)
+                );
                 """
             )
             self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")

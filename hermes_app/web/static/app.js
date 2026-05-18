@@ -24,6 +24,7 @@ const panelLabels = {
   skills: "技能",
   skillRuns: "技能运行",
   files: "文件",
+  images: "图片",
   tools: "工具",
   logs: "日志",
 };
@@ -38,6 +39,7 @@ const panelEndpoints = {
   skills: "/api/skills",
   skillRuns: "/api/skills/runs",
   files: "/api/files",
+  images: "/api/images",
   tools: "/api/tools",
   logs: "/api/logs",
 };

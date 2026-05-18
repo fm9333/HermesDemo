@@ -16,6 +16,7 @@ from hermes_app.core.config import get_settings
 from hermes_app.core.database import Database
 from hermes_app.services.actions import ActionService
 from hermes_app.services.files import FileService
+from hermes_app.services.images import ImageService
 from hermes_app.services.inspiration import InspirationService
 from hermes_app.services.intent_router import IntentRouter
 from hermes_app.services.logs import ExecutionLogService
@@ -45,6 +46,7 @@ skill_runtime = SkillRuntime(db, skill_registry)
 log_service = ExecutionLogService(db)
 weather_service = WeatherService(db)
 file_service = FileService(db)
+image_service = ImageService(db, file_service)
 orchestrator = HermesOrchestrator(
     intent_router=IntentRouter(),
     task_decomposer=TaskDecomposer(),
@@ -78,6 +80,7 @@ app.include_router(
         skill_runtime,
         weather_service,
         file_service,
+        image_service,
         log_service,
     )
 )

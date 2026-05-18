@@ -1,13 +1,22 @@
 import os
+from io import BytesIO
 
 os.environ["HERMES_DB"] = ":memory:"
+os.environ.pop("HERMES_LOCAL_TOKEN", None)
 
+from PIL import Image
 from fastapi.testclient import TestClient
 
 from hermes_app.main import app, weather_service
 
 
 client = TestClient(app)
+
+
+def _png_bytes() -> bytes:
+    buffer = BytesIO()
+    Image.new("RGB", (2, 3), color=(255, 0, 0)).save(buffer, format="PNG")
+    return buffer.getvalue()
 
 
 def test_health():
@@ -132,6 +141,21 @@ def test_file_upload_api():
 
     files = client.get("/api/files").json()
     assert any(item["id"] == data["id"] for item in files)
+
+
+def test_image_upload_api():
+    response = client.post(
+        "/api/images/upload",
+        files={"file": ("coat.png", _png_bytes(), "image/png")},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["filename"] == "coat.png"
+    assert data["width"] == 2
+    assert data["height"] == 3
+
+    images = client.get("/api/images").json()
+    assert any(item["id"] == data["id"] for item in images)
 
 
 def test_wardrobe_action_and_crud_flow():

@@ -5,6 +5,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from hermes_app.schemas import ChatRequest, ChatResponse, ConfirmActionResponse
 from hermes_app.services.actions import ActionService
 from hermes_app.services.files import FileService
+from hermes_app.services.images import ImageService
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
@@ -23,6 +24,7 @@ def create_api_router(
     skill_runtime: SkillRuntime,
     weather: WeatherService,
     files: FileService,
+    images: ImageService,
     logs: ExecutionLogService,
 ) -> APIRouter:
     reminder_service = ReminderService(actions.db)
@@ -199,6 +201,25 @@ def create_api_router(
         item = files.get(file_id)
         if not item:
             raise HTTPException(status_code=404, detail="File not found.")
+        return item
+
+    @router.post("/images/upload")
+    async def upload_image(file: UploadFile = File(...)) -> dict:
+        data = await file.read()
+        try:
+            return images.save_upload(file.filename or "image.bin", file.content_type or "application/octet-stream", data)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @router.get("/images")
+    def list_images() -> list[dict]:
+        return images.list()
+
+    @router.get("/images/{image_id}")
+    def get_image(image_id: str) -> dict:
+        item = images.get(image_id)
+        if not item:
+            raise HTTPException(status_code=404, detail="Image not found.")
         return item
 
     @router.get("/logs")

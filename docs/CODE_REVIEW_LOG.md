@@ -465,3 +465,44 @@ python -m pytest -q
 ```text
 ae947bb stage 3 file upload v1
 ```
+
+## 2026-05-18 阶段 3 Image Upload v1 评审
+
+范围：
+
+```text
+images 数据表
+ImageService
+POST /api/images/upload
+GET /api/images
+GET /api/images/{id}
+客户端图片面板
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-3-image-upload-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+图片上传复用 FileService，同时写入独立 images 表。
+ImageService 使用 Pillow 验证图片有效性并读取宽高。
+非图片内容会返回 400，不会写入图片记录。
+该能力为 image.clothing_recognition 和照片分类提供基础。
+```
+
+提交记录：
+
+```text
+待提交：stage-3-image-upload-v1
+```
