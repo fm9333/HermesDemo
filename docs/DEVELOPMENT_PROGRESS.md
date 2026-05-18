@@ -99,7 +99,10 @@
   - 验证：上传 `.txt/.md` 后可调用 `/api/files/{file_id}/summarize`
   - 验证：摘要通过 SkillRuntime 写入 `skill_runs`
   - 测试：`python -m pytest -q` 通过，26 passed
-- [ ] document.summarize PDF/DOCX 解析
+- [x] document.summarize PDF/DOCX 解析 v1
+  - 验证：`FileService.extract_text` 支持 PDF/DOCX
+  - 验证：`/api/files/{file_id}/summarize` 统一走 TXT/MD/PDF/DOCX 提取
+  - 测试：`python -m pytest -q` 通过，30 passed
 - [ ] image.clothing_recognition 真实图片识别
 - [x] work.todo_extract v1
   - 验证：可从中文文本中提取“请、需要、确认、修复”等待办候选
@@ -131,5 +134,6 @@
   - commit：`5765d6d stage 3 document summarize text v1`
   - commit：`9831ab9 stage 3 work todo extract v1`
   - commit：`1c6e89d stage 3 content list generate v1`
+  - 当前提交点：`stage-3-document-summarize-pdf-docx-v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

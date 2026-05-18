@@ -617,3 +617,42 @@ python -m pytest -q
 ```text
 1c6e89d stage 3 content list generate v1
 ```
+
+## 2026-05-18 阶段 3 document.summarize PDF/DOCX 解析 v1 评审
+
+范围：
+
+```text
+FileService.extract_text
+pypdf PDF 解析
+python-docx DOCX 解析
+/api/files/{file_id}/summarize 统一接入
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-3-document-summarize-pdf-docx-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+TXT/MD/PDF/DOCX 使用统一 extract_text 入口。
+DOCX 测试验证可提取段落文本。
+PDF v1 使用 pypdf，支持文本层 PDF；扫描版 PDF OCR 不在本次范围。
+摘要 API 不关心文件类型细节，只调用 FileService 提取文本后交给 SkillRuntime。
+```
+
+提交记录：
+
+```text
+待提交：stage-3-document-summarize-pdf-docx-v1
+```

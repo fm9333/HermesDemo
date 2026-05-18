@@ -6,6 +6,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
+from docx import Document
+from pypdf import PdfReader
+
 from hermes_app.core.config import BASE_DIR, get_settings
 from hermes_app.core.database import Database
 
@@ -46,16 +49,46 @@ class FileService:
         return self.db.query_one("SELECT * FROM files WHERE id = ?", (file_id,))
 
     def read_text(self, file_id: str, max_bytes: int = 200_000) -> str:
+        return self.extract_text(file_id, max_chars=max_bytes)
+
+    def extract_text(self, file_id: str, max_chars: int = 200_000) -> str:
         record = self.get(file_id)
         if not record:
             raise KeyError(f"File not found: {file_id}")
         path = Path(record["storage_path"])
-        if record["content_type"] not in {"text/plain", "text/markdown"} and path.suffix.lower() not in {".txt", ".md"}:
-            raise ValueError("Only text or markdown files can be summarized in v1.")
-        data = path.read_bytes()
-        if len(data) > max_bytes:
-            data = data[:max_bytes]
-        return data.decode("utf-8", errors="replace")
+        suffix = path.suffix.lower()
+        content_type = record["content_type"]
+
+        if content_type in {"text/plain", "text/markdown"} or suffix in {".txt", ".md"}:
+            text = _read_text_file(path, max_chars)
+        elif content_type == "application/pdf" or suffix == ".pdf":
+            text = _read_pdf(path)
+        elif (
+            content_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            or suffix == ".docx"
+        ):
+            text = _read_docx(path)
+        else:
+            raise ValueError("Only TXT, Markdown, PDF, and DOCX files can be summarized.")
+
+        return text[:max_chars]
+
+
+def _read_text_file(path: Path, max_bytes: int) -> str:
+    data = path.read_bytes()
+    if len(data) > max_bytes:
+        data = data[:max_bytes]
+    return data.decode("utf-8", errors="replace")
+
+
+def _read_pdf(path: Path) -> str:
+    reader = PdfReader(str(path))
+    return "\n".join(page.extract_text() or "" for page in reader.pages).strip()
+
+
+def _read_docx(path: Path) -> str:
+    document = Document(str(path))
+    return "\n".join(paragraph.text for paragraph in document.paragraphs if paragraph.text).strip()
 
 
 def _default_file_root() -> Path:

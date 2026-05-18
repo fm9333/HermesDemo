@@ -206,7 +206,7 @@ def create_api_router(
     @router.post("/files/{file_id}/summarize")
     def summarize_file(file_id: str) -> dict:
         try:
-            text = files.read_text(file_id)
+            text = files.extract_text(file_id)
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
         except ValueError as exc:
