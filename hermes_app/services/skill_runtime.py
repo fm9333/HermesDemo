@@ -24,8 +24,8 @@ class SkillRuntime:
         self.registry = registry
         self.llm_client = llm_client
 
-    def run(self, skill_id: str, text: str) -> dict:
-        output = self._run_with_llm(skill_id, text) or self.registry.run(skill_id, text)
+    def run(self, skill_id: str, text: str, metadata: dict | None = None) -> dict:
+        output = self._run_with_llm(skill_id, text, metadata=metadata or {}) or self.registry.run(skill_id, text)
         status = "ok" if output.get("title") != "Skill 未注册" else "not_found"
         run_id = str(uuid4())
         self.db.execute(
@@ -56,13 +56,18 @@ class SkillRuntime:
             row["output"] = json.loads(row.pop("output_json"))
         return rows
 
-    def _run_with_llm(self, skill_id: str, text: str) -> dict | None:
+    def _run_with_llm(self, skill_id: str, text: str, metadata: dict) -> dict | None:
         if not self.llm_client or skill_id not in self.llm_prompt_map:
             return None
         result = self.llm_client.chat(
             text,
             prompt_id=self.llm_prompt_map[skill_id],
-            context={"skill_id": skill_id, "output": "Return the requested JSON or structured content only."},
+            context={
+                "skill_id": skill_id,
+                "source": metadata.get("source", "manual"),
+                "output": "Return the requested JSON or structured content only.",
+            },
+            contains_file_context=bool(metadata.get("contains_file_context")),
         )
         if result.get("status") != "ok" or not result.get("reply"):
             return None

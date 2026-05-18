@@ -7,12 +7,19 @@ import httpx
 
 from hermes_app.services.llm_providers import LLMProviderService
 from hermes_app.services.prompt_library import PromptLibrary
+from hermes_app.services.settings import SettingsService
 
 
 class LLMClient:
-    def __init__(self, providers: LLMProviderService, prompts: PromptLibrary):
+    def __init__(
+        self,
+        providers: LLMProviderService,
+        prompts: PromptLibrary,
+        settings: SettingsService | None = None,
+    ):
         self.providers = providers
         self.prompts = prompts
+        self.settings = settings
 
     def chat(
         self,
@@ -21,6 +28,7 @@ class LLMClient:
         prompt_id: str = "hermes.agent.core",
         context: dict | None = None,
         messages: list[dict[str, str]] | None = None,
+        contains_file_context: bool = False,
     ) -> dict:
         provider = self.providers.get_runtime(provider_id)
         if not provider:
@@ -29,6 +37,14 @@ class LLMClient:
                 "reply": "",
                 "message": "未配置可用的 LLM Provider。",
                 "provider_id": provider_id,
+            }
+        if contains_file_context and not self._can_process_file_context(provider):
+            return {
+                "status": "blocked_by_policy",
+                "reply": "",
+                "message": "当前策略禁止云模型处理文件内容。请在模型 Provider 和设置中显式允许，或改用本地模型。",
+                "provider_id": provider["provider_id"],
+                "model": provider["model"],
             }
 
         system_prompt = self.prompts.render(prompt_id, context=context)
@@ -150,3 +166,12 @@ class LLMClient:
                     parts.append(str(part))
             return "".join(parts).strip()
         return str(content).strip()
+
+    def _can_process_file_context(self, provider: dict) -> bool:
+        if provider.get("provider_type") == "local_openai_compatible":
+            return True
+        global_allowed = False
+        if self.settings:
+            setting = self.settings.get("llm_allow_cloud_file_context")
+            global_allowed = bool(setting and setting["value"])
+        return global_allowed and bool(provider.get("allow_file_context"))

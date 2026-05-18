@@ -346,6 +346,19 @@
   - 验证：所有执行/写入/外发类动作仍通过 Action Gate，不允许 LLM 直接写数据库或直接调用外部 API
   - 测试：`python -m pytest -q` 通过，105 passed
 
+## 阶段 10：功能符合度审计与隐私策略补强
+
+- [x] 功能符合度审计 v1
+  - 文档：`docs/FUNCTIONAL_GAP_AUDIT.md`
+  - 验证：对照原始产品方案、桌面一体化计划、当前 API、当前测试和进度台账，明确当前状态不是完整商用版
+  - 验证：列出 Personal Skill、完整 Skills、真实 OAuth Provider、完整 UI、系统通知、密钥强加密、安装器签名等未完成缺口
+- [x] 云模型文件上下文权限拦截 v1
+  - 验证：`LLMClient.chat(..., contains_file_context=True)` 在云模型未双重授权时返回 `blocked_by_policy`
+  - 验证：文件总结 API 会将上传文件文本标记为 `contains_file_context`
+  - 验证：云 Provider 必须同时满足全局 `llm_allow_cloud_file_context=true` 和 Provider `allow_file_context=true` 才能处理文件文本
+  - 验证：本地 OpenAI-compatible Provider 可处理本地文件上下文
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，107 passed
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库

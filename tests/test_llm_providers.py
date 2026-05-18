@@ -2,6 +2,7 @@ from hermes_app.core.database import Database
 from hermes_app.services.llm_client import LLMClient
 from hermes_app.services.llm_providers import LLMProviderService
 from hermes_app.services.prompt_library import PromptLibrary
+from hermes_app.services.settings import SettingsService
 
 
 def test_llm_provider_masks_api_key_and_sets_default(tmp_path):
@@ -62,6 +63,44 @@ def test_llm_client_uses_openai_compatible_chat_payload(tmp_path, monkeypatch):
     assert captured["payload"]["messages"][0]["role"] == "system"
     assert captured["payload"]["messages"][1] == {"role": "user", "content": "你好"}
     assert providers.list_calls()[0]["status"] == "ok"
+
+
+def test_cloud_file_context_is_blocked_until_explicitly_allowed(tmp_path, monkeypatch):
+    db = Database(tmp_path / "llm.db")
+    db.init()
+    settings = SettingsService(db)
+    providers = LLMProviderService(db)
+    providers.create(
+        {
+            "provider_id": "cloud.test",
+            "name": "Cloud Test",
+            "base_url": "https://api.openai.com/v1",
+            "model": "test-model",
+            "api_key": "secret",
+            "allow_file_context": False,
+        }
+    )
+    client = LLMClient(providers, PromptLibrary(), settings)
+
+    def fail_post(provider, payload):
+        raise AssertionError("cloud provider must not receive file context when policy blocks it")
+
+    monkeypatch.setattr(client, "_post_json", fail_post)
+
+    blocked = client.chat("private file text", provider_id="cloud.test", contains_file_context=True)
+    assert blocked["status"] == "blocked_by_policy"
+
+    settings.update("llm_allow_cloud_file_context", True)
+    providers.update("cloud.test", {"allow_file_context": True})
+    monkeypatch.setattr(
+        client,
+        "_post_json",
+        lambda provider, payload: {"choices": [{"message": {"content": "allowed"}}]},
+    )
+
+    allowed = client.chat("private file text", provider_id="cloud.test", contains_file_context=True)
+    assert allowed["status"] == "ok"
+    assert allowed["reply"] == "allowed"
 
 
 def test_prompt_library_contains_deep_skill_prompts():

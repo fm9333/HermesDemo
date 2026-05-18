@@ -270,6 +270,7 @@ def create_api_router(
             provider_id=payload.get("provider_id"),
             prompt_id=payload.get("prompt_id", "hermes.agent.core"),
             context=payload.get("context") or {},
+            contains_file_context=bool(payload.get("contains_file_context", False)),
         )
 
     @router.get("/llm/calls")
@@ -668,7 +669,11 @@ def create_api_router(
             raise HTTPException(status_code=404, detail=str(exc)) from exc
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
-        return skill_runtime.run("document.summarize", text)
+        return skill_runtime.run(
+            "document.summarize",
+            text,
+            metadata={"source": "file", "file_id": file_id, "contains_file_context": True},
+        )
 
     @router.post("/images/upload")
     async def upload_image(file: UploadFile = File(...)) -> dict:

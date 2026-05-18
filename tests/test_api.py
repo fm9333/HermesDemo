@@ -430,6 +430,39 @@ def test_prompt_library_api():
     assert "Hermes" in detail.json()["system_prompt"]
 
 
+def test_file_summarize_blocks_cloud_llm_without_consent(monkeypatch):
+    client.post(
+        "/api/llm/providers",
+        json={
+            "provider_id": "api.file.cloud",
+            "name": "File Cloud",
+            "base_url": "https://api.openai.com/v1",
+            "model": "test-model",
+            "api_key": "secret",
+            "allow_file_context": False,
+            "is_default": True,
+        },
+    )
+
+    def fail_post(provider, payload):
+        raise AssertionError("file text must not be sent to cloud LLM without explicit consent")
+
+    monkeypatch.setattr(llm_client, "_post_json", fail_post)
+
+    uploaded = client.post(
+        "/api/files/upload",
+        files={"file": ("private.txt", b"private file text", "text/plain")},
+    )
+    assert uploaded.status_code == 200
+
+    summarized = client.post(f"/api/files/{uploaded.json()['id']}/summarize")
+    assert summarized.status_code == 200
+    data = summarized.json()
+    assert data["status"] == "ok"
+    assert data["output"]["title"] == "文档总结草案"
+    assert "_llm" not in data["output"]
+
+
 def test_proactive_suggestions_api():
     suggestions = client.get("/api/proactive/suggestions")
     assert suggestions.status_code == 200

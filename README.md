@@ -78,6 +78,8 @@ API Key: 云模型填写；本地模型可留空
 
 API Key 只保存在本地数据库，接口不会回显完整密钥，只返回 `api_key_set` 和 `api_key_preview`。当前实现是本地保护保存，不等同于系统 Keychain 或 SQLCipher 强加密。
 
+云端模型默认不能处理上传文件内容。只有同时打开全局 `llm_allow_cloud_file_context` 设置，并且对应 LLM Provider 的 `allow_file_context=true` 时，文件总结类 Skill 才会把文件文本发送给云端模型；本地 OpenAI-compatible Provider 不受该云端限制。
+
 ## API
 
 ```text

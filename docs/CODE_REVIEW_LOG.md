@@ -2059,3 +2059,43 @@ LLM 仍不能直接写数据库或直接调用外部 API，执行类动作继续
 ```text
 06a5ae9 stage 9 llm provider and prompts v1
 ```
+
+## 2026-05-18 阶段 10 功能符合度审计与云模型文件权限拦截 v1 评审
+
+范围：
+```text
+docs/FUNCTIONAL_GAP_AUDIT.md
+LLMClient contains_file_context policy
+SkillRuntime metadata propagation
+file summarize API file-context marking
+LLM provider / API regression tests
+```
+
+结论：
+```text
+通过，形成可提交点 stage-10-gap-audit-cloud-file-guard-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest tests\test_llm_providers.py tests\test_api.py -q
+python -m pytest -q
+```
+
+评审结论：
+```text
+功能符合度审计明确当前项目是可运行 MVP/技术底座，不是原始文档要求的完整商用版。
+审计文档列出 P0/P1 缺口，后续开发应优先围绕 Personal Skill、完整 Skills、真实 OAuth Provider、完整 UI 和商用安全交付推进。
+文件总结 API 现在会把上传文件文本标记为 contains_file_context。
+云端 LLM Provider 处理文件内容必须同时满足全局设置和 Provider 配置双重授权，默认阻断。
+本地 OpenAI-compatible Provider 不受云端文件限制，可作为隐私优先路径。
+被策略阻断时不会调用 `_post_json`，SkillRuntime 会回退本地规则输出，避免泄漏和功能中断。
+```
+
+测试结果：
+```text
+107 passed, 2 warnings
+```
