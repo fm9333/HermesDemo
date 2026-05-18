@@ -579,5 +579,5 @@ python -m pytest -q
 提交记录：
 
 ```text
-待提交：stage-3-work-todo-extract-v1
+9831ab9 stage 3 work todo extract v1
 ```
