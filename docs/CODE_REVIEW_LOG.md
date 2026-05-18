@@ -998,5 +998,5 @@ Idea 转待办 v1 会把结构化 Idea Card 的 next_steps 转为本地 todo_ite
 提交记录：
 
 ```text
-待提交 stage 5 idea to todo v1
+9d6d4f4 stage 5 idea to todo v1
 ```
