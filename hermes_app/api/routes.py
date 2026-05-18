@@ -20,6 +20,7 @@ from hermes_app.services.prd_drafts import PrdDraftService
 from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
 from hermes_app.services.scenes import SceneService
+from hermes_app.services.settings import SettingsService
 from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.todos import TodoService
@@ -47,6 +48,7 @@ def create_api_router(
     autonomy: AutonomyZoneClassifier,
     eval_runner: EvalRunner,
     growth_logs: GrowthLogService,
+    settings: SettingsService,
     memory: MemoryService,
     actions: ActionService,
     skills: SkillRegistry,
@@ -144,6 +146,19 @@ def create_api_router(
             return growth_logs.rollback(log_id)
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.get("/settings")
+    def list_settings() -> list[dict]:
+        return settings.list()
+
+    @router.patch("/settings/{key}")
+    def update_setting(key: str, payload: dict) -> dict:
+        try:
+            return settings.update(key, payload.get("value"))
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     @router.get("/memory")
     def list_memory() -> list[dict]:

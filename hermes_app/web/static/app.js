@@ -39,6 +39,7 @@ const panelLabels = {
   redZone: "红区",
   evalRuns: "评测",
   growthLog: "成长",
+  settings: "设置",
   logs: "日志",
 };
 
@@ -66,6 +67,7 @@ const panelEndpoints = {
   redZone: "/api/red-zone/rules",
   evalRuns: "/api/eval/runs",
   growthLog: "/api/growth-log",
+  settings: "/api/settings",
   logs: "/api/logs",
 };
 
@@ -259,6 +261,16 @@ async function rollbackGrowthLog(logId) {
   await loadPanel(activePanel);
 }
 
+async function updateSetting(key, rawValue) {
+  const value = rawValue === "true" ? true : rawValue === "false" ? false : rawValue;
+  const data = await requestJson(`/api/settings/${key}`, {
+    method: "PATCH",
+    body: JSON.stringify({ value }),
+  });
+  addMessage("assistant", `设置已更新：${data.key}`);
+  await loadPanel(activePanel);
+}
+
 async function completeTodo(todoId) {
   const data = await requestJson(`/api/todos/${todoId}/complete`, { method: "POST" });
   addMessage("assistant", `待办已完成：${data.title}`);
@@ -285,6 +297,23 @@ function renderPanelItem(item, panel) {
   if (panel === "yellowQueue" && item.status === "pending") {
     controls.push(`<button class="action-button" data-confirm="${item.id}">确认</button>`);
     controls.push(`<button class="action-button reject" data-reject="${item.id}">拒绝</button>`);
+  }
+  if (panel === "settings") {
+    if (typeof item.value === "boolean") {
+      controls.push(
+        `<button class="action-button" data-setting-key="${item.key}" data-setting-value="${String(!item.value)}">
+          ${item.value ? "关闭" : "开启"}
+        </button>`
+      );
+    }
+    if (item.key === "red_zone_policy") {
+      const nextValue = item.value === "block" ? "confirm_only" : "block";
+      controls.push(
+        `<button class="action-button reject" data-setting-key="${item.key}" data-setting-value="${nextValue}">
+          切换为 ${nextValue}
+        </button>`
+      );
+    }
   }
   if (panel === "scenes") {
     controls.push(`<button class="action-button" data-scene-feedback-positive="${item.id}">有效</button>`);
@@ -347,6 +376,8 @@ document.addEventListener("click", async (event) => {
   const ideaToSceneId = event.target.dataset?.ideaToScene;
   const ideaPreferenceId = event.target.dataset?.ideaPreference;
   const rollbackGrowthId = event.target.dataset?.rollbackGrowth;
+  const settingKey = event.target.dataset?.settingKey;
+  const settingValue = event.target.dataset?.settingValue;
   const completeTodoId = event.target.dataset?.completeTodo;
   const panel = event.target.dataset?.panel;
 
@@ -361,6 +392,7 @@ document.addEventListener("click", async (event) => {
     if (ideaToSceneId) await convertIdeaToScene(ideaToSceneId);
     if (ideaPreferenceId) await createIdeaPreferenceCandidate(ideaPreferenceId);
     if (rollbackGrowthId) await rollbackGrowthLog(rollbackGrowthId);
+    if (settingKey) await updateSetting(settingKey, settingValue);
     if (completeTodoId) await completeTodo(completeTodoId);
     if (panel) await loadPanel(panel);
   } catch (error) {

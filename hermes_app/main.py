@@ -33,6 +33,7 @@ from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
 from hermes_app.services.scenes import SceneService
 from hermes_app.services.safety import SafetyService
+from hermes_app.services.settings import SettingsService
 from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.task_decomposer import TaskDecomposer
@@ -52,6 +53,7 @@ wardrobe_service = WardrobeService(db)
 autonomy_classifier = AutonomyZoneClassifier()
 eval_runner = EvalRunner(db, autonomy_classifier)
 growth_log_service = GrowthLogService(db)
+settings_service = SettingsService(db)
 tool_registry = ToolRegistry(db, memory_service, reminder_service, wardrobe_service)
 action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
@@ -98,6 +100,7 @@ app.include_router(
         autonomy_classifier,
         eval_runner,
         growth_log_service,
+        settings_service,
         memory_service,
         action_service,
         skill_registry,

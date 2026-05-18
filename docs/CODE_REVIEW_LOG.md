@@ -1338,3 +1338,45 @@ red-zone/check API 可供后续 Eval Runner 和安全策略页复用。
 ```text
 3328566 stage 6 red zone blocking v1
 ```
+
+## 2026-05-18 阶段 6 安全策略设置 v1 评审
+
+范围：
+
+```text
+app_settings 数据表
+SettingsService
+GET /api/settings
+PATCH /api/settings/{key}
+客户端设置面板和策略切换
+Settings 服务和 API 测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-6-safety-settings-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+安全策略设置 v1 建立了本地 app_settings 表和默认策略初始化。
+当前覆盖自主进化开关、Yellow Zone 确认策略、Red Zone 策略、Draft Eval 要求和通知开关。
+设置更新会校验非法值，避免写入不可识别策略。
+客户端设置面板支持布尔策略和 Red Zone 策略切换。
+```
+
+提交记录：
+
+```text
+待提交 stage 6 safety settings v1
+```

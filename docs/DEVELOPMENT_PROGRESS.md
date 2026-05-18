@@ -212,7 +212,12 @@
   - 验证：`POST /api/red-zone/check` 和 `GET /api/red-zone/rules` 可用
   - 验证：客户端红区面板可查看阻断规则
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，54 passed
-- [ ] 安全策略设置
+- [x] 安全策略设置 v1
+  - 验证：`app_settings` 可保存本地安全/自主/Eval 策略
+  - 验证：默认策略包含 `autonomy_enabled`、`yellow_zone_requires_confirmation`、`red_zone_policy`、`eval_required_for_drafts`
+  - 验证：`GET /api/settings`、`PATCH /api/settings/{key}` 可用并校验非法值
+  - 验证：客户端设置面板可切换布尔策略和 Red Zone 策略
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，56 passed
 
 ## GitHub / SVN 同步状态
 
@@ -254,5 +259,6 @@
   - commit：`8dd90b7 stage 6 growth log v1`
   - commit：`1e377b6 stage 6 yellow zone queue v1`
   - commit：`3328566 stage 6 red zone blocking v1`
+  - commit：`待提交 stage 6 safety settings v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

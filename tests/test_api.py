@@ -37,6 +37,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="redZone"' in response.text
     assert 'data-panel="evalRuns"' in response.text
     assert 'data-panel="growthLog"' in response.text
+    assert 'data-panel="settings"' in response.text
     assert 'id="panel-action"' in response.text
 
 
@@ -176,6 +177,19 @@ def test_growth_log_api():
     rolled_back = client.post(f"/api/growth-log/{created.json()['id']}/rollback")
     assert rolled_back.status_code == 200
     assert rolled_back.json()["status"] == "rolled_back"
+
+
+def test_settings_api():
+    listed = client.get("/api/settings")
+    assert listed.status_code == 200
+    assert any(item["key"] == "autonomy_enabled" for item in listed.json())
+
+    updated = client.patch("/api/settings/autonomy_enabled", json={"value": False})
+    assert updated.status_code == 200
+    assert updated.json()["value"] is False
+
+    invalid = client.patch("/api/settings/red_zone_policy", json={"value": "unsafe"})
+    assert invalid.status_code == 400
 
 
 def test_tools_api_lists_action_tool_registry():
