@@ -1619,5 +1619,5 @@ Provider 状态为 disconnected 时刷新会返回 disabled，不会继续访问
 
 提交记录：
 ```text
-待提交 stage 7 news provider v1
+f6a7b8c stage 7 news provider v1
 ```

@@ -303,6 +303,6 @@
   - commit：`5451de5 stage 7 lightweight triggers v1`
   - commit：`e235bb9 stage 7 weekly review v1`
   - commit：`73075ce stage 7 personalized home cards v1`
-  - commit：`待提交 stage 7 news provider v1`
+  - commit：`f6a7b8c stage 7 news provider v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
