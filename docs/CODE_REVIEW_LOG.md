@@ -544,3 +544,40 @@ PDF/DOCX 解析仍是后续任务，未在本次范围内标记完成。
 ```text
 5765d6d stage 3 document summarize text v1
 ```
+
+## 2026-05-18 阶段 3 work.todo_extract v1 评审
+
+范围：
+
+```text
+SkillRegistry work.todo_extract
+SkillRuntime work.todo_extract 测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-3-work-todo-extract-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+待办提取从静态 mock 升级为规则提取。
+支持按中文/英文分隔符切句。
+识别待办、todo、需要、请、安排、跟进、确认、完成、处理、修复等动作信号。
+无命中时返回低置信度 fallback，避免空结果造成 UI 断层。
+```
+
+提交记录：
+
+```text
+待提交：stage-3-work-todo-extract-v1
+```

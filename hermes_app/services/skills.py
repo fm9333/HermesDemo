@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from hermes_app.schemas import SkillContract
 
 
@@ -67,13 +69,7 @@ class SkillRegistry:
                 "structure": ["结论", "关键信息", "待确认问题"],
             }
         if skill_id == "work.todo_extract":
-            return {
-                "title": "待办候选",
-                "todos": [
-                    {"title": "确认任务范围", "source": "message"},
-                    {"title": "补充时间与负责人", "source": "message"},
-                ],
-            }
+            return self._extract_todos(text)
         if skill_id == "content.list_generate":
             return {
                 "title": "清单草案",
@@ -81,3 +77,25 @@ class SkillRegistry:
             }
         return {"title": "Skill 未注册", "message": f"{skill_id} is not available."}
 
+    def _extract_todos(self, text: str) -> dict:
+        chunks = [
+            chunk.strip(" \t\r\n，。；;：:")
+            for chunk in re.split(r"[\n。；;]", text)
+            if chunk.strip(" \t\r\n，。；;：:")
+        ]
+        keywords = ("待办", "todo", "需要", "请", "安排", "跟进", "确认", "完成", "处理", "修复")
+        todos = []
+        for chunk in chunks:
+            lower = chunk.lower()
+            if any(keyword in lower for keyword in keywords):
+                title = re.sub(r"^(待办|todo)[:：\-\s]*", "", chunk, flags=re.IGNORECASE).strip()
+                todos.append({"title": title[:120], "source": "message", "confidence": 0.78})
+
+        if not todos:
+            todos.append({"title": "确认是否存在待办事项", "source": "fallback", "confidence": 0.42})
+
+        return {
+            "title": "待办候选",
+            "todos": todos,
+            "count": len(todos),
+        }

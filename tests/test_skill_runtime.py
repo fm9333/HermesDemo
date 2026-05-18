@@ -16,3 +16,16 @@ def test_skill_runtime_records_run(tmp_path):
     assert len(runs) == 1
     assert runs[0]["skill_id"] == "content.list_generate"
 
+
+def test_todo_extract_skill_extracts_action_items(tmp_path):
+    db = Database(tmp_path / "skills.db")
+    db.init()
+    runtime = SkillRuntime(db, SkillRegistry())
+
+    result = runtime.run("work.todo_extract", "请小王明天确认发布清单；需要修复登录失败问题。")
+
+    todos = result["output"]["todos"]
+    assert result["status"] == "ok"
+    assert len(todos) == 2
+    assert "确认发布清单" in todos[0]["title"]
+    assert "修复登录失败" in todos[1]["title"]
