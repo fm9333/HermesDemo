@@ -301,7 +301,11 @@
   - 验证：未知表名会被拒绝，避免任意 SQL/系统表导出
   - 验证：`GET /api/exports`、`POST /api/exports` 和客户端导出面板可用
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，82 passed
-- [ ] 性能优化
+- [x] 性能优化 v1
+  - 验证：常用状态列表、历史列表、新闻、地图缓存查询已建立 SQLite 索引
+  - 验证：`schema_migrations` 记录 `0005_performance_indexes`
+  - 验证：`GET /api/performance/indexes` 和客户端性能面板可查看索引
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，94 passed
 - [ ] 端到端测试
 - [ ] 安全测试
 
@@ -359,5 +363,6 @@
   - commit：`7641b3b stage 8 crash recovery v1`
   - commit：`f98a2ad stage 8 pyinstaller packaging v1`
   - commit：`acdfee4 stage 8 update strategy v1`
+  - commit：`待提交 stage 8 performance indexes v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

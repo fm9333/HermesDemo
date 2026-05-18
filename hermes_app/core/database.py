@@ -12,6 +12,7 @@ MIGRATIONS = (
     ("0002_inspiration_workflows", "Idea cards, todos, PRD drafts, wardrobe, and feedback schema"),
     ("0003_proactive_integrations", "Providers, triggers, weekly reviews, news, and maps schema"),
     ("0004_release_backups", "Release readiness support for local backup and restore"),
+    ("0005_performance_indexes", "Indexes for common status, source, and history queries"),
 )
 
 
@@ -332,6 +333,29 @@ class Database:
                     created_at TEXT NOT NULL,
                     FOREIGN KEY(opportunity_id) REFERENCES opportunities(id)
                 );
+
+                CREATE INDEX IF NOT EXISTS idx_pending_actions_status_created
+                    ON pending_actions(status, created_at);
+                CREATE INDEX IF NOT EXISTS idx_memory_candidates_status_created
+                    ON memory_candidates(status, created_at);
+                CREATE INDEX IF NOT EXISTS idx_reminders_status_created
+                    ON reminders(status, created_at);
+                CREATE INDEX IF NOT EXISTS idx_todo_items_status_created
+                    ON todo_items(status, created_at);
+                CREATE INDEX IF NOT EXISTS idx_idea_cards_status_created
+                    ON idea_cards(status, created_at);
+                CREATE INDEX IF NOT EXISTS idx_prd_drafts_status_created
+                    ON prd_drafts(status, created_at);
+                CREATE INDEX IF NOT EXISTS idx_context_signals_status_type_created
+                    ON context_signals(status, signal_type, created_at);
+                CREATE INDEX IF NOT EXISTS idx_opportunities_status_created
+                    ON opportunities(status, created_at);
+                CREATE INDEX IF NOT EXISTS idx_recommendations_status_created
+                    ON recommendations(status, created_at);
+                CREATE INDEX IF NOT EXISTS idx_news_articles_status_published
+                    ON news_articles(status, published_at);
+                CREATE INDEX IF NOT EXISTS idx_map_places_query_created
+                    ON map_places(query, created_at);
                 """
             )
             self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")
@@ -384,6 +408,16 @@ class Database:
 
     def list_migrations(self) -> list[dict[str, Any]]:
         return self.query("SELECT * FROM schema_migrations ORDER BY id")
+
+    def list_indexes(self) -> list[dict[str, Any]]:
+        return self.query(
+            """
+            SELECT name, tbl_name, sql
+            FROM sqlite_master
+            WHERE type = 'index' AND name NOT LIKE 'sqlite_autoindex%'
+            ORDER BY name
+            """
+        )
 
     def backup_to(self, target: str | Path) -> None:
         target_path = Path(target)

@@ -78,6 +78,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="databaseMigrations"' in response.text
     assert 'data-panel="runtimeRecovery"' in response.text
     assert 'data-panel="updates"' in response.text
+    assert 'data-panel="performance"' in response.text
     assert 'data-panel="providers"' in response.text
     assert 'data-panel="backups"' in response.text
     assert 'data-panel="exports"' in response.text
@@ -136,6 +137,14 @@ def test_updates_api(tmp_path):
     checked = client.post("/api/updates/check")
     assert checked.status_code == 200
     assert checked.json()["status"] == "update_available"
+
+
+def test_performance_indexes_api():
+    response = client.get("/api/performance/indexes")
+    assert response.status_code == 200
+    index_names = {item["name"] for item in response.json()}
+    assert "idx_pending_actions_status_created" in index_names
+    assert "idx_map_places_query_created" in index_names
 
 
 def test_export_api(tmp_path, monkeypatch):

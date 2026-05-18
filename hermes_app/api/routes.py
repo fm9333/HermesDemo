@@ -98,6 +98,10 @@ def create_api_router(
     def list_database_migrations() -> list[dict]:
         return actions.db.list_migrations()
 
+    @router.get("/performance/indexes")
+    def list_performance_indexes() -> list[dict]:
+        return actions.db.list_indexes()
+
     @router.get("/runtime/recovery")
     def runtime_recovery_status() -> dict:
         return runtime_state.heartbeat()
