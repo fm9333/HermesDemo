@@ -2191,3 +2191,8 @@ Skill Curator、自动补丁生成和价值/成功率治理仍是后续 P0。
 ```text
 113 passed, 2 warnings
 ```
+
+提交记录：
+```text
+2f3824d stage 12 skill patches v1
+```
