@@ -129,8 +129,16 @@
   - 验证：可从 `weather.rain` 信号生成带伞提醒机会
   - 验证：可从 `file.uploaded` 信号生成文档总结 Skill 推荐机会
   - 测试：`python -m pytest -q` 通过，37 passed
-- [ ] Attention Policy 深化
-- [ ] 推荐卡片
+- [x] Attention Policy v1
+  - 验证：`AttentionPolicy` 可按机会优先级输出 `interrupt`、`summary`、`silent`
+  - 验证：高优先级机会会标记 `requires_confirmation=true`
+  - 测试：`python -m pytest -q` 通过，41 passed
+- [x] Recommendation Cards v1
+  - 验证：`POST /api/recommendations/generate` 可基于 open opportunities 生成推荐卡片
+  - 验证：同一 open opportunity 重复生成不会产生重复 open 推荐
+  - 验证：`GET /api/recommendations` 可查询，`POST /api/recommendations/{id}/dismiss` 可忽略
+  - 验证：客户端推荐面板可触发生成推荐，并可忽略 open 推荐
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过
 - [ ] Scene Feedback
 
 ## GitHub / SVN 同步状态
@@ -161,5 +169,6 @@
   - commit：`8af4950 stage 4 scene registry v1`
   - commit：`4787665 stage 4 context signal pipeline v1`
   - commit：`3479a07 stage 4 opportunity engine v1`
+  - commit：`待提交 stage 4 attention recommendations v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

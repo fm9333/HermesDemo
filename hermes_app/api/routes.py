@@ -11,6 +11,7 @@ from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
+from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
 from hermes_app.services.scenes import SceneService
 from hermes_app.services.skill_runtime import SkillRuntime
@@ -31,6 +32,7 @@ def create_api_router(
     scenes: SceneService,
     context_signals: ContextSignalService,
     opportunities: OpportunityEngine,
+    recommendations: RecommendationService,
     logs: ExecutionLogService,
 ) -> APIRouter:
     reminder_service = ReminderService(actions.db)
@@ -300,6 +302,21 @@ def create_api_router(
     def close_opportunity(opportunity_id: str) -> dict:
         try:
             return opportunities.close(opportunity_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.post("/recommendations/generate")
+    def generate_recommendations() -> list[dict]:
+        return recommendations.generate()
+
+    @router.get("/recommendations")
+    def list_recommendations(status: str | None = None) -> list[dict]:
+        return recommendations.list(status=status)
+
+    @router.post("/recommendations/{recommendation_id}/dismiss")
+    def dismiss_recommendation(recommendation_id: str) -> dict:
+        try:
+            return recommendations.dismiss(recommendation_id)
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 

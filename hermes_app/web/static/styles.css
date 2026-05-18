@@ -181,6 +181,13 @@ h2 {
   border-bottom: 1px solid var(--line);
 }
 
+.inspector-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .messages {
   display: flex;
   flex-direction: column;
@@ -391,4 +398,3 @@ pre {
     grid-template-columns: 1fr;
   }
 }
-

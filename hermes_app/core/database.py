@@ -179,6 +179,17 @@ class Database:
                     created_at TEXT NOT NULL,
                     FOREIGN KEY(signal_id) REFERENCES context_signals(id)
                 );
+
+                CREATE TABLE IF NOT EXISTS recommendations (
+                    id TEXT PRIMARY KEY,
+                    opportunity_id TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    channel TEXT NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(opportunity_id) REFERENCES opportunities(id)
+                );
                 """
             )
             self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")

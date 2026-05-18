@@ -30,6 +30,7 @@
           <button class="rail-button" data-panel="scenes" title="场景">场景</button>
           <button class="rail-button" data-panel="signals" title="信号">信号</button>
           <button class="rail-button" data-panel="opportunities" title="机会">机会</button>
+          <button class="rail-button" data-panel="recommendations" title="推荐">推荐</button>
           <button class="rail-button" data-panel="ideas" title="灵感">灵感</button>
           <button class="rail-button" data-panel="weather" title="天气">天气</button>
           <button class="rail-button" data-panel="wardrobe" title="衣橱">衣橱</button>
@@ -70,7 +71,10 @@
             <p class="eyebrow">State Inspector</p>
             <h2 id="panel-title">记忆</h2>
           </div>
-          <button class="ghost-button" id="refresh-panel" title="刷新">刷新</button>
+          <div class="inspector-actions">
+            <button class="ghost-button" id="panel-action" hidden>Run</button>
+            <button class="ghost-button" id="refresh-panel" title="刷新">刷新</button>
+          </div>
         </div>
         <div class="panel-list" id="panel-list"></div>
       </aside>

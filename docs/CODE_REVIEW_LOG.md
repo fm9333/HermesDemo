@@ -821,3 +821,48 @@ file.uploaded 信号生成 document.summarize Skill 推荐机会。
 ```text
 3479a07 stage 4 opportunity engine v1
 ```
+
+## 2026-05-18 阶段 4 Attention Policy + Recommendation Cards v1 评审
+
+范围：
+
+```text
+recommendations 数据表
+AttentionPolicy
+RecommendationService
+POST /api/recommendations/generate
+GET /api/recommendations
+POST /api/recommendations/{id}/dismiss
+客户端推荐面板生成与忽略操作
+推荐服务和 API 单元测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-4-attention-recommendations-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+Attention Policy v1 按 opportunity priority 将推荐分流到 interrupt、summary、silent。
+interrupt 通道会标记 requires_confirmation，后续可接入桌面通知和 Action Gate。
+Recommendation Cards v1 会把 open opportunities 转为可查询、可忽略的推荐卡片。
+生成逻辑对同一 open opportunity 幂等，避免重复点击产生重复 open 卡片。
+客户端推荐面板已具备生成和忽略操作，满足当前阶段闭环。
+```
+
+提交记录：
+
+```text
+待提交 stage 4 attention recommendations v1
+```

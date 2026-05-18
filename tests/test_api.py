@@ -25,6 +25,13 @@ def test_health():
     assert response.json()["status"] == "ok"
 
 
+def test_home_contains_recommendation_controls():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert 'data-panel="recommendations"' in response.text
+    assert 'id="panel-action"' in response.text
+
+
 def test_reminder_action_flow():
     response = client.post("/api/chat", json={"message": "明天早上提醒我带伞"})
     assert response.status_code == 200
@@ -220,6 +227,33 @@ def test_opportunity_api_flow():
     closed = client.post(f"/api/opportunities/{opportunity['id']}/close")
     assert closed.status_code == 200
     assert closed.json()["status"] == "closed"
+
+
+def test_recommendation_api_flow():
+    signal = client.post(
+        "/api/context-signals",
+        json={"source": "weather", "signal_type": "weather.rain", "payload": {"probability": 85}},
+    ).json()
+    client.post("/api/opportunities/generate")
+    opportunity = next(
+        item for item in client.get("/api/opportunities").json() if item["signal_id"] == signal["id"]
+    )
+
+    generated = client.post("/api/recommendations/generate")
+    assert generated.status_code == 200
+    recommendation = next(
+        item for item in generated.json() if item["opportunity_id"] == opportunity["id"]
+    )
+    assert recommendation["channel"] == "interrupt"
+    assert recommendation["payload"]["attention"]["requires_confirmation"] is True
+
+    listed = client.get("/api/recommendations?status=open")
+    assert listed.status_code == 200
+    assert any(item["id"] == recommendation["id"] for item in listed.json())
+
+    dismissed = client.post(f"/api/recommendations/{recommendation['id']}/dismiss")
+    assert dismissed.status_code == 200
+    assert dismissed.json()["status"] == "dismissed"
 
 
 def test_wardrobe_action_and_crud_flow():

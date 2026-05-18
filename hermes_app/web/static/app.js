@@ -5,6 +5,7 @@ const healthPill = document.querySelector("#health-pill");
 const panelList = document.querySelector("#panel-list");
 const panelTitle = document.querySelector("#panel-title");
 const refreshPanel = document.querySelector("#refresh-panel");
+const panelAction = document.querySelector("#panel-action");
 let activePanel = "memory";
 
 const pageToken = document.querySelector('meta[name="hermes-token"]')?.content || "";
@@ -21,6 +22,7 @@ const panelLabels = {
   scenes: "场景",
   signals: "信号",
   opportunities: "机会",
+  recommendations: "推荐",
   ideas: "灵感",
   weather: "天气",
   wardrobe: "衣橱",
@@ -39,6 +41,7 @@ const panelEndpoints = {
   scenes: "/api/scenes",
   signals: "/api/context-signals",
   opportunities: "/api/opportunities",
+  recommendations: "/api/recommendations",
   ideas: "/api/ideas",
   weather: "/api/weather/cache",
   wardrobe: "/api/wardrobe",
@@ -48,6 +51,11 @@ const panelEndpoints = {
   images: "/api/images",
   tools: "/api/tools",
   logs: "/api/logs",
+};
+
+const panelActions = {
+  opportunities: { label: "生成机会", endpoint: "/api/opportunities/generate" },
+  recommendations: { label: "生成推荐", endpoint: "/api/recommendations/generate" },
 };
 
 function escapeHtml(value) {
@@ -174,14 +182,33 @@ async function rejectAction(actionId) {
   await loadPanel(activePanel);
 }
 
+async function runPanelAction() {
+  const action = panelActions[activePanel];
+  if (!action) return;
+  const data = await requestJson(action.endpoint, { method: "POST" });
+  addMessage("assistant", `${action.label}完成`, { cards: [{ title: action.label, payload: data }] });
+  await loadPanel(activePanel);
+}
+
+async function dismissRecommendation(recommendationId) {
+  const data = await requestJson(`/api/recommendations/${recommendationId}/dismiss`, { method: "POST" });
+  addMessage("assistant", `推荐已忽略：${data.title || data.id}`);
+  await loadPanel(activePanel);
+}
+
 function renderPanelItem(item, panel) {
   let title = item.title || item.key || item.skill_id || item.intent || item.name || item.action_type || item.id;
   if (panel === "reminders") title = item.title;
   if (panel === "ideas") title = item.title;
+  const controls = [];
+  if (panel === "recommendations" && item.status === "open") {
+    controls.push(`<button class="action-button reject" data-dismiss-recommendation="${item.id}">忽略</button>`);
+  }
   return `
     <article class="panel-item">
       <p class="panel-title">${escapeHtml(title || "Item")}</p>
       <pre>${asJson(item)}</pre>
+      ${controls.length ? `<div class="action-row">${controls.join("")}</div>` : ""}
     </article>
   `;
 }
@@ -192,6 +219,12 @@ async function loadPanel(panel) {
   document.querySelectorAll(".rail-button").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.panel === panel);
   });
+  const action = panelActions[panel];
+  panelAction.hidden = !action;
+  if (action) {
+    panelAction.textContent = action.label;
+    panelAction.title = action.label;
+  }
 
   panelList.innerHTML = `<div class="panel-empty">Loading</div>`;
   const data = await requestJson(panelEndpoints[panel]);
@@ -217,11 +250,13 @@ form.addEventListener("submit", async (event) => {
 document.addEventListener("click", async (event) => {
   const confirmId = event.target.dataset?.confirm;
   const rejectId = event.target.dataset?.reject;
+  const dismissRecommendationId = event.target.dataset?.dismissRecommendation;
   const panel = event.target.dataset?.panel;
 
   try {
     if (confirmId) await confirmAction(confirmId);
     if (rejectId) await rejectAction(rejectId);
+    if (dismissRecommendationId) await dismissRecommendation(dismissRecommendationId);
     if (panel) await loadPanel(panel);
   } catch (error) {
     addMessage("assistant", `操作失败：${error.message}`);
@@ -229,6 +264,7 @@ document.addEventListener("click", async (event) => {
 });
 
 refreshPanel.addEventListener("click", () => loadPanel(activePanel));
+panelAction.addEventListener("click", runPanelAction);
 
 async function boot() {
   try {

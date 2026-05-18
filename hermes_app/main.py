@@ -15,6 +15,7 @@ from hermes_app.api.routes import create_api_router
 from hermes_app.core.config import get_settings
 from hermes_app.core.database import Database
 from hermes_app.services.actions import ActionService
+from hermes_app.services.attention import AttentionPolicy
 from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.files import FileService
 from hermes_app.services.images import ImageService
@@ -24,6 +25,7 @@ from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
+from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
 from hermes_app.services.scenes import SceneService
 from hermes_app.services.safety import SafetyService
@@ -53,6 +55,8 @@ image_service = ImageService(db, file_service)
 scene_service = SceneService(db)
 context_signal_service = ContextSignalService(db)
 opportunity_engine = OpportunityEngine(db, context_signal_service)
+attention_policy = AttentionPolicy()
+recommendation_service = RecommendationService(db, opportunity_engine, attention_policy)
 orchestrator = HermesOrchestrator(
     intent_router=IntentRouter(),
     task_decomposer=TaskDecomposer(),
@@ -91,6 +95,7 @@ app.include_router(
         scene_service,
         context_signal_service,
         opportunity_engine,
+        recommendation_service,
         log_service,
     )
 )
@@ -112,4 +117,4 @@ async def local_token_guard(request: Request, call_next):
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "token": request.query_params.get("token", "")})
+    return templates.TemplateResponse(request, "index.html", {"token": request.query_params.get("token", "")})
