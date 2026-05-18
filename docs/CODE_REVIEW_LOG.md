@@ -1254,5 +1254,5 @@ Growth Log v1 让用户可以查看 Hermes 最近优化了什么。
 提交记录：
 
 ```text
-待提交 stage 6 growth log v1
+8dd90b7 stage 6 growth log v1
 ```
