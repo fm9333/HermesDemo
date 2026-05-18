@@ -32,6 +32,7 @@ from hermes_app.services.safety import SafetyService
 from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.task_decomposer import TaskDecomposer
+from hermes_app.services.todos import TodoService
 from hermes_app.services.tools import ToolRegistry
 from hermes_app.services.wardrobe import WardrobeService
 from hermes_app.services.weather import WeatherService
@@ -48,6 +49,7 @@ tool_registry = ToolRegistry(db, memory_service, reminder_service, wardrobe_serv
 action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
 skill_runtime = SkillRuntime(db, skill_registry)
+todo_service = TodoService(db)
 log_service = ExecutionLogService(db)
 weather_service = WeatherService(db)
 file_service = FileService(db)
@@ -89,6 +91,7 @@ app.include_router(
         action_service,
         skill_registry,
         skill_runtime,
+        todo_service,
         weather_service,
         file_service,
         image_service,

@@ -30,6 +30,7 @@ def test_home_contains_recommendation_controls():
     assert response.status_code == 200
     assert 'data-panel="recommendations"' in response.text
     assert 'data-panel="sceneFeedback"' in response.text
+    assert 'data-panel="todos"' in response.text
     assert 'id="panel-action"' in response.text
 
 
@@ -201,6 +202,23 @@ def test_inspiration_chat_saves_structured_idea_card():
     assert idea["risks"]
     assert idea["next_steps"]
     assert "idea-card" in idea["tags"]
+
+    converted = client.post(f"/api/ideas/{idea_id}/to-todo")
+    assert converted.status_code == 200
+    todos = converted.json()["todos"]
+    assert len(todos) == len(idea["next_steps"])
+    assert all(item["source"] == "idea" and item["source_id"] == idea_id for item in todos)
+
+    converted_again = client.post(f"/api/ideas/{idea_id}/to-todo")
+    assert [item["id"] for item in converted_again.json()["todos"]] == [item["id"] for item in todos]
+
+    listed = client.get("/api/todos?status=open")
+    assert listed.status_code == 200
+    assert any(item["id"] == todos[0]["id"] for item in listed.json())
+
+    completed = client.post(f"/api/todos/{todos[0]['id']}/complete")
+    assert completed.status_code == 200
+    assert completed.json()["status"] == "completed"
 
 
 def test_scene_api_and_chat_flow():

@@ -155,7 +155,13 @@
   - 验证：`idea.save` 可将结构化字段保存到 `idea_cards`
   - 验证：`GET /api/ideas`、`GET /api/ideas/{id}` 返回解析后的 `tags`、`risks`、`next_steps`
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，43 passed
-- [ ] Idea 转待办
+- [x] Idea 转待办 v1
+  - 验证：`todo_items` 可创建、查询、完成
+  - 验证：`POST /api/ideas/{id}/to-todo` 可将 Idea Card 的 `next_steps` 转为待办
+  - 验证：同一 Idea 重复转待办不会重复创建相同 `next_steps`
+  - 验证：`GET /api/todos` 可查看待办，`POST /api/todos/{id}/complete` 可完成待办
+  - 验证：客户端 Idea 面板可转待办，待办面板可完成条目
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，44 passed
 - [ ] Idea 转 PRD 草案
 - [ ] Idea 转 Scene 草案
 - [ ] 灵感偏好写入确认
@@ -191,5 +197,6 @@
   - commit：`dbafd42 stage 4 attention recommendations v1`
   - commit：`77ae698 stage 4 scene feedback v1`
   - commit：`650fd6f stage 5 inspiration idea card v1`
+  - commit：`待提交 stage 5 idea to todo v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

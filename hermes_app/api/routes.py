@@ -18,6 +18,7 @@ from hermes_app.services.reminders import ReminderService
 from hermes_app.services.scenes import SceneService
 from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
+from hermes_app.services.todos import TodoService
 from hermes_app.services.wardrobe import WardrobeService
 from hermes_app.services.weather import WeatherService
 
@@ -43,6 +44,7 @@ def create_api_router(
     actions: ActionService,
     skills: SkillRegistry,
     skill_runtime: SkillRuntime,
+    todos: TodoService,
     weather: WeatherService,
     files: FileService,
     images: ImageService,
@@ -169,6 +171,30 @@ def create_api_router(
         if not row:
             raise HTTPException(status_code=404, detail="Idea not found.")
         return _deserialize_idea(row)
+
+    @router.post("/ideas/{idea_id}/to-todo")
+    def convert_idea_to_todo(idea_id: str) -> dict:
+        row = orchestrator.actions.db.query_one("SELECT * FROM idea_cards WHERE id = ?", (idea_id,))
+        if not row:
+            raise HTTPException(status_code=404, detail="Idea not found.")
+        idea = _deserialize_idea(row)
+        titles = idea["next_steps"] or [idea.get("mvp_plan") or idea["title"]]
+        created = []
+        for title in titles:
+            existing = todos.get_by_source_title("idea", idea_id, title)
+            created.append(existing or todos.create(title, source="idea", source_id=idea_id))
+        return {"idea_id": idea_id, "todos": created}
+
+    @router.get("/todos")
+    def list_todos(status: str | None = None) -> list[dict]:
+        return todos.list(status=status)
+
+    @router.post("/todos/{todo_id}/complete")
+    def complete_todo(todo_id: str) -> dict:
+        try:
+            return todos.complete(todo_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     @router.get("/wardrobe")
     def list_wardrobe(status: str | None = None) -> list[dict]:

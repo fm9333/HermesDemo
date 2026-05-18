@@ -77,6 +77,16 @@ class Database:
                     created_at TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS todo_items (
+                    id TEXT PRIMARY KEY,
+                    title TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    source_id TEXT,
+                    status TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    completed_at TEXT
+                );
+
                 CREATE TABLE IF NOT EXISTS idea_cards (
                     id TEXT PRIMARY KEY,
                     title TEXT NOT NULL,

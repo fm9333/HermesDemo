@@ -19,6 +19,7 @@ const panelLabels = {
   memory: "记忆",
   memoryCandidates: "记忆候选",
   reminders: "提醒",
+  todos: "待办",
   scenes: "场景",
   sceneFeedback: "反馈",
   signals: "信号",
@@ -39,6 +40,7 @@ const panelEndpoints = {
   memory: "/api/memory",
   memoryCandidates: "/api/memory/candidates",
   reminders: "/api/reminders",
+  todos: "/api/todos",
   scenes: "/api/scenes",
   sceneFeedback: "/api/scene-feedback",
   signals: "/api/context-signals",
@@ -211,11 +213,29 @@ async function recordSceneFeedback(sceneId, rating) {
   await loadPanel(activePanel);
 }
 
+async function convertIdeaToTodo(ideaId) {
+  const data = await requestJson(`/api/ideas/${ideaId}/to-todo`, { method: "POST" });
+  addMessage("assistant", `已生成待办：${data.todos.length} 条`);
+  await loadPanel("todos");
+}
+
+async function completeTodo(todoId) {
+  const data = await requestJson(`/api/todos/${todoId}/complete`, { method: "POST" });
+  addMessage("assistant", `待办已完成：${data.title}`);
+  await loadPanel(activePanel);
+}
+
 function renderPanelItem(item, panel) {
   let title = item.title || item.key || item.skill_id || item.intent || item.name || item.action_type || item.id;
   if (panel === "reminders") title = item.title;
   if (panel === "ideas") title = item.title;
   const controls = [];
+  if (panel === "ideas") {
+    controls.push(`<button class="action-button" data-idea-to-todo="${item.id}">转待办</button>`);
+  }
+  if (panel === "todos" && item.status === "open") {
+    controls.push(`<button class="action-button" data-complete-todo="${item.id}">完成</button>`);
+  }
   if (panel === "scenes") {
     controls.push(`<button class="action-button" data-scene-feedback-positive="${item.id}">有效</button>`);
     controls.push(`<button class="action-button reject" data-scene-feedback-misfire="${item.id}">误触发</button>`);
@@ -272,6 +292,8 @@ document.addEventListener("click", async (event) => {
   const dismissRecommendationId = event.target.dataset?.dismissRecommendation;
   const positiveSceneId = event.target.dataset?.sceneFeedbackPositive;
   const misfireSceneId = event.target.dataset?.sceneFeedbackMisfire;
+  const ideaToTodoId = event.target.dataset?.ideaToTodo;
+  const completeTodoId = event.target.dataset?.completeTodo;
   const panel = event.target.dataset?.panel;
 
   try {
@@ -280,6 +302,8 @@ document.addEventListener("click", async (event) => {
     if (dismissRecommendationId) await dismissRecommendation(dismissRecommendationId);
     if (positiveSceneId) await recordSceneFeedback(positiveSceneId, "positive");
     if (misfireSceneId) await recordSceneFeedback(misfireSceneId, "misfire");
+    if (ideaToTodoId) await convertIdeaToTodo(ideaToTodoId);
+    if (completeTodoId) await completeTodo(completeTodoId);
     if (panel) await loadPanel(panel);
   } catch (error) {
     addMessage("assistant", `操作失败：${error.message}`);
