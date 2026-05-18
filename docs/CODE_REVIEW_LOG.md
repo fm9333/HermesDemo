@@ -257,5 +257,5 @@ python -m pytest -q
 提交记录：
 
 ```text
-待提交：stage-2-memory-candidate-pipeline
+827b28f stage 2 memory candidate pipeline
 ```
