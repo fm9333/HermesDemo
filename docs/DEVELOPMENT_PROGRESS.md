@@ -363,6 +363,6 @@
   - commit：`7641b3b stage 8 crash recovery v1`
   - commit：`f98a2ad stage 8 pyinstaller packaging v1`
   - commit：`acdfee4 stage 8 update strategy v1`
-  - commit：`待提交 stage 8 performance indexes v1`
+  - commit：`b753ec1 stage 8 performance indexes v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
