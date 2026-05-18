@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QAction, QCloseEvent, QIcon
 from PySide6.QtWebEngineWidgets import QWebEngineView
@@ -8,11 +10,15 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QMenu, QStyle, QSystemT
 from desktop.service_manager import DesktopServiceManager, DesktopServiceState
 
 
+logger = logging.getLogger(__name__)
+
+
 class HermesDesktopWindow(QMainWindow):
     def __init__(self, service_manager: DesktopServiceManager | None = None):
         super().__init__()
         self.service_manager = service_manager or DesktopServiceManager()
         self.service_state: DesktopServiceState = self.service_manager.start()
+        logger.info("Hermes desktop window initialized with service %s", self.service_state.base_url)
         self._allow_quit = False
         self.tray: QSystemTrayIcon | None = None
 
@@ -31,6 +37,7 @@ class HermesDesktopWindow(QMainWindow):
 
     def _setup_tray(self) -> None:
         if not QSystemTrayIcon.isSystemTrayAvailable():
+            logger.info("System tray is not available")
             return
 
         icon = self._default_icon()
@@ -53,6 +60,7 @@ class HermesDesktopWindow(QMainWindow):
         self.tray.setContextMenu(menu)
         self.tray.activated.connect(self._on_tray_activated)
         self.tray.show()
+        logger.info("System tray initialized")
 
     def _default_icon(self) -> QIcon:
         return self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon)
@@ -65,6 +73,7 @@ class HermesDesktopWindow(QMainWindow):
         self.show()
         self.raise_()
         self.activateWindow()
+        logger.info("Hermes desktop window shown")
 
     def closeEvent(self, event: QCloseEvent) -> None:
         if self._allow_quit or not self.tray:
@@ -75,9 +84,10 @@ class HermesDesktopWindow(QMainWindow):
         event.ignore()
         self.hide()
         self.tray.showMessage("Hermes 仍在运行", "可从系统托盘重新打开或退出。", QSystemTrayIcon.MessageIcon.Information, 3000)
+        logger.info("Window close intercepted; Hermes remains in tray")
 
     def quit_application(self) -> None:
         self._allow_quit = True
+        logger.info("Quitting Hermes desktop application")
         self.service_manager.stop()
         QApplication.instance().quit()
-

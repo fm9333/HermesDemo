@@ -87,3 +87,42 @@ DesktopServiceManager 会恢复环境变量，避免测试污染。
 ```text
 f3e3241 stage 1 desktop shell and local service
 ```
+
+## 2026-05-18 阶段 1 桌面日志系统评审
+
+范围：
+
+```text
+desktop/logging_config.py
+DesktopServiceManager 日志接入
+HermesDesktopWindow 日志接入
+日志单元测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-1-desktop-logging。
+```
+
+已验证：
+
+```text
+python -m compileall desktop tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+日志写入 %APPDATA%/Hermes/logs/desktop.log 或 HERMES_DESKTOP_HOME/logs/desktop.log。
+RotatingFileHandler 单文件 2MB，最多保留 5 份，满足桌面 MVP 的本地诊断需求。
+setup_desktop_logging(reset=True) 支持测试隔离，避免重复 handler。
+服务启动、服务就绪、服务停止、窗口初始化、托盘初始化、退出路径均已记录。
+```
+
+提交记录：
+
+```text
+待提交：stage-1-desktop-logging
+```
