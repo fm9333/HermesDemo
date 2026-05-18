@@ -230,6 +230,6 @@
   - commit：`6164f3b stage 5 idea to prd v1`
   - commit：`7eb185d stage 5 idea to scene v1`
   - commit：`90b237f stage 5 inspiration preference candidate v1`
-  - commit：`待提交 stage 6 autonomy zone classifier v1`
+  - commit：`03ea6c3 stage 6 autonomy zone classifier v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
