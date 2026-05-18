@@ -134,6 +134,29 @@ class Database:
                     created_at TEXT NOT NULL,
                     FOREIGN KEY(file_id) REFERENCES files(id)
                 );
+
+                CREATE TABLE IF NOT EXISTS scenes (
+                    id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    context_signal TEXT NOT NULL,
+                    user_state TEXT NOT NULL,
+                    opportunity TEXT NOT NULL,
+                    decision_policy TEXT NOT NULL,
+                    output_type TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    effect_score REAL NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS scene_runs (
+                    id TEXT PRIMARY KEY,
+                    scene_id TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    output_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(scene_id) REFERENCES scenes(id)
+                );
                 """
             )
             self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")

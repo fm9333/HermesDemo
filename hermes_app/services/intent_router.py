@@ -5,6 +5,8 @@ class IntentRouter:
     def route(self, message: str) -> str:
         normalized = message.strip().lower()
 
+        if "场景" in normalized or "scene" in normalized:
+            return "create_scene"
         if any(word in normalized for word in ("提醒", "闹钟", "叫我")):
             return "create_reminder"
         if any(word in normalized for word in ("记住", "以后", "默认", "偏好")):
@@ -22,4 +24,3 @@ class IntentRouter:
         if any(word in normalized for word in ("清单", "列表", "计划")):
             return "list_generate"
         return "general_chat"
-

@@ -10,6 +10,7 @@ from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.reminders import ReminderService
+from hermes_app.services.scenes import SceneService
 from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.wardrobe import WardrobeService
@@ -25,6 +26,7 @@ def create_api_router(
     weather: WeatherService,
     files: FileService,
     images: ImageService,
+    scenes: SceneService,
     logs: ExecutionLogService,
 ) -> APIRouter:
     reminder_service = ReminderService(actions.db)
@@ -249,5 +251,45 @@ def create_api_router(
     @router.get("/logs")
     def list_logs() -> list[dict]:
         return logs.list()
+
+    @router.get("/scenes")
+    def list_scenes(status: str | None = None) -> list[dict]:
+        return scenes.list(status=status)
+
+    @router.post("/scenes")
+    def create_scene(payload: dict) -> dict:
+        return scenes.create(**payload)
+
+    @router.get("/scenes/runs")
+    def list_scene_runs(scene_id: str | None = None) -> list[dict]:
+        return scenes.list_runs(scene_id=scene_id)
+
+    @router.get("/scenes/{scene_id}")
+    def get_scene(scene_id: str) -> dict:
+        scene = scenes.get(scene_id)
+        if not scene:
+            raise HTTPException(status_code=404, detail="Scene not found.")
+        return scene
+
+    @router.patch("/scenes/{scene_id}")
+    def update_scene(scene_id: str, payload: dict) -> dict:
+        try:
+            return scenes.update(scene_id, **payload)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.post("/scenes/{scene_id}/pause")
+    def pause_scene(scene_id: str) -> dict:
+        try:
+            return scenes.pause(scene_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.post("/scenes/{scene_id}/run")
+    def run_scene(scene_id: str) -> dict:
+        try:
+            return scenes.run(scene_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     return router

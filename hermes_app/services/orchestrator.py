@@ -9,6 +9,7 @@ from hermes_app.services.inspiration import InspirationService
 from hermes_app.services.intent_router import IntentRouter
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
+from hermes_app.services.scenes import SceneService
 from hermes_app.services.safety import SafetyService
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.skill_runtime import SkillRuntime
@@ -26,6 +27,7 @@ class HermesOrchestrator:
         actions: ActionService,
         skills: SkillRegistry,
         skill_runtime: SkillRuntime,
+        scenes: SceneService,
         inspiration: InspirationService,
         weather: WeatherService,
         logs: ExecutionLogService,
@@ -37,6 +39,7 @@ class HermesOrchestrator:
         self.actions = actions
         self.skills = skills
         self.skill_runtime = skill_runtime
+        self.scenes = scenes
         self.inspiration = inspiration
         self.weather = weather
         self.logs = logs
@@ -107,6 +110,20 @@ class HermesOrchestrator:
             )
             reply = "我已生成衣橱条目草案，确认后会加入衣橱。"
             cards.append({"type": "wardrobe_candidate", "title": "衣橱草案", "payload": payload})
+
+        elif intent == "create_scene":
+            scene = self.scenes.create(
+                name=self._parse_scene_name(message),
+                source="user",
+                context_signal="conversation",
+                user_state="unknown",
+                opportunity="user_requested_scene",
+                decision_policy="confirm_before_interrupt",
+                output_type="recommendation",
+                status="active",
+            )
+            reply = "我已创建一个场景草案，并加入 Scene Registry。"
+            cards.append({"type": "scene", "title": "场景草案", "payload": scene})
 
         elif intent == "inspiration":
             idea = self.inspiration.generate_card(message)
@@ -190,3 +207,9 @@ class HermesOrchestrator:
         for token in ("帮我看看", "查询", "查一下", "看看", "天气", "下雨", "降雨", "气温", "怎么样", "如何"):
             value = value.replace(token, "")
         return value.strip(" ，。？?：:")
+
+    def _parse_scene_name(self, message: str) -> str:
+        value = message.strip()
+        for token in ("帮我", "创建", "新建", "一个", "场景", "scene"):
+            value = value.replace(token, "")
+        return value.strip(" ，。？?：:") or "Hermes 场景"

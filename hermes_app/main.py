@@ -23,6 +23,7 @@ from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.reminders import ReminderService
+from hermes_app.services.scenes import SceneService
 from hermes_app.services.safety import SafetyService
 from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
@@ -47,6 +48,7 @@ log_service = ExecutionLogService(db)
 weather_service = WeatherService(db)
 file_service = FileService(db)
 image_service = ImageService(db, file_service)
+scene_service = SceneService(db)
 orchestrator = HermesOrchestrator(
     intent_router=IntentRouter(),
     task_decomposer=TaskDecomposer(),
@@ -55,6 +57,7 @@ orchestrator = HermesOrchestrator(
     actions=action_service,
     skills=skill_registry,
     skill_runtime=skill_runtime,
+    scenes=scene_service,
     inspiration=InspirationService(),
     weather=weather_service,
     logs=log_service,
@@ -81,6 +84,7 @@ app.include_router(
         weather_service,
         file_service,
         image_service,
+        scene_service,
         log_service,
     )
 )

@@ -12,7 +12,7 @@ class SafetyService:
             return "high"
         if any(keyword in message for keyword in self.sensitive_keywords):
             return "sensitive"
-        if intent in {"create_reminder", "memory_update", "wardrobe_add"}:
+        if intent in {"create_reminder", "memory_update", "wardrobe_add", "create_scene"}:
             return "medium"
         return "low"
 
@@ -22,4 +22,3 @@ class SafetyService:
         if skill_id.startswith(("image.wardrobe", "scene.", "preference.")):
             return "yellow"
         return "red"
-

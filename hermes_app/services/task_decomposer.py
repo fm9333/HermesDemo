@@ -42,6 +42,12 @@ class TaskDecomposer:
                 self._step("生成衣橱条目草案", "plan", "wardrobe.add", risk_level, confirmation),
                 self._step("等待用户确认加入衣橱", "gate", "action_gate", risk_level, confirmation),
             ]
+        if intent == "create_scene":
+            return [
+                self._step("解析场景目标", "parse", "scene.intent", "low"),
+                self._step("生成 Scene Registry 草案", "plan", "scene.registry", risk_level, confirmation),
+                self._step("设置打扰策略", "policy", "attention_policy", risk_level, confirmation),
+            ]
         if intent == "inspiration":
             return [
                 self._step("进入灵感模式", "route", "inspiration_agent", "low"),
@@ -62,6 +68,7 @@ class TaskDecomposer:
             "memory_update": "写入记忆候选计划",
             "weather_query": "天气查询计划",
             "wardrobe_add": "衣橱条目草案计划",
+            "create_scene": "场景创建计划",
             "inspiration": "灵感碰撞计划",
             "document_summarize": "文档总结计划",
             "todo_extract": "待办提取计划",
@@ -90,4 +97,3 @@ class TaskDecomposer:
             requires_confirmation=requires_confirmation,
             status="blocked" if risk_level == "blocked" else "planned",
         )
-

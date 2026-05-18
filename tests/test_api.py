@@ -169,6 +169,23 @@ def test_image_upload_api():
     assert result["action"]["action_type"] == "wardrobe.add"
 
 
+def test_scene_api_and_chat_flow():
+    response = client.post("/api/scenes", json={"name": "雨天通勤提醒", "output_type": "reminder"})
+    assert response.status_code == 200
+    scene = response.json()
+    assert scene["name"] == "雨天通勤提醒"
+
+    run = client.post(f"/api/scenes/{scene['id']}/run")
+    assert run.status_code == 200
+    assert run.json()["status"] == "ok"
+
+    chat = client.post("/api/chat", json={"message": "创建雨天通勤提醒场景"})
+    assert chat.status_code == 200
+    data = chat.json()
+    assert data["intent"] == "create_scene"
+    assert data["cards"][0]["type"] == "scene"
+
+
 def test_wardrobe_action_and_crud_flow():
     response = client.post("/api/chat", json={"message": "把这件黑色外套加入衣橱"})
     assert response.status_code == 200

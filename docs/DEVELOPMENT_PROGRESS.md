@@ -114,6 +114,19 @@
   - 验证：支持上线、旅行、采购和通用清单模板
   - 测试：`python -m pytest -q` 通过，28 passed
 
+## 阶段 4：智能场景编排
+
+- [x] Scene Registry v1
+  - 验证：`/api/scenes` 可创建、列表、详情、更新、暂停
+  - 验证：`/api/scenes/{scene_id}/run` 可生成场景输出并写入 `scene_runs`
+  - 验证：对话输入“创建...场景”可进入 `create_scene`
+  - 测试：`python -m pytest -q` 通过，33 passed
+- [ ] Context Signal Pipeline
+- [ ] Opportunity Engine
+- [ ] Attention Policy 深化
+- [ ] 推荐卡片
+- [ ] Scene Feedback
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库
@@ -139,5 +152,6 @@
   - commit：`1c6e89d stage 3 content list generate v1`
   - commit：`c9f3503 stage 3 document summarize pdf docx v1`
   - commit：`e3986ff stage 3 image clothing recognition v1`
+  - 当前提交点：`stage-4-scene-registry-v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
