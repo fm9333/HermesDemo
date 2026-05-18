@@ -232,7 +232,12 @@
   - 验证：建议卡包含 `type`、`title`、`priority`、`source_id`、`payload`
   - 验证：客户端主动面板可查看统一建议列表
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，60 passed
-- [ ] 轻量实时触发
+- [x] 轻量实时触发 v1
+  - 验证：`trigger_runs` 可记录触发类型、状态和输出
+  - 验证：`POST /api/triggers/run` 可串联 Context Signal -> Opportunity -> Recommendation -> Proactive Suggestions
+  - 验证：`GET /api/triggers/history` 可查看触发历史
+  - 验证：客户端触发面板可手动运行触发并查看历史
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，62 passed
 - [ ] 每周灵感复盘
 - [ ] 个性化首页卡片
 - [ ] 新闻 Provider
@@ -281,5 +286,6 @@
   - commit：`826bfd5 stage 6 safety settings v1`
   - commit：`c2d829b stage 7 provider registry v1`
   - commit：`cc5dcf2 stage 7 proactive suggestions v1`
+  - commit：`待提交 stage 7 lightweight triggers v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

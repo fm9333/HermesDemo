@@ -26,6 +26,7 @@ from hermes_app.services.settings import SettingsService
 from hermes_app.services.skill_runtime import SkillRuntime
 from hermes_app.services.skills import SkillRegistry
 from hermes_app.services.todos import TodoService
+from hermes_app.services.triggers import TriggerService
 from hermes_app.services.wardrobe import WardrobeService
 from hermes_app.services.weather import WeatherService
 
@@ -53,6 +54,7 @@ def create_api_router(
     settings: SettingsService,
     providers: ProviderRegistry,
     proactive: ProactiveSuggestionService,
+    triggers: TriggerService,
     memory: MemoryService,
     actions: ActionService,
     skills: SkillRegistry,
@@ -185,6 +187,14 @@ def create_api_router(
     @router.get("/proactive/suggestions")
     def list_proactive_suggestions(limit: int = 20) -> list[dict]:
         return proactive.list(limit=limit)
+
+    @router.post("/triggers/run")
+    def run_trigger(payload: dict | None = None) -> dict:
+        return triggers.run(trigger_type=(payload or {}).get("trigger_type", "manual"))
+
+    @router.get("/triggers/history")
+    def list_trigger_runs() -> list[dict]:
+        return triggers.list_runs()
 
     @router.get("/memory")
     def list_memory() -> list[dict]:

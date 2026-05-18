@@ -26,6 +26,7 @@ const panelLabels = {
   opportunities: "机会",
   recommendations: "推荐",
   proactive: "主动",
+  triggerRuns: "触发",
   ideas: "灵感",
   prdDrafts: "PRD",
   weather: "天气",
@@ -56,6 +57,7 @@ const panelEndpoints = {
   opportunities: "/api/opportunities",
   recommendations: "/api/recommendations",
   proactive: "/api/proactive/suggestions",
+  triggerRuns: "/api/triggers/history",
   ideas: "/api/ideas",
   prdDrafts: "/api/prd-drafts",
   weather: "/api/weather/cache",
@@ -78,6 +80,7 @@ const panelEndpoints = {
 const panelActions = {
   opportunities: { label: "生成机会", endpoint: "/api/opportunities/generate" },
   recommendations: { label: "生成推荐", endpoint: "/api/recommendations/generate" },
+  triggerRuns: { label: "运行触发", endpoint: "/api/triggers/run" },
   evalRuns: { label: "运行评测", endpoint: "/api/eval/suites/autonomy.zone.basic/run" },
 };
 

@@ -105,6 +105,14 @@ class Database:
                     rolled_back_at TEXT
                 );
 
+                CREATE TABLE IF NOT EXISTS trigger_runs (
+                    id TEXT PRIMARY KEY,
+                    trigger_type TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    output_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS reminders (
                     id TEXT PRIMARY KEY,
                     title TEXT NOT NULL,

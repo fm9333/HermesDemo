@@ -30,6 +30,7 @@ def test_home_contains_recommendation_controls():
     assert response.status_code == 200
     assert 'data-panel="recommendations"' in response.text
     assert 'data-panel="proactive"' in response.text
+    assert 'data-panel="triggerRuns"' in response.text
     assert 'data-panel="sceneFeedback"' in response.text
     assert 'data-panel="todos"' in response.text
     assert 'data-panel="prdDrafts"' in response.text
@@ -215,6 +216,21 @@ def test_proactive_suggestions_api():
     assert suggestions.status_code == 200
     assert isinstance(suggestions.json(), list)
     assert any(item["type"] == "provider_setup" for item in suggestions.json())
+
+
+def test_trigger_run_api():
+    client.post(
+        "/api/context-signals",
+        json={"source": "weather", "signal_type": "weather.rain", "payload": {"probability": 80}},
+    )
+    run = client.post("/api/triggers/run", json={"trigger_type": "test"})
+    assert run.status_code == 200
+    assert run.json()["status"] == "ok"
+    assert run.json()["output"]["suggestions"]
+
+    history = client.get("/api/triggers/history")
+    assert history.status_code == 200
+    assert any(item["id"] == run.json()["id"] for item in history.json())
 
 
 def test_tools_api_lists_action_tool_registry():

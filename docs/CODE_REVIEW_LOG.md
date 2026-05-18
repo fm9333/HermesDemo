@@ -1463,3 +1463,45 @@ python -m pytest -q
 ```text
 cc5dcf2 stage 7 proactive suggestions v1
 ```
+
+## 2026-05-18 阶段 7 轻量实时触发 v1 评审
+
+范围：
+
+```text
+trigger_runs 数据表
+TriggerService
+POST /api/triggers/run
+GET /api/triggers/history
+客户端触发历史面板
+Context Signal -> Opportunity -> Recommendation -> Proactive Suggestions 触发链路测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-7-lightweight-triggers-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+轻量实时触发 v1 将上下文信号、机会引擎、推荐卡和主动建议串成一条可运行链路。
+每次触发都会写入 trigger_runs，保留输出快照，便于后续排查和复盘。
+客户端触发面板可手动运行并查看历史记录。
+当前版本只支持本地轻量触发，不引入后台高频轮询，避免打扰和资源浪费。
+```
+
+提交记录：
+
+```text
+待提交 stage 7 lightweight triggers v1
+```
