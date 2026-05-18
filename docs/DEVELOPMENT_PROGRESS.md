@@ -259,6 +259,6 @@
   - commit：`8dd90b7 stage 6 growth log v1`
   - commit：`1e377b6 stage 6 yellow zone queue v1`
   - commit：`3328566 stage 6 red zone blocking v1`
-  - commit：`待提交 stage 6 safety settings v1`
+  - commit：`826bfd5 stage 6 safety settings v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
