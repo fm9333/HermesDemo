@@ -1336,5 +1336,5 @@ red-zone/check API 可供后续 Eval Runner 和安全策略页复用。
 提交记录：
 
 ```text
-待提交 stage 6 red zone blocking v1
+3328566 stage 6 red zone blocking v1
 ```
