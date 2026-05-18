@@ -71,10 +71,7 @@ class SkillRegistry:
         if skill_id == "work.todo_extract":
             return self._extract_todos(text)
         if skill_id == "content.list_generate":
-            return {
-                "title": "清单草案",
-                "items": ["目标", "约束", "步骤", "风险", "下一步"],
-            }
+            return self._generate_list(text)
         return {"title": "Skill 未注册", "message": f"{skill_id} is not available."}
 
     def _extract_todos(self, text: str) -> dict:
@@ -98,4 +95,25 @@ class SkillRegistry:
             "title": "待办候选",
             "todos": todos,
             "count": len(todos),
+        }
+
+    def _generate_list(self, text: str) -> dict:
+        normalized = text.lower()
+        if any(word in normalized for word in ("上线", "发布", "release", "deploy")):
+            items = ["确认发布范围", "完成回归测试", "准备回滚方案", "通知相关人员", "发布后监控指标"]
+            list_type = "release"
+        elif any(word in normalized for word in ("旅行", "出行", "行程", "旅游")):
+            items = ["证件与票据", "天气与衣物", "住宿与交通", "预算与支付", "紧急联系人"]
+            list_type = "travel"
+        elif any(word in normalized for word in ("采购", "购物", "买")):
+            items = ["必买项", "可选项", "预算上限", "购买渠道", "到货检查"]
+            list_type = "shopping"
+        else:
+            items = ["目标", "约束", "步骤", "风险", "下一步"]
+            list_type = "general"
+
+        return {
+            "title": "清单草案",
+            "list_type": list_type,
+            "items": [{"title": item, "checked": False} for item in items],
         }

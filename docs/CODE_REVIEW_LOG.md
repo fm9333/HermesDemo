@@ -581,3 +581,39 @@ python -m pytest -q
 ```text
 9831ab9 stage 3 work todo extract v1
 ```
+
+## 2026-05-18 阶段 3 content.list_generate v1 评审
+
+范围：
+
+```text
+SkillRegistry content.list_generate
+SkillRuntime content.list_generate 测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-3-content-list-generate-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+清单生成从静态 mock 升级为主题模板。
+当前支持 release、travel、shopping、general 四类。
+输出 items 使用结构化对象，后续可直接进入待办或清单管理。
+```
+
+提交记录：
+
+```text
+待提交：stage-3-content-list-generate-v1
+```

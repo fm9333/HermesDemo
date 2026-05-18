@@ -29,3 +29,15 @@ def test_todo_extract_skill_extracts_action_items(tmp_path):
     assert len(todos) == 2
     assert "确认发布清单" in todos[0]["title"]
     assert "修复登录失败" in todos[1]["title"]
+
+
+def test_list_generate_skill_uses_release_template(tmp_path):
+    db = Database(tmp_path / "skills.db")
+    db.init()
+    runtime = SkillRuntime(db, SkillRegistry())
+
+    result = runtime.run("content.list_generate", "帮我生成上线清单")
+
+    output = result["output"]
+    assert output["list_type"] == "release"
+    assert output["items"][0]["title"] == "确认发布范围"

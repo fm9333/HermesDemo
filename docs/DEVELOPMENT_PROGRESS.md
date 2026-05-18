@@ -104,7 +104,9 @@
 - [x] work.todo_extract v1
   - 验证：可从中文文本中提取“请、需要、确认、修复”等待办候选
   - 测试：`python -m pytest -q` 通过，27 passed
-- [ ] content.list_generate 深化
+- [x] content.list_generate v1
+  - 验证：支持上线、旅行、采购和通用清单模板
+  - 测试：`python -m pytest -q` 通过，28 passed
 
 ## GitHub / SVN 同步状态
 
@@ -128,5 +130,6 @@
   - commit：`3f5712b stage 3 image upload v1`
   - commit：`5765d6d stage 3 document summarize text v1`
   - commit：`9831ab9 stage 3 work todo extract v1`
+  - 当前提交点：`stage-3-content-list-generate-v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
