@@ -115,6 +115,6 @@
   - commit：`bdabf9f stage 2 reminder center v1`
   - commit：`ee3659d stage 2 wardrobe center v1`
   - commit：`b43fb37 stage 3 skill runtime v1`
-  - 当前提交点：`stage-3-file-upload-v1`
+  - commit：`ae947bb stage 3 file upload v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
