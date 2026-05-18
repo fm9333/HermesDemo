@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="hermes-token" content="{{ token }}" />
+    <title>Hermes Control Desk</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Hermes MVP</p>
+        <h1>Control Desk</h1>
+      </div>
+      <div class="status-strip" aria-label="system status">
+        <span>Memory</span>
+        <span>Action Gate</span>
+        <span>Skill Registry</span>
+      </div>
+    </header>
+
+    <main class="shell">
+      <aside class="rail">
+        <div class="rail-mark">H</div>
+        <nav class="rail-nav" aria-label="modules">
+          <button class="rail-button is-active" data-panel="memory" title="记忆">记忆</button>
+          <button class="rail-button" data-panel="reminders" title="提醒">提醒</button>
+          <button class="rail-button" data-panel="ideas" title="灵感">灵感</button>
+          <button class="rail-button" data-panel="wardrobe" title="衣橱">衣橱</button>
+          <button class="rail-button" data-panel="skills" title="技能">技能</button>
+          <button class="rail-button" data-panel="logs" title="日志">日志</button>
+        </nav>
+      </aside>
+
+      <section class="workspace" aria-label="conversation">
+        <div class="conversation-head">
+          <div>
+            <p class="eyebrow">Conversation Gateway</p>
+            <h2>主智能体</h2>
+          </div>
+          <span class="pill" id="health-pill">checking</span>
+        </div>
+
+        <div class="messages" id="messages">
+          <article class="message assistant">
+            <div class="message-meta">Hermes</div>
+            <p>基础架构已就绪。可以测试“明天早上提醒我带伞”、“记住我喜欢科技新闻”、“给我一个产品灵感挑战”。</p>
+          </article>
+        </div>
+
+        <form class="composer" id="chat-form">
+          <textarea id="chat-input" rows="3" placeholder="输入请求，例如：明天早上提醒我带伞"></textarea>
+          <button type="submit" title="发送">发送</button>
+        </form>
+      </section>
+
+      <aside class="inspector" aria-label="inspector">
+        <div class="inspector-head">
+          <div>
+            <p class="eyebrow">State Inspector</p>
+            <h2 id="panel-title">记忆</h2>
+          </div>
+          <button class="ghost-button" id="refresh-panel" title="刷新">刷新</button>
+        </div>
+        <div class="panel-list" id="panel-list"></div>
+      </aside>
+    </main>
+
+    <script src="{{ url_for('static', path='/app.js') }}"></script>
+  </body>
+</html>

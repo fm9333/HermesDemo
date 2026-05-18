@@ -1,0 +1,394 @@
+:root {
+  --paper: #f4f3ee;
+  --panel: #fffdfa;
+  --ink: #20201d;
+  --muted: #6e6a61;
+  --line: #d8d2c4;
+  --carbon: #2c2b27;
+  --teal: #176f63;
+  --red: #b23a2f;
+  --amber: #b57922;
+  --focus: #12100d;
+  --shadow: 0 18px 45px rgba(24, 22, 18, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background:
+    linear-gradient(90deg, rgba(32, 32, 29, 0.05) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(32, 32, 29, 0.05) 1px, transparent 1px),
+    var(--paper);
+  background-size: 28px 28px;
+  font-family: "Aptos", "Segoe UI", sans-serif;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.topbar {
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(244, 243, 238, 0.88);
+  backdrop-filter: blur(12px);
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: 32px;
+}
+
+h2 {
+  font-size: 22px;
+}
+
+.status-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.status-strip span,
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--carbon);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pill.ok {
+  border-color: rgba(23, 111, 99, 0.32);
+  color: var(--teal);
+}
+
+.pill.fail {
+  border-color: rgba(178, 58, 47, 0.32);
+  color: var(--red);
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 92px minmax(420px, 1fr) minmax(320px, 430px);
+  gap: 18px;
+  min-height: calc(100vh - 88px);
+  padding: 18px;
+}
+
+.rail,
+.workspace,
+.inspector {
+  border: 1px solid var(--line);
+  background: rgba(255, 253, 250, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 10px;
+}
+
+.rail-mark {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  border: 2px solid var(--carbon);
+  background: var(--carbon);
+  color: var(--panel);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.rail-nav {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.rail-button {
+  min-height: 42px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.rail-button:hover,
+.rail-button.is-active {
+  border-color: var(--carbon);
+  background: var(--carbon);
+  color: var(--panel);
+}
+
+.workspace {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-width: 0;
+}
+
+.conversation-head,
+.inspector-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 74px;
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: auto;
+  padding: 18px;
+}
+
+.message {
+  max-width: 860px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: var(--panel);
+}
+
+.message.user {
+  align-self: flex-end;
+  border-color: rgba(23, 111, 99, 0.4);
+}
+
+.message.assistant {
+  align-self: flex-start;
+}
+
+.message-meta {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.message p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.card-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.result-card,
+.panel-item {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--teal);
+  border-radius: 8px;
+  padding: 12px;
+  background: #fffefa;
+}
+
+.result-card.warning {
+  border-left-color: var(--amber);
+}
+
+.result-card.danger {
+  border-left-color: var(--red);
+}
+
+.card-title,
+.panel-title {
+  margin: 0 0 8px;
+  font-weight: 850;
+}
+
+pre {
+  overflow: auto;
+  margin: 0;
+  max-height: 260px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  background: #f7f5ed;
+  color: var(--carbon);
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.composer {
+  display: grid;
+  grid-template-columns: 1fr 96px;
+  gap: 10px;
+  padding: 14px;
+  border-top: 1px solid var(--line);
+  background: #eeece3;
+}
+
+.composer textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 72px;
+  max-height: 180px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  outline: none;
+}
+
+.composer textarea:focus {
+  border-color: var(--focus);
+}
+
+.composer button,
+.ghost-button,
+.action-button {
+  min-height: 42px;
+  border: 1px solid var(--carbon);
+  border-radius: 8px;
+  background: var(--carbon);
+  color: var(--panel);
+  font-weight: 850;
+}
+
+.ghost-button {
+  padding: 0 12px;
+  background: transparent;
+  color: var(--carbon);
+}
+
+.action-button {
+  padding: 0 12px;
+  min-height: 34px;
+}
+
+.action-button.reject {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--muted);
+}
+
+.inspector {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+}
+
+.panel-list {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  overflow: auto;
+  padding: 14px;
+}
+
+.panel-item {
+  border-left-color: var(--amber);
+}
+
+.panel-empty {
+  padding: 18px;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 1060px) {
+  .shell {
+    grid-template-columns: 72px 1fr;
+  }
+
+  .inspector {
+    grid-column: 1 / -1;
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    height: auto;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .shell {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .rail {
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+  }
+
+  .rail-mark {
+    flex: 0 0 auto;
+    margin: 0 10px 0 0;
+  }
+
+  .rail-nav {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(64px, auto);
+    overflow-x: auto;
+  }
+
+  .composer {
+    grid-template-columns: 1fr;
+  }
+}
+

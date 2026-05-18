@@ -1,0 +1,2 @@
+"""Desktop shell for Hermes."""
+
