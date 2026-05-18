@@ -15,8 +15,20 @@ if TYPE_CHECKING:
 class SkillRuntime:
     llm_prompt_map = {
         "document.summarize": "skill.document.summarize",
+        "document.contract_extract": "skill.document.contract_extract",
+        "document.bill_analyze": "skill.document.bill_analyze",
+        "image.photo_classify": "skill.image.photo_classify",
         "work.todo_extract": "skill.work.todo_extract",
+        "work.meeting_minutes": "skill.work.meeting_minutes",
+        "work.weekly_report": "skill.work.weekly_report",
         "content.list_generate": "skill.content.list_generate",
+        "content.prd_generate": "skill.content.prd",
+        "content.copy_generate": "skill.content.copy_generate",
+        "content.travel_plan": "skill.content.travel_plan",
+        "data.table_analyze": "skill.data.table_analyze",
+        "file.archive_plan": "skill.file.archive_plan",
+        "calendar.schedule_plan": "skill.calendar.schedule_plan",
+        "email.reply_draft": "skill.email.reply_draft",
     }
 
     def __init__(self, db: Database, registry: SkillRegistry, llm_client: "LLMClient | None" = None):

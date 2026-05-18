@@ -420,6 +420,24 @@
   - 验证：设置面板可切换全局 `llm_allow_cloud_file_context`
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，117 passed
 
+## 阶段 15：扩展 System Skills
+
+- [x] 高价值 System Skills v1
+  - 验证：新增 `document.contract_extract`、`document.bill_analyze`、`image.photo_classify`、`work.meeting_minutes`、`work.weekly_report`、`content.prd_generate`、`content.copy_generate`、`content.travel_plan`、`data.table_analyze`、`file.archive_plan`、`calendar.schedule_plan`、`email.reply_draft`
+  - 验证：每个新增 Skill 都有 Capability Contract、本地 fallback 输出和 SkillRun 记录
+- [x] Skill 路由与编排 v1
+  - 验证：IntentRouter 可识别合同、账单、会议纪要、周报、PRD、文案、旅行、表格、归档、照片分类、日程、邮件回复等请求
+  - 验证：TaskDecomposer 为新增 Skill 生成明确执行步骤
+  - 验证：HermesOrchestrator 统一通过 SkillRuntime 调用新增 Skill
+- [x] 扩展 Prompt Library v1
+  - 验证：为合同、账单、照片分类、会议纪要、周报、文案、旅行、表格、文件归档、日程、邮件回复补专用 Prompt
+  - 验证：配置模型时走 LLM Prompt，未配置或失败时回退本地规则
+- [x] API 与聊天测试 v1
+  - 验证：`GET /api/skills` 列出新增 Skill
+  - 验证：`POST /api/skills/data.table_analyze/run` 可运行并写入 `skill_runs`
+  - 验证：`POST /api/chat` 的 PRD、会议纪要、合同请求能路由到对应 Skill
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，121 passed
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库
@@ -484,5 +502,6 @@
   - commit：`2f3824d stage 12 skill patches v1`
   - commit：`f2b45e1 stage 13 skill curator v1`
   - commit：`df250c8 stage 14 llm file policy ui v1`
+  - commit：待提交 `stage 15 expanded system skills v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

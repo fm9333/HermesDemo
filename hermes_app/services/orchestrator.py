@@ -19,6 +19,24 @@ from hermes_app.services.weather import WeatherService
 
 
 class HermesOrchestrator:
+    SKILL_INTENTS = {
+        "document_summarize": "document.summarize",
+        "contract_extract": "document.contract_extract",
+        "bill_analyze": "document.bill_analyze",
+        "photo_classify": "image.photo_classify",
+        "todo_extract": "work.todo_extract",
+        "meeting_minutes": "work.meeting_minutes",
+        "weekly_report": "work.weekly_report",
+        "list_generate": "content.list_generate",
+        "prd_generate": "content.prd_generate",
+        "copy_generate": "content.copy_generate",
+        "travel_plan": "content.travel_plan",
+        "table_analyze": "data.table_analyze",
+        "file_archive": "file.archive_plan",
+        "schedule_plan": "calendar.schedule_plan",
+        "email_reply": "email.reply_draft",
+    }
+
     def __init__(
         self,
         intent_router: IntentRouter,
@@ -141,12 +159,8 @@ class HermesOrchestrator:
             reply = "我生成了一张 Idea Card，并准备好保存到灵感库。"
             cards.append({"type": "idea_card", **idea})
 
-        elif intent in {"document_summarize", "todo_extract", "list_generate"}:
-            skill_id = {
-                "document_summarize": "document.summarize",
-                "todo_extract": "work.todo_extract",
-                "list_generate": "content.list_generate",
-            }[intent]
+        elif intent in self.SKILL_INTENTS:
+            skill_id = self.SKILL_INTENTS[intent]
             result = self.skill_runtime.run(skill_id, message)
             reply = f"已通过 `{skill_id}` 生成草案。"
             cards.append({"type": "skill_result", "skill_id": skill_id, "payload": result})

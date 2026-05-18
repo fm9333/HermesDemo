@@ -572,6 +572,51 @@ def test_skill_run_api_records_result(monkeypatch):
     assert any(run["skill_id"] == "content.list_generate" for run in runs)
 
 
+def test_expanded_system_skills_are_listed_and_runnable(monkeypatch):
+    monkeypatch.setattr(llm_client, "_post_json", lambda provider, payload: (_ for _ in ()).throw(RuntimeError("skip llm")))
+    response = client.get("/api/skills")
+    assert response.status_code == 200
+    skill_ids = {skill["skill_id"] for skill in response.json()}
+    expected = {
+        "document.contract_extract",
+        "document.bill_analyze",
+        "image.photo_classify",
+        "work.meeting_minutes",
+        "work.weekly_report",
+        "content.prd_generate",
+        "content.copy_generate",
+        "content.travel_plan",
+        "data.table_analyze",
+        "file.archive_plan",
+        "calendar.schedule_plan",
+        "email.reply_draft",
+    }
+    assert expected.issubset(skill_ids)
+
+    table = client.post("/api/skills/data.table_analyze/run", json={"message": "name,amount\nA,10\nB,20"})
+    assert table.status_code == 200
+    assert table.json()["output"]["row_count"] == 2
+
+
+def test_expanded_skill_chat_routes(monkeypatch):
+    monkeypatch.setattr(llm_client, "_post_json", lambda provider, payload: (_ for _ in ()).throw(RuntimeError("skip llm")))
+
+    prd = client.post("/api/chat", json={"message": "帮我生成桌面智能体任务中心 PRD"})
+    assert prd.status_code == 200
+    assert prd.json()["intent"] == "prd_generate"
+    assert prd.json()["cards"][0]["skill_id"] == "content.prd_generate"
+
+    meeting = client.post("/api/chat", json={"message": "整理会议纪要：会议决定上线，请小王明天修复登录问题"})
+    assert meeting.status_code == 200
+    assert meeting.json()["intent"] == "meeting_minutes"
+    assert meeting.json()["cards"][0]["skill_id"] == "work.meeting_minutes"
+
+    contract = client.post("/api/chat", json={"message": "分析合同：甲方A，乙方B，金额 1000 元"})
+    assert contract.status_code == 200
+    assert contract.json()["intent"] == "contract_extract"
+    assert contract.json()["task_plan"]["steps"][0]["target"] == "document.contract_extract"
+
+
 def test_personal_skill_api_flow(monkeypatch):
     monkeypatch.setattr(llm_client, "_post_json", lambda provider, payload: (_ for _ in ()).throw(RuntimeError("skip llm")))
     skill_run = client.post("/api/skills/content.list_generate/run", json={"message": "帮我生成上线清单"})

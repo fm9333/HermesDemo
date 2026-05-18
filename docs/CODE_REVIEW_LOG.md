@@ -2283,3 +2283,44 @@ python -m pytest -q
 ```text
 df250c8 stage 14 llm file policy ui v1
 ```
+
+## 2026-05-19 阶段 15 扩展 System Skills v1 评审
+
+范围：
+```text
+SkillRegistry 扩展
+SkillRuntime LLM Prompt 映射
+IntentRouter / TaskDecomposer / HermesOrchestrator Skill 编排
+Prompt Library 高价值 Skill 模板
+服务层与 API 测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-15-expanded-system-skills-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app\web\static\app.js
+python -m pytest tests\test_skill_runtime.py -q
+python -m pytest tests\test_api.py::test_expanded_system_skills_are_listed_and_runnable tests\test_api.py::test_expanded_skill_chat_routes -q
+python -m pytest tests\test_llm_providers.py::test_prompt_library_contains_deep_skill_prompts -q
+python -m pytest -q
+```
+
+评审结论：
+```text
+System Skills 已从原来的 document/image/todo/list MVP 扩展到合同、账单、照片分类、会议纪要、周报、PRD、文案、旅行计划、表格分析、文件归档、日程草案和邮件回复草案。
+新增 Skill 均有 Capability Contract、本地 fallback 输出、SkillRun 记录和专用 Prompt；模型配置可用时走 LLM，失败或未配置时不影响本地草案输出。
+聊天入口现在能把 PRD、会议纪要、合同等请求路由到对应 Skill，并在 TaskPlan 中保留可审计步骤。
+日程、邮件、文件归档等 Skill 当前只生成候选/草案，不直接写外部系统、不发送、不移动/删除文件，符合 Action Gate 安全边界。
+仍未完成真实日历/邮件/网盘 OAuth Provider、OS Keychain/SQLCipher、Responses API 工具调用和正式安装器签名链路。
+```
+
+测试结果：
+```text
+121 passed, 2 warnings
+```

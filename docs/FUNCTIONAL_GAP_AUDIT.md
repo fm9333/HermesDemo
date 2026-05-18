@@ -1,6 +1,6 @@
 # Hermes 功能符合度审计
 
-审计日期：2026-05-18  
+审计日期：2026-05-19
 审计范围：原始产品方案、桌面一体化开发计划、当前代码、API、测试和进度台账。
 
 ## 总结论
@@ -12,7 +12,7 @@
 + 本地服务
 + 本地数据
 + Action Gate
-+ MVP Skills
++ Expanded System Skills v1
 + Scene / Inspiration / Autonomy 基础
 + OpenAI-compatible LLM Provider v1
 ```
@@ -36,7 +36,7 @@
 | Memory | MVP 完成 | 候选、确认、拒绝、删除 |
 | Reminder | MVP 完成 | 创建、列表、更新、完成、删除 |
 | Wardrobe | MVP 完成 | 基础条目管理和图片识别候选 |
-| Skills | MVP 完成 | document、image、todo、list 四类 |
+| Skills | 扩展 v1 完成 | 文档总结、合同提取、账单分析、照片分类、待办、会议纪要、周报、清单、PRD、文案、旅行计划、表格分析、文件归档、日程草案、邮件草案 |
 | Personal Skill Draft | v1 完成 | 草案、来源 Skill Run、评测门禁、激活、归档、版本记录 |
 | Skill Patch | v1 完成 | 补丁、评测、版本冲突检查、应用、版本记录、回滚 |
 | Skill Curator | v1 完成 | 重复技能、未评测草案、失败补丁、高频变更、来源弱追踪建议 |
@@ -50,7 +50,7 @@
 
 | 缺口 | 严重度 | 原因 |
 |---|---:|---|
-| 完整 Skills 清单未实现 | P0 | 合同、账单、归档、照片分类、日程、邮件、表格等缺失 |
+| 高级/执行型 Skills 未全部完成 | P1 | 日历、邮件、网盘等目前已有草案 Skill，但真实 OAuth 执行、附件处理和外部写入仍未接入 |
 | API Key 不是 OS Keychain/SQLCipher 级加密 | P0 | 当前只是本地保护保存 |
 | 日历、邮件、网盘没有真实 OAuth Provider | P1 | 仍是本地占位 Provider |
 | UI 不是完整模块化产品界面 | P1 | 当前是控制台式面板，不是完整页面/详情/向导 |
@@ -80,12 +80,12 @@ python -m pytest -q
 最新结果：
 
 ```text
-117 passed, 2 warnings
+121 passed, 2 warnings
 ```
 
 ## 下一步开发顺序
 
-1. 补全完整 Skills 清单中的高价值技能。
-2. 接入日历、邮件、网盘真实 Provider。
-3. 升级密钥存储到 OS Keychain 或 SQLCipher。
+1. 接入日历、邮件、网盘真实 OAuth Provider。
+2. 升级密钥存储到 OS Keychain 或 SQLCipher。
+3. 补 Responses API / 工具调用 / 流式输出。
 4. 补正式安装器、签名、更新校验和 GUI 冒烟测试。

@@ -110,5 +110,9 @@ def test_prompt_library_contains_deep_skill_prompts():
     assert "hermes.agent.core" in ids
     assert "hermes.planner.deep_thinking" in ids
     assert "skill.document.summarize" in ids
+    assert "skill.document.contract_extract" in ids
+    assert "skill.work.meeting_minutes" in ids
+    assert "skill.data.table_analyze" in ids
+    assert "skill.email.reply_draft" in ids
     assert "eval.skill_judge" in ids
     assert "隐藏推理过程" in prompts.get("hermes.agent.core").system_prompt

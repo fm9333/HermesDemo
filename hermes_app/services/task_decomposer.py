@@ -54,12 +54,26 @@ class TaskDecomposer:
                 self._step("生成 Idea Card", "generate", "idea_card", "low"),
                 self._step("准备保存到灵感库", "plan", "idea.save", "low"),
             ]
-        if intent == "document_summarize":
-            return [self._skill_step("调用文档总结 Skill", "document.summarize")]
-        if intent == "todo_extract":
-            return [self._skill_step("调用待办提取 Skill", "work.todo_extract")]
-        if intent == "list_generate":
-            return [self._skill_step("调用清单生成 Skill", "content.list_generate")]
+        skill_targets = {
+            "document_summarize": ("调用文档总结 Skill", "document.summarize"),
+            "contract_extract": ("调用合同要点提取 Skill", "document.contract_extract"),
+            "bill_analyze": ("调用账单票据分析 Skill", "document.bill_analyze"),
+            "photo_classify": ("调用照片分类 Skill", "image.photo_classify"),
+            "todo_extract": ("调用待办提取 Skill", "work.todo_extract"),
+            "meeting_minutes": ("调用会议纪要生成 Skill", "work.meeting_minutes"),
+            "weekly_report": ("调用周报生成 Skill", "work.weekly_report"),
+            "list_generate": ("调用清单生成 Skill", "content.list_generate"),
+            "prd_generate": ("调用 PRD 草案生成 Skill", "content.prd_generate"),
+            "copy_generate": ("调用文案生成 Skill", "content.copy_generate"),
+            "travel_plan": ("调用旅行计划生成 Skill", "content.travel_plan"),
+            "table_analyze": ("调用表格数据分析 Skill", "data.table_analyze"),
+            "file_archive": ("调用文件归档方案 Skill", "file.archive_plan"),
+            "schedule_plan": ("调用日程安排草案 Skill", "calendar.schedule_plan"),
+            "email_reply": ("调用邮件回复草案 Skill", "email.reply_draft"),
+        }
+        if intent in skill_targets:
+            title, target = skill_targets[intent]
+            return [self._skill_step(title, target)]
         return [self._step("普通对话回复", "reply", "hermes_agent", risk_level)]
 
     def _summary_for_intent(self, intent: str, message: str) -> str:
@@ -71,8 +85,20 @@ class TaskDecomposer:
             "create_scene": "场景创建计划",
             "inspiration": "灵感碰撞计划",
             "document_summarize": "文档总结计划",
+            "contract_extract": "合同要点提取计划",
+            "bill_analyze": "账单票据分析计划",
+            "photo_classify": "照片分类计划",
             "todo_extract": "待办提取计划",
+            "meeting_minutes": "会议纪要生成计划",
+            "weekly_report": "周报生成计划",
             "list_generate": "清单生成计划",
+            "prd_generate": "PRD 草案生成计划",
+            "copy_generate": "文案生成计划",
+            "travel_plan": "旅行计划生成计划",
+            "table_analyze": "表格数据分析计划",
+            "file_archive": "文件归档方案计划",
+            "schedule_plan": "日程安排草案计划",
+            "email_reply": "邮件回复草案计划",
             "general_chat": "普通对话计划",
         }
         return f"{labels.get(intent, 'Hermes 任务计划')}：{message[:80]}"
