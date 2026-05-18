@@ -244,7 +244,11 @@
   - 验证：`GET /api/weekly-reviews` 可查看历史复盘
   - 验证：客户端复盘面板可生成复盘并查看历史记录
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，65 passed
-- [ ] 个性化首页卡片
+- [x] 个性化首页卡片 v1
+  - 验证：`GET /api/home/cards` 可聚合待确认动作、记忆候选、最新周复盘和主动建议
+  - 验证：首页卡片包含 `type`、`title`、`priority`、`route`、`action_label`、`payload` 统一结构
+  - 验证：客户端默认打开首页面板，卡片可跳转到对应模块
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，68 passed
 - [ ] 新闻 Provider
 - [ ] 地图 Provider
 
@@ -293,5 +297,6 @@
   - commit：`cc5dcf2 stage 7 proactive suggestions v1`
   - commit：`5451de5 stage 7 lightweight triggers v1`
   - commit：`e235bb9 stage 7 weekly review v1`
+  - commit：`待提交 stage 7 personalized home cards v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

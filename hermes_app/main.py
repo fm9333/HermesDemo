@@ -21,6 +21,7 @@ from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.evals import EvalRunner
 from hermes_app.services.files import FileService
 from hermes_app.services.growth import GrowthLogService
+from hermes_app.services.home_cards import HomeCardService
 from hermes_app.services.images import ImageService
 from hermes_app.services.inspiration import InspirationService
 from hermes_app.services.intent_router import IntentRouter
@@ -77,6 +78,7 @@ recommendation_service = RecommendationService(db, opportunity_engine, attention
 proactive_service = ProactiveSuggestionService(recommendation_service, todo_service, provider_registry)
 trigger_service = TriggerService(db, opportunity_engine, recommendation_service, proactive_service)
 weekly_review_service = WeeklyReviewService(db)
+home_card_service = HomeCardService(db, proactive_service, weekly_review_service)
 orchestrator = HermesOrchestrator(
     intent_router=IntentRouter(),
     task_decomposer=TaskDecomposer(),
@@ -113,6 +115,7 @@ app.include_router(
         proactive_service,
         trigger_service,
         weekly_review_service,
+        home_card_service,
         memory_service,
         action_service,
         skill_registry,

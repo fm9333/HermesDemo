@@ -28,6 +28,7 @@ def test_health():
 def test_home_contains_recommendation_controls():
     response = client.get("/")
     assert response.status_code == 200
+    assert 'data-panel="homeCards"' in response.text
     assert 'data-panel="recommendations"' in response.text
     assert 'data-panel="proactive"' in response.text
     assert 'data-panel="triggerRuns"' in response.text
@@ -43,6 +44,14 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="settings"' in response.text
     assert 'data-panel="providers"' in response.text
     assert 'id="panel-action"' in response.text
+
+
+def test_home_cards_api():
+    response = client.get("/api/home/cards")
+    assert response.status_code == 200
+    cards = response.json()
+    assert cards
+    assert {"id", "type", "title", "priority", "route", "payload"}.issubset(cards[0])
 
 
 def test_reminder_action_flow():

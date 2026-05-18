@@ -11,6 +11,7 @@ from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.evals import EvalRunner
 from hermes_app.services.files import FileService
 from hermes_app.services.growth import GrowthLogService
+from hermes_app.services.home_cards import HomeCardService
 from hermes_app.services.images import ImageService
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
@@ -57,6 +58,7 @@ def create_api_router(
     proactive: ProactiveSuggestionService,
     triggers: TriggerService,
     weekly_reviews: WeeklyReviewService,
+    home_cards: HomeCardService,
     memory: MemoryService,
     actions: ActionService,
     skills: SkillRegistry,
@@ -205,6 +207,10 @@ def create_api_router(
     @router.get("/weekly-reviews")
     def list_weekly_reviews() -> list[dict]:
         return weekly_reviews.list()
+
+    @router.get("/home/cards")
+    def list_home_cards(limit: int = 12) -> list[dict]:
+        return home_cards.list(limit=limit)
 
     @router.get("/memory")
     def list_memory() -> list[dict]:

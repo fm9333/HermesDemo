@@ -1543,3 +1543,40 @@ python -m pytest -q
 ```text
 e235bb9 stage 7 weekly review v1
 ```
+
+## 2026-05-18 阶段 7 个性化首页卡片 v1 评审
+
+范围：
+```text
+HomeCardService
+GET /api/home/cards
+客户端首页面板默认入口
+首页卡片跳转控制
+Home Cards 服务和 API 测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-7-personalized-home-cards-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+```text
+个性化首页卡片 v1 采用派生视图聚合已有状态，不新增冗余业务表，降低数据一致性风险。
+卡片优先级覆盖待确认动作、记忆候选、最新周复盘和主动建议，能把当前最需要处理的事项放到首页。
+每张卡片都保留 route 和 action_label，客户端可以从首页跳转到对应模块，而不是只展示静态摘要。
+空状态提供创建提醒或灵感的引导，避免新用户首次打开首页时出现无解释空白。
+```
+
+提交记录：
+```text
+待提交 stage 7 personalized home cards v1
+```

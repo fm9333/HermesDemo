@@ -6,7 +6,7 @@ const panelList = document.querySelector("#panel-list");
 const panelTitle = document.querySelector("#panel-title");
 const refreshPanel = document.querySelector("#refresh-panel");
 const panelAction = document.querySelector("#panel-action");
-let activePanel = "memory";
+let activePanel = "homeCards";
 
 const pageToken = document.querySelector('meta[name="hermes-token"]')?.content || "";
 const queryToken = new URLSearchParams(window.location.search).get("token") || "";
@@ -16,6 +16,7 @@ if (bootToken) {
 }
 
 const panelLabels = {
+  homeCards: "\u9996\u9875",
   memory: "记忆",
   memoryCandidates: "记忆候选",
   reminders: "提醒",
@@ -48,6 +49,7 @@ const panelLabels = {
 };
 
 const panelEndpoints = {
+  homeCards: "/api/home/cards",
   memory: "/api/memory",
   memoryCandidates: "/api/memory/candidates",
   reminders: "/api/reminders",
@@ -298,6 +300,13 @@ function renderPanelItem(item, panel) {
   if (panel === "reminders") title = item.title;
   if (panel === "ideas") title = item.title;
   const controls = [];
+  if (panel === "homeCards" && item.route) {
+    controls.push(
+      `<button class="action-button" data-panel="${escapeHtml(item.route)}">
+        ${escapeHtml(item.action_label || "\u67e5\u770b")}
+      </button>`
+    );
+  }
   if (panel === "ideas") {
     controls.push(`<button class="action-button" data-idea-to-todo="${item.id}">转待办</button>`);
     controls.push(`<button class="action-button" data-idea-to-prd="${item.id}">转 PRD</button>`);
