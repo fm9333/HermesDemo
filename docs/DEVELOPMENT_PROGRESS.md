@@ -174,7 +174,11 @@
   - 验证：同一 Idea 重复转换返回已有 Scene，不重复创建
   - 验证：客户端 Idea 面板可转场景，转换后跳转到场景面板
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，45 passed
-- [ ] 灵感偏好写入确认
+- [x] 灵感偏好写入确认 v1
+  - 验证：`POST /api/ideas/{id}/preference-candidate` 只生成记忆候选，不直接写长期记忆
+  - 验证：生成的 Action 为 `memory.confirm_candidate`，确认后才写入 `memory_items`
+  - 验证：客户端 Idea 面板可生成“记住偏好”确认卡
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，45 passed
 
 ## GitHub / SVN 同步状态
 
@@ -210,5 +214,6 @@
   - commit：`9d6d4f4 stage 5 idea to todo v1`
   - commit：`6164f3b stage 5 idea to prd v1`
   - commit：`7eb185d stage 5 idea to scene v1`
+  - commit：`待提交 stage 5 inspiration preference candidate v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

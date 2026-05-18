@@ -233,6 +233,15 @@ async function convertIdeaToScene(ideaId) {
   await loadPanel("scenes");
 }
 
+async function createIdeaPreferenceCandidate(ideaId) {
+  const data = await requestJson(`/api/ideas/${ideaId}/preference-candidate`, { method: "POST" });
+  addMessage("assistant", "灵感偏好候选已生成，确认后写入记忆。", {
+    memory_candidates: [data.candidate],
+    actions: [data.action],
+  });
+  await loadPanel("memoryCandidates");
+}
+
 async function completeTodo(todoId) {
   const data = await requestJson(`/api/todos/${todoId}/complete`, { method: "POST" });
   addMessage("assistant", `待办已完成：${data.title}`);
@@ -248,6 +257,7 @@ function renderPanelItem(item, panel) {
     controls.push(`<button class="action-button" data-idea-to-todo="${item.id}">转待办</button>`);
     controls.push(`<button class="action-button" data-idea-to-prd="${item.id}">转 PRD</button>`);
     controls.push(`<button class="action-button" data-idea-to-scene="${item.id}">转场景</button>`);
+    controls.push(`<button class="action-button" data-idea-preference="${item.id}">记住偏好</button>`);
   }
   if (panel === "todos" && item.status === "open") {
     controls.push(`<button class="action-button" data-complete-todo="${item.id}">完成</button>`);
@@ -311,6 +321,7 @@ document.addEventListener("click", async (event) => {
   const ideaToTodoId = event.target.dataset?.ideaToTodo;
   const ideaToPrdId = event.target.dataset?.ideaToPrd;
   const ideaToSceneId = event.target.dataset?.ideaToScene;
+  const ideaPreferenceId = event.target.dataset?.ideaPreference;
   const completeTodoId = event.target.dataset?.completeTodo;
   const panel = event.target.dataset?.panel;
 
@@ -323,6 +334,7 @@ document.addEventListener("click", async (event) => {
     if (ideaToTodoId) await convertIdeaToTodo(ideaToTodoId);
     if (ideaToPrdId) await convertIdeaToPrd(ideaToPrdId);
     if (ideaToSceneId) await convertIdeaToScene(ideaToSceneId);
+    if (ideaPreferenceId) await createIdeaPreferenceCandidate(ideaPreferenceId);
     if (completeTodoId) await completeTodo(completeTodoId);
     if (panel) await loadPanel(panel);
   } catch (error) {

@@ -4,7 +4,7 @@ import json
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
-from hermes_app.schemas import ChatRequest, ChatResponse, ConfirmActionResponse
+from hermes_app.schemas import ChatRequest, ChatResponse, ConfirmActionResponse, MemoryCandidate
 from hermes_app.services.actions import ActionService
 from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.files import FileService
@@ -215,6 +215,41 @@ def create_api_router(
             output_type="recommendation",
             status="active",
         )
+
+    @router.post("/ideas/{idea_id}/preference-candidate")
+    def create_idea_preference_candidate(idea_id: str) -> dict:
+        row = orchestrator.actions.db.query_one("SELECT * FROM idea_cards WHERE id = ?", (idea_id,))
+        if not row:
+            raise HTTPException(status_code=404, detail="Idea not found.")
+        idea = _deserialize_idea(row)
+        mode = next((tag for tag in idea["tags"] if tag not in {"inspiration", "idea-card"}), "general")
+        value = f"灵感偏好：关注 {idea['direction'] or idea['title']}，适合使用 {mode} 模式推进。"
+        existing = orchestrator.actions.db.query_one(
+            """
+            SELECT * FROM memory_candidates
+            WHERE key = ? AND value = ? AND status = ?
+            ORDER BY created_at DESC LIMIT 1
+            """,
+            ("inspiration_preference", value, "pending"),
+        )
+        candidate = existing or memory.create_candidate(
+            MemoryCandidate(
+                memory_type="preference",
+                key="inspiration_preference",
+                value=value,
+                sensitivity="normal",
+                confidence=0.68,
+            ),
+            source="idea",
+            reason="从已保存 Idea Card 中提取灵感工作偏好，需用户确认后写入长期记忆。",
+        )
+        action = actions.create_pending(
+            "memory.confirm_candidate",
+            {"candidate_id": candidate["id"]},
+            "medium",
+            "灵感偏好会影响后续建议，需要确认后写入长期记忆。",
+        )
+        return {"candidate": candidate, "action": action.model_dump()}
 
     @router.get("/prd-drafts")
     def list_prd_drafts(status: str | None = None) -> list[dict]:

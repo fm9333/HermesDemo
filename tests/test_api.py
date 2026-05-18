@@ -243,6 +243,19 @@ def test_inspiration_chat_saves_structured_idea_card():
     assert scene_again.status_code == 200
     assert scene_again.json()["id"] == scene.json()["id"]
 
+    preference = client.post(f"/api/ideas/{idea_id}/preference-candidate")
+    assert preference.status_code == 200
+    preference_data = preference.json()
+    assert preference_data["candidate"]["status"] == "pending"
+    assert preference_data["candidate"]["key"] == "inspiration_preference"
+    assert preference_data["action"]["action_type"] == "memory.confirm_candidate"
+
+    confirmed_preference = client.post(f"/api/actions/{preference_data['action']['id']}/confirm")
+    assert confirmed_preference.status_code == 200
+    memory_id = confirmed_preference.json()["result"]["memory_id"]
+    memories = client.get("/api/memory").json()
+    assert any(item["id"] == memory_id and item["key"] == "inspiration_preference" for item in memories)
+
 
 def test_scene_api_and_chat_flow():
     response = client.post("/api/scenes", json={"name": "雨天通勤提醒", "output_type": "reminder"})
