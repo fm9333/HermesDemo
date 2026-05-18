@@ -819,5 +819,5 @@ file.uploaded 信号生成 document.summarize Skill 推荐机会。
 提交记录：
 
 ```text
-待提交：stage-4-opportunity-engine-v1
+3479a07 stage 4 opportunity engine v1
 ```
