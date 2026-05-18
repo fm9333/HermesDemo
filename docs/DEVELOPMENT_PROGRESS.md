@@ -265,7 +265,12 @@
 
 ## 阶段 8：打包、稳定性和正式发布
 
-- [ ] PyInstaller 打包
+- [x] PyInstaller 打包 v1
+  - 验证：`packaging/hermes_desktop.spec` 指向 `desktop/main.py` 桌面入口
+  - 验证：spec 会打包 `hermes_app/web` 本地 UI 资源和参考文档
+  - 验证：`scripts/build_desktop.ps1` 可调用 PyInstaller spec
+  - 验证：`requirements-desktop.txt` 包含 PyInstaller 和 PySide6 桌面依赖
+  - 测试：`python -m compileall hermes_app desktop tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，88 passed
 - [ ] 自动更新策略
 - [x] 崩溃恢复 v1
   - 验证：`RuntimeStateService` 可记录运行中、心跳和干净关闭状态
@@ -347,5 +352,6 @@
   - commit：`cdd072e stage 8 database migrations v1`
   - commit：`5330923 stage 8 data export v1`
   - commit：`7641b3b stage 8 crash recovery v1`
+  - commit：`待提交 stage 8 pyinstaller packaging v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
