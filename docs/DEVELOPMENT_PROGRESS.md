@@ -306,7 +306,10 @@
   - 验证：`schema_migrations` 记录 `0005_performance_indexes`
   - 验证：`GET /api/performance/indexes` 和客户端性能面板可查看索引
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，94 passed
-- [ ] 端到端测试
+- [x] 端到端测试 v1
+  - 验证：覆盖对话生成 Idea、Action 确认、Idea 转待办、周复盘、首页聚合
+  - 验证：覆盖备份、导出、迁移、性能索引、运行恢复接口
+  - 测试：`python -m compileall hermes_app desktop tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，95 passed
 - [ ] 安全测试
 
 ## GitHub / SVN 同步状态
@@ -364,5 +367,6 @@
   - commit：`f98a2ad stage 8 pyinstaller packaging v1`
   - commit：`acdfee4 stage 8 update strategy v1`
   - commit：`b753ec1 stage 8 performance indexes v1`
+  - commit：`待提交 stage 8 e2e release flow v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
