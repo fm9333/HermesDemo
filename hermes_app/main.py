@@ -29,6 +29,7 @@ from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
 from hermes_app.services.prd_drafts import PrdDraftService
+from hermes_app.services.proactive import ProactiveSuggestionService
 from hermes_app.services.providers import ProviderRegistry
 from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
@@ -71,6 +72,7 @@ context_signal_service = ContextSignalService(db)
 opportunity_engine = OpportunityEngine(db, context_signal_service)
 attention_policy = AttentionPolicy()
 recommendation_service = RecommendationService(db, opportunity_engine, attention_policy)
+proactive_service = ProactiveSuggestionService(recommendation_service, todo_service, provider_registry)
 orchestrator = HermesOrchestrator(
     intent_router=IntentRouter(),
     task_decomposer=TaskDecomposer(),
@@ -104,6 +106,7 @@ app.include_router(
         growth_log_service,
         settings_service,
         provider_registry,
+        proactive_service,
         memory_service,
         action_service,
         skill_registry,

@@ -227,7 +227,11 @@
   - 验证：`GET /api/providers`、`POST /api/providers/{id}/connect`、`POST /api/providers/{id}/disconnect` 可用
   - 验证：客户端集成面板可连接/断开 Provider
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，58 passed
-- [ ] 主动建议中心
+- [x] 主动建议中心 v1
+  - 验证：`GET /api/proactive/suggestions` 可聚合 open 推荐、open 待办和未连接 Provider
+  - 验证：建议卡包含 `type`、`title`、`priority`、`source_id`、`payload`
+  - 验证：客户端主动面板可查看统一建议列表
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，60 passed
 - [ ] 轻量实时触发
 - [ ] 每周灵感复盘
 - [ ] 个性化首页卡片
@@ -276,5 +280,6 @@
   - commit：`3328566 stage 6 red zone blocking v1`
   - commit：`826bfd5 stage 6 safety settings v1`
   - commit：`c2d829b stage 7 provider registry v1`
+  - commit：`待提交 stage 7 proactive suggestions v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

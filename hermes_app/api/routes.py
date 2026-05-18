@@ -17,6 +17,7 @@ from hermes_app.services.memory import MemoryService
 from hermes_app.services.orchestrator import HermesOrchestrator
 from hermes_app.services.opportunities import OpportunityEngine
 from hermes_app.services.prd_drafts import PrdDraftService
+from hermes_app.services.proactive import ProactiveSuggestionService
 from hermes_app.services.providers import ProviderRegistry
 from hermes_app.services.recommendations import RecommendationService
 from hermes_app.services.reminders import ReminderService
@@ -51,6 +52,7 @@ def create_api_router(
     growth_logs: GrowthLogService,
     settings: SettingsService,
     providers: ProviderRegistry,
+    proactive: ProactiveSuggestionService,
     memory: MemoryService,
     actions: ActionService,
     skills: SkillRegistry,
@@ -179,6 +181,10 @@ def create_api_router(
             return providers.disconnect(provider_id)
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.get("/proactive/suggestions")
+    def list_proactive_suggestions(limit: int = 20) -> list[dict]:
+        return proactive.list(limit=limit)
 
     @router.get("/memory")
     def list_memory() -> list[dict]:

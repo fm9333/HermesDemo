@@ -29,6 +29,7 @@ def test_home_contains_recommendation_controls():
     response = client.get("/")
     assert response.status_code == 200
     assert 'data-panel="recommendations"' in response.text
+    assert 'data-panel="proactive"' in response.text
     assert 'data-panel="sceneFeedback"' in response.text
     assert 'data-panel="todos"' in response.text
     assert 'data-panel="prdDrafts"' in response.text
@@ -207,6 +208,13 @@ def test_provider_registry_api():
     disconnected = client.post("/api/providers/calendar.local/disconnect")
     assert disconnected.status_code == 200
     assert disconnected.json()["status"] == "disconnected"
+
+
+def test_proactive_suggestions_api():
+    suggestions = client.get("/api/proactive/suggestions")
+    assert suggestions.status_code == 200
+    assert isinstance(suggestions.json(), list)
+    assert any(item["type"] == "provider_setup" for item in suggestions.json())
 
 
 def test_tools_api_lists_action_tool_registry():
