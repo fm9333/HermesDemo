@@ -31,6 +31,7 @@
 | 主对话 | MVP 完成 | 支持意图路由、计划、LLM 普通对话 |
 | LLM Provider | v1 完成 | OpenAI-compatible Chat Completions |
 | LLM 文件策略 | v1 完成 | 云模型默认禁止文件上下文，策略面板可见，Provider 可单独授权 |
+| LLM Secret Vault | v1 完成 | Windows DPAPI 本机用户级加密、旧本地混淆密钥兼容读取和轮换 |
 | Prompt Library | v1 完成 | Agent、Planner、Skill、Eval、Safety 提示词 |
 | Action Gate | v1 完成 | 提醒、记忆、衣橱等变更需确认 |
 | Memory | MVP 完成 | 候选、确认、拒绝、删除 |
@@ -51,7 +52,7 @@
 | 缺口 | 严重度 | 原因 |
 |---|---:|---|
 | 高级/执行型 Skills 未全部完成 | P1 | 日历、邮件、网盘等目前已有草案 Skill，但真实 OAuth 执行、附件处理和外部写入仍未接入 |
-| API Key 不是 OS Keychain/SQLCipher 级加密 | P0 | 当前只是本地保护保存 |
+| 跨平台 Keychain / SQLCipher 未完成 | P1 | Windows 已接入 DPAPI；macOS/Linux Keychain 和数据库级加密仍未实现 |
 | 日历、邮件、网盘没有真实 OAuth Provider | P1 | 仍是本地占位 Provider |
 | UI 不是完整模块化产品界面 | P1 | 当前是控制台式面板，不是完整页面/详情/向导 |
 | 没有真实 Scheduler / Windows 通知闭环 | P1 | 提醒存在数据层，未形成系统通知产品闭环 |
@@ -80,12 +81,12 @@ python -m pytest -q
 最新结果：
 
 ```text
-121 passed, 2 warnings
+122 passed, 2 warnings
 ```
 
 ## 下一步开发顺序
 
 1. 接入日历、邮件、网盘真实 OAuth Provider。
-2. 升级密钥存储到 OS Keychain 或 SQLCipher。
+2. 补 macOS/Linux Keychain 或 SQLCipher 数据库级加密。
 3. 补 Responses API / 工具调用 / 流式输出。
 4. 补正式安装器、签名、更新校验和 GUI 冒烟测试。

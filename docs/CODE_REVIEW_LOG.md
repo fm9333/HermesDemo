@@ -2329,3 +2329,42 @@ System Skills 已从原来的 document/image/todo/list MVP 扩展到合同、账
 ```text
 e12809b stage 15 expanded system skills v1
 ```
+
+## 2026-05-19 阶段 16 LLM Secret Vault v1 评审
+
+范围：
+```text
+LLMProviderService SecretVault
+Windows DPAPI API Key 加密
+旧 v1 本地混淆密钥兼容与轮换
+LLM secret policy API
+服务层与 API 测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-16-llm-secret-vault-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app\web\static\app.js
+python -m pytest tests\test_llm_providers.py tests\test_api.py::test_llm_file_policy_api -q
+python -m pytest -q
+```
+
+评审结论：
+```text
+LLM API Key 存储从单一本地混淆升级为 SecretVault。
+Windows 环境优先使用 DPAPI 生成 dpapi.v1. 密文，绑定当前 OS 用户，接口只返回 preview 和 secret_backend，不返回完整密钥。
+旧 v1. 本地混淆密钥仍可读取，避免升级破坏现有 Provider；新增 rotate API 可将旧密钥迁移到当前强保护后端。
+llm file policy 现在同时暴露 secret_protection，用户可以看到当前密钥保护后端和已存密钥类型统计。
+跨平台 macOS/Linux Keychain、SQLCipher 数据库级加密和密钥备份/恢复策略仍是后续商用强化项。
+```
+
+测试结果：
+```text
+122 passed, 2 warnings
+```

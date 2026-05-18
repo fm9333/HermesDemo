@@ -438,6 +438,20 @@
   - 验证：`POST /api/chat` 的 PRD、会议纪要、合同请求能路由到对应 Skill
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，121 passed
 
+## 阶段 16：LLM Secret Vault
+
+- [x] Windows DPAPI Secret Vault v1
+  - 验证：Windows 环境下新建/更新 LLM Provider API Key 写入 `dpapi.v1.` 密文
+  - 验证：接口返回 `api_key_set`、`api_key_preview` 和 `secret_backend`，不回显完整密钥
+  - 验证：非 Windows 或 DPAPI 不可用时仍可 fallback 到旧本地保护，并明确标注 `local_obfuscation`
+- [x] 旧密钥兼容与轮换 v1
+  - 验证：旧 `v1.` 本地混淆密钥仍可解密，避免升级后 Provider 失效
+  - 验证：`POST /api/llm/secret-policy/rotate` 可把旧密钥迁移到当前强保护后端
+- [x] 密钥保护策略可见化 v1
+  - 验证：`GET /api/llm/secret-policy` 返回当前后端、强保护状态和已存密钥后端统计
+  - 验证：`GET /api/llm/file-policy` 同步返回 `secret_protection`
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，122 passed
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库
@@ -503,5 +517,6 @@
   - commit：`f2b45e1 stage 13 skill curator v1`
   - commit：`df250c8 stage 14 llm file policy ui v1`
   - commit：`e12809b stage 15 expanded system skills v1`
+  - commit：待提交 `stage 16 llm secret vault v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

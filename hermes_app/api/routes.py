@@ -305,8 +305,17 @@ def create_api_router(
         return {
             "global_allow_cloud_file_context": bool(global_setting and global_setting["value"]),
             "default_policy": "block_cloud_file_context",
+            "secret_protection": llm_providers.secret_status(),
             "providers": providers_payload,
         }
+
+    @router.get("/llm/secret-policy")
+    def get_llm_secret_policy() -> dict:
+        return llm_providers.secret_status()
+
+    @router.post("/llm/secret-policy/rotate")
+    def rotate_llm_legacy_secrets() -> dict:
+        return llm_providers.rotate_legacy_secrets()
 
     @router.get("/prompts")
     def list_prompts() -> list[dict]:

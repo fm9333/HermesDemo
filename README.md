@@ -120,7 +120,7 @@ GET  /api/logs
 
 ## 重要边界
 
-当前版本已接入真实 LLM Provider 配置和 OpenAI-compatible 调用，但默认不内置任何云端 API Key；用户必须在“模型”面板自行配置。LLM 只负责理解、生成草案和规划，不能直接写数据库或直接调用外部 API；执行类动作仍必须经过 Tool Registry 与 Action Gate。
+当前版本已接入真实 LLM Provider 配置和 OpenAI-compatible 调用，但默认不内置任何云端 API Key；用户必须在“模型”面板自行配置。Windows 环境下 API Key 使用 DPAPI 做本机用户级加密保存，旧本地混淆密钥可兼容读取并通过 `/api/llm/secret-policy/rotate` 轮换。LLM 只负责理解、生成草案和规划，不能直接写数据库或直接调用外部 API；执行类动作仍必须经过 Tool Registry 与 Action Gate。
 
 日历、邮件、网盘仍是占位 Provider；文件解析、天气、新闻、地图和扩展 System Skills 已有本地或公开接口实现。System Skills 目前覆盖合同、账单、照片分类、会议纪要、周报、PRD、文案、旅行计划、表格分析、文件归档、日程草案和邮件回复草案等 v1 能力。
 
@@ -141,7 +141,7 @@ Forecast:  https://api.open-meteo.com/v1/forecast
 下一步应该继续接入：
 
 1. Responses API / 工具调用协议支持。
-2. OS Keychain 或 SQLCipher 级密钥保护。
+2. macOS/Linux Keychain 或 SQLCipher 级密钥保护。
 3. 日历、邮件、网盘 OAuth Provider。
 4. 多模态图片识别和文件深度解析模型。
 5. 更深度的多模态 Skills、真实外部 Provider、密钥强保护和正式商用发布链路。

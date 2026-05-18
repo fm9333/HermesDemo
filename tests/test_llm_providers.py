@@ -24,10 +24,47 @@ def test_llm_provider_masks_api_key_and_sets_default(tmp_path):
     assert provider["is_default"] is True
     assert provider["api_key_set"] is True
     assert provider["api_key_preview"] == "sk-t...cret"
+    assert provider["secret_backend"] in {"windows_dpapi", "local_obfuscation"}
     assert "sk-test-secret" not in str(provider)
+
+    stored = db.query_one("SELECT api_key_secret FROM llm_providers WHERE provider_id = ?", ("openai.test",))
+    assert stored["api_key_secret"] != "sk-test-secret"
+    assert stored["api_key_secret"].startswith(("dpapi.v1.", "v1."))
+    assert service.secret_status()["backend"] in {"windows_dpapi", "local_obfuscation"}
 
     runtime = service.get_runtime("openai.test")
     assert runtime["api_key"] == "sk-test-secret"
+
+
+def test_llm_provider_can_rotate_legacy_secrets_to_active_backend(tmp_path):
+    db = Database(tmp_path / "llm.db")
+    db.init()
+    service = LLMProviderService(db)
+    service.create(
+        {
+            "provider_id": "legacy.test",
+            "name": "Legacy Test",
+            "base_url": "https://api.openai.com/v1",
+            "model": "test-model",
+            "api_key": "new-secret",
+        }
+    )
+    legacy_secret = service.codec.legacy.encode("legacy-secret")
+    db.execute(
+        "UPDATE llm_providers SET api_key_secret = ? WHERE provider_id = ?",
+        (legacy_secret, "legacy.test"),
+    )
+
+    rotated = service.rotate_legacy_secrets()
+    runtime = service.get_runtime("legacy.test")
+
+    assert runtime["api_key"] == "legacy-secret"
+    if service.secret_status()["backend"] == "windows_dpapi":
+        stored = db.query_one("SELECT api_key_secret FROM llm_providers WHERE provider_id = ?", ("legacy.test",))
+        assert rotated["rotated"] == 1
+        assert stored["api_key_secret"].startswith("dpapi.v1.")
+    else:
+        assert rotated["status"] == "skipped"
 
 
 def test_llm_client_uses_openai_compatible_chat_payload(tmp_path, monkeypatch):

@@ -396,6 +396,7 @@ def test_llm_provider_api_and_chat(monkeypatch):
     assert created.status_code == 200
     provider = created.json()
     assert provider["api_key_set"] is True
+    assert provider["secret_backend"] in {"windows_dpapi", "local_obfuscation"}
     assert "secret-key" not in str(provider)
 
     monkeypatch.setattr(
@@ -439,8 +440,17 @@ def test_llm_file_policy_api():
 
     policy = client.get("/api/llm/file-policy")
     assert policy.status_code == 200
+    assert policy.json()["secret_protection"]["backend"] in {"windows_dpapi", "local_obfuscation"}
     provider = next(item for item in policy.json()["providers"] if item["provider_id"] == "api.file.policy")
     assert provider["effective_file_context_allowed"] is False
+
+    secret_policy = client.get("/api/llm/secret-policy")
+    assert secret_policy.status_code == 200
+    assert secret_policy.json()["backend"] in {"windows_dpapi", "local_obfuscation"}
+
+    rotated = client.post("/api/llm/secret-policy/rotate")
+    assert rotated.status_code == 200
+    assert rotated.json()["backend"] in {"windows_dpapi", "local_obfuscation"}
 
     client.patch("/api/settings/llm_allow_cloud_file_context", json={"value": True})
     client.patch("/api/llm/providers/api.file.policy", json={"allow_file_context": True})

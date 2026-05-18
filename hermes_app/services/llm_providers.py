@@ -12,6 +12,8 @@ from hermes_app.core.database import Database
 
 
 class LocalSecretCodec:
+    prefix = "v1."
+
     def __init__(self, db: Database):
         source = os.getenv("HERMES_SECRET_KEY") or f"hermes-local-v1|{db.path}|{platform.node()}"
         self._key = hashlib.sha256(source.encode("utf-8")).digest()
@@ -21,15 +23,15 @@ class LocalSecretCodec:
             return ""
         data = value.encode("utf-8")
         encoded = bytes(byte ^ self._key[index % len(self._key)] for index, byte in enumerate(data))
-        return "v1." + base64.urlsafe_b64encode(encoded).decode("ascii")
+        return self.prefix + base64.urlsafe_b64encode(encoded).decode("ascii")
 
     def decode(self, value: str) -> str:
         if not value:
             return ""
-        if not value.startswith("v1."):
+        if not value.startswith(self.prefix):
             return ""
         try:
-            data = base64.urlsafe_b64decode(value[3:].encode("ascii"))
+            data = base64.urlsafe_b64decode(value[len(self.prefix) :].encode("ascii"))
         except ValueError:
             return ""
         decoded = bytes(byte ^ self._key[index % len(self._key)] for index, byte in enumerate(data))
@@ -47,6 +49,100 @@ class LocalSecretCodec:
         return f"{secret[:4]}...{secret[-4:]}"
 
 
+class WindowsDPAPISecretCodec:
+    prefix = "dpapi.v1."
+
+    def __init__(self):
+        import win32crypt  # type: ignore[import-not-found]
+
+        self._win32crypt = win32crypt
+
+    def encode(self, value: str) -> str:
+        if not value:
+            return ""
+        encrypted = self._win32crypt.CryptProtectData(
+            value.encode("utf-8"),
+            "Hermes LLM API Key",
+            None,
+            None,
+            None,
+            0,
+        )
+        return self.prefix + base64.urlsafe_b64encode(encrypted).decode("ascii")
+
+    def decode(self, value: str) -> str:
+        if not value or not value.startswith(self.prefix):
+            return ""
+        try:
+            encrypted = base64.urlsafe_b64decode(value[len(self.prefix) :].encode("ascii"))
+            _, data = self._win32crypt.CryptUnprotectData(encrypted, None, None, None, 0)
+            return data.decode("utf-8")
+        except Exception:
+            return ""
+
+
+class SecretVault:
+    def __init__(self, db: Database):
+        self.legacy = LocalSecretCodec(db)
+        self.dpapi = self._load_dpapi()
+
+    def encode(self, value: str) -> str:
+        if self.dpapi:
+            return self.dpapi.encode(value)
+        return self.legacy.encode(value)
+
+    def decode(self, value: str) -> str:
+        if not value:
+            return ""
+        if value.startswith(WindowsDPAPISecretCodec.prefix):
+            if not self.dpapi:
+                return ""
+            return self.dpapi.decode(value)
+        if value.startswith(LocalSecretCodec.prefix):
+            return self.legacy.decode(value)
+        return ""
+
+    def preview(self, value: str) -> str:
+        secret = self.decode(value)
+        if not secret:
+            return ""
+        if len(secret) <= 8:
+            return "*" * len(secret)
+        return f"{secret[:4]}...{secret[-4:]}"
+
+    def active_backend(self) -> str:
+        return "windows_dpapi" if self.dpapi else "local_obfuscation"
+
+    def backend_for(self, value: str) -> str:
+        if not value:
+            return "empty"
+        if value.startswith(WindowsDPAPISecretCodec.prefix):
+            return "windows_dpapi"
+        if value.startswith(LocalSecretCodec.prefix):
+            return "local_obfuscation_legacy"
+        return "unknown"
+
+    def status(self) -> dict:
+        backend = self.active_backend()
+        return {
+            "backend": backend,
+            "strong_protection": backend == "windows_dpapi",
+            "description": (
+                "Windows DPAPI protects API keys for the current OS user."
+                if backend == "windows_dpapi"
+                else "Fallback local obfuscation is active; configure Windows DPAPI or an OS keychain for stronger protection."
+            ),
+        }
+
+    def _load_dpapi(self) -> WindowsDPAPISecretCodec | None:
+        if platform.system().lower() != "windows":
+            return None
+        try:
+            return WindowsDPAPISecretCodec()
+        except Exception:
+            return None
+
+
 class LLMProviderService:
     provider_types = {"openai_compatible", "openai", "local_openai_compatible"}
     protocols = {"chat_completions"}
@@ -54,7 +150,7 @@ class LLMProviderService:
 
     def __init__(self, db: Database):
         self.db = db
-        self.codec = LocalSecretCodec(db)
+        self.codec = SecretVault(db)
 
     def list(self) -> list[dict]:
         rows = self.db.query(
@@ -71,6 +167,51 @@ class LLMProviderService:
             row["request"] = json.loads(row.pop("request_json"))
             row["response"] = json.loads(row.pop("response_json"))
         return rows
+
+    def secret_status(self) -> dict:
+        stored = self.db.query("SELECT api_key_secret FROM llm_providers")
+        backends = {}
+        for row in stored:
+            backend = self.codec.backend_for(row["api_key_secret"])
+            backends[backend] = backends.get(backend, 0) + 1
+        return {
+            **self.codec.status(),
+            "stored_secret_backends": backends,
+        }
+
+    def rotate_legacy_secrets(self) -> dict:
+        target_backend = self.codec.active_backend()
+        if target_backend != "windows_dpapi":
+            return {
+                "status": "skipped",
+                "backend": target_backend,
+                "rotated": 0,
+                "reason": "No stronger OS secret backend is active.",
+            }
+        rotated = 0
+        skipped = 0
+        rows = self.db.query("SELECT provider_id, api_key_secret FROM llm_providers")
+        for row in rows:
+            secret_value = row["api_key_secret"]
+            if not secret_value or self.codec.backend_for(secret_value) == target_backend:
+                skipped += 1
+                continue
+            decoded = self.codec.decode(secret_value)
+            if not decoded:
+                skipped += 1
+                continue
+            self.db.execute(
+                "UPDATE llm_providers SET api_key_secret = ?, updated_at = ? WHERE provider_id = ?",
+                (self.codec.encode(decoded), _now(), row["provider_id"]),
+            )
+            rotated += 1
+        return {
+            "status": "ok",
+            "backend": target_backend,
+            "rotated": rotated,
+            "skipped": skipped,
+            "secret_status": self.secret_status(),
+        }
 
     def get(self, provider_id: str) -> dict | None:
         row = self.db.query_one("SELECT * FROM llm_providers WHERE provider_id = ?", (provider_id,))
@@ -289,6 +430,7 @@ class LLMProviderService:
         item["allow_file_context"] = bool(item["allow_file_context"])
         item["api_key_set"] = bool(secret)
         item["api_key_preview"] = self.codec.preview(secret)
+        item["secret_backend"] = self.codec.backend_for(secret)
         return item
 
     def _has_default(self) -> bool:
