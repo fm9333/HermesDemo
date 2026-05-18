@@ -542,5 +542,5 @@ PDF/DOCX 解析仍是后续任务，未在本次范围内标记完成。
 提交记录：
 
 ```text
-待提交：stage-3-document-summarize-text-v1
+5765d6d stage 3 document summarize text v1
 ```
