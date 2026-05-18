@@ -36,6 +36,7 @@ const panelLabels = {
   tools: "工具",
   autonomy: "自治",
   evalRuns: "评测",
+  growthLog: "成长",
   logs: "日志",
 };
 
@@ -60,6 +61,7 @@ const panelEndpoints = {
   tools: "/api/tools",
   autonomy: "/api/autonomy/zones",
   evalRuns: "/api/eval/runs",
+  growthLog: "/api/growth-log",
   logs: "/api/logs",
 };
 
@@ -247,6 +249,12 @@ async function createIdeaPreferenceCandidate(ideaId) {
   await loadPanel("memoryCandidates");
 }
 
+async function rollbackGrowthLog(logId) {
+  const data = await requestJson(`/api/growth-log/${logId}/rollback`, { method: "POST" });
+  addMessage("assistant", `优化已回滚：${data.title}`);
+  await loadPanel(activePanel);
+}
+
 async function completeTodo(todoId) {
   const data = await requestJson(`/api/todos/${todoId}/complete`, { method: "POST" });
   addMessage("assistant", `待办已完成：${data.title}`);
@@ -266,6 +274,9 @@ function renderPanelItem(item, panel) {
   }
   if (panel === "todos" && item.status === "open") {
     controls.push(`<button class="action-button" data-complete-todo="${item.id}">完成</button>`);
+  }
+  if (panel === "growthLog" && item.status === "active") {
+    controls.push(`<button class="action-button reject" data-rollback-growth="${item.id}">回滚</button>`);
   }
   if (panel === "scenes") {
     controls.push(`<button class="action-button" data-scene-feedback-positive="${item.id}">有效</button>`);
@@ -327,6 +338,7 @@ document.addEventListener("click", async (event) => {
   const ideaToPrdId = event.target.dataset?.ideaToPrd;
   const ideaToSceneId = event.target.dataset?.ideaToScene;
   const ideaPreferenceId = event.target.dataset?.ideaPreference;
+  const rollbackGrowthId = event.target.dataset?.rollbackGrowth;
   const completeTodoId = event.target.dataset?.completeTodo;
   const panel = event.target.dataset?.panel;
 
@@ -340,6 +352,7 @@ document.addEventListener("click", async (event) => {
     if (ideaToPrdId) await convertIdeaToPrd(ideaToPrdId);
     if (ideaToSceneId) await convertIdeaToScene(ideaToSceneId);
     if (ideaPreferenceId) await createIdeaPreferenceCandidate(ideaPreferenceId);
+    if (rollbackGrowthId) await rollbackGrowthLog(rollbackGrowthId);
     if (completeTodoId) await completeTodo(completeTodoId);
     if (panel) await loadPanel(panel);
   } catch (error) {

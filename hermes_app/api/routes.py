@@ -10,6 +10,7 @@ from hermes_app.services.autonomy import AutonomyZoneClassifier
 from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.evals import EvalRunner
 from hermes_app.services.files import FileService
+from hermes_app.services.growth import GrowthLogService
 from hermes_app.services.images import ImageService
 from hermes_app.services.logs import ExecutionLogService
 from hermes_app.services.memory import MemoryService
@@ -45,6 +46,7 @@ def create_api_router(
     orchestrator: HermesOrchestrator,
     autonomy: AutonomyZoneClassifier,
     eval_runner: EvalRunner,
+    growth_logs: GrowthLogService,
     memory: MemoryService,
     actions: ActionService,
     skills: SkillRegistry,
@@ -98,6 +100,27 @@ def create_api_router(
     def run_eval_suite(suite_id: str) -> dict:
         try:
             return eval_runner.run(suite_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @router.get("/growth-log")
+    def list_growth_logs(status: str | None = None) -> list[dict]:
+        return growth_logs.list(status=status)
+
+    @router.post("/growth-log")
+    def create_growth_log(payload: dict) -> dict:
+        return growth_logs.create(
+            title=payload.get("title", ""),
+            zone=payload.get("zone", "green"),
+            source_task=payload.get("source_task", "manual"),
+            impact=payload.get("impact", ""),
+            payload=payload.get("payload", {}),
+        )
+
+    @router.post("/growth-log/{log_id}/rollback")
+    def rollback_growth_log(log_id: str) -> dict:
+        try:
+            return growth_logs.rollback(log_id)
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 

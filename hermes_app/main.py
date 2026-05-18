@@ -20,6 +20,7 @@ from hermes_app.services.autonomy import AutonomyZoneClassifier
 from hermes_app.services.context_signals import ContextSignalService
 from hermes_app.services.evals import EvalRunner
 from hermes_app.services.files import FileService
+from hermes_app.services.growth import GrowthLogService
 from hermes_app.services.images import ImageService
 from hermes_app.services.inspiration import InspirationService
 from hermes_app.services.intent_router import IntentRouter
@@ -50,6 +51,7 @@ reminder_service = ReminderService(db)
 wardrobe_service = WardrobeService(db)
 autonomy_classifier = AutonomyZoneClassifier()
 eval_runner = EvalRunner(db, autonomy_classifier)
+growth_log_service = GrowthLogService(db)
 tool_registry = ToolRegistry(db, memory_service, reminder_service, wardrobe_service)
 action_service = ActionService(db, memory_service, tool_registry)
 skill_registry = SkillRegistry()
@@ -95,6 +97,7 @@ app.include_router(
         orchestrator,
         autonomy_classifier,
         eval_runner,
+        growth_log_service,
         memory_service,
         action_service,
         skill_registry,

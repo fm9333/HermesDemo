@@ -1213,3 +1213,46 @@ Eval Runner v1 已具备本地评测套件、运行记录和 API 查询能力。
 ```text
 e2b3163 stage 6 eval runner v1
 ```
+
+## 2026-05-18 阶段 6 Growth Log v1 评审
+
+范围：
+
+```text
+growth_logs 数据表
+GrowthLogService
+GET /api/growth-log
+POST /api/growth-log
+POST /api/growth-log/{id}/rollback
+客户端成长记录面板
+Growth Log 服务和 API 测试
+```
+
+结论：
+
+```text
+通过，形成可提交点 stage-6-growth-log-v1。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app/web/static/app.js
+python -m pytest -q
+```
+
+评审结论：
+
+```text
+Growth Log v1 让用户可以查看 Hermes 最近优化了什么。
+记录保留 Zone、来源任务、影响范围和结构化 payload，便于后续审计。
+回滚采用 status=rolled_back 和 rolled_back_at 标记，不物理删除历史。
+客户端成长记录面板已提供查看和回滚入口。
+```
+
+提交记录：
+
+```text
+待提交 stage 6 growth log v1
+```

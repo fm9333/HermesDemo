@@ -195,7 +195,12 @@
   - 验证：`GET /api/eval/suites`、`POST /api/eval/suites/{suite_id}/run`、`GET /api/eval/runs` 可用
   - 验证：客户端评测面板可运行并查看评测记录
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，49 passed
-- [ ] Growth Log v1
+- [x] Growth Log v1
+  - 验证：`growth_logs` 可记录优化内容、Zone、来源、影响范围和 payload
+  - 验证：`GET /api/growth-log`、`POST /api/growth-log`、`POST /api/growth-log/{id}/rollback` 可用
+  - 验证：回滚采用 `status=rolled_back` 和 `rolled_back_at` 记录，不物理删除
+  - 验证：客户端成长面板可查看和回滚优化记录
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，51 passed
 - [ ] Yellow Zone 确认页
 - [ ] Red Zone 拦截强化
 - [ ] 安全策略设置
@@ -237,5 +242,6 @@
   - commit：`90b237f stage 5 inspiration preference candidate v1`
   - commit：`03ea6c3 stage 6 autonomy zone classifier v1`
   - commit：`e2b3163 stage 6 eval runner v1`
+  - commit：`待提交 stage 6 growth log v1`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。

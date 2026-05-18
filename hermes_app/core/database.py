@@ -77,6 +77,18 @@ class Database:
                     created_at TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS growth_logs (
+                    id TEXT PRIMARY KEY,
+                    title TEXT NOT NULL,
+                    zone TEXT NOT NULL,
+                    source_task TEXT NOT NULL,
+                    impact TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    rolled_back_at TEXT
+                );
+
                 CREATE TABLE IF NOT EXISTS reminders (
                     id TEXT PRIMARY KEY,
                     title TEXT NOT NULL,

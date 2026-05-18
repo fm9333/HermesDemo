@@ -34,6 +34,7 @@ def test_home_contains_recommendation_controls():
     assert 'data-panel="prdDrafts"' in response.text
     assert 'data-panel="autonomy"' in response.text
     assert 'data-panel="evalRuns"' in response.text
+    assert 'data-panel="growthLog"' in response.text
     assert 'id="panel-action"' in response.text
 
 
@@ -149,6 +150,30 @@ def test_eval_runner_api():
     runs = client.get("/api/eval/runs?suite_id=autonomy.zone.basic")
     assert runs.status_code == 200
     assert any(item["id"] == run.json()["id"] for item in runs.json())
+
+
+def test_growth_log_api():
+    created = client.post(
+        "/api/growth-log",
+        json={
+            "title": "优化摘要模板",
+            "zone": "green",
+            "source_task": "manual",
+            "impact": "提升摘要稳定性",
+            "payload": {"note": "unit-test"},
+        },
+    )
+    assert created.status_code == 200
+    assert created.json()["status"] == "active"
+    assert created.json()["payload"]["note"] == "unit-test"
+
+    listed = client.get("/api/growth-log?status=active")
+    assert listed.status_code == 200
+    assert any(item["id"] == created.json()["id"] for item in listed.json())
+
+    rolled_back = client.post(f"/api/growth-log/{created.json()['id']}/rollback")
+    assert rolled_back.status_code == 200
+    assert rolled_back.json()["status"] == "rolled_back"
 
 
 def test_tools_api_lists_action_tool_registry():
