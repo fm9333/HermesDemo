@@ -2455,3 +2455,8 @@ textarea 禁止手动 resize，避免输入框拖拽破坏桌面布局高度。
 ```text
 124 passed, 3 warnings
 ```
+
+提交记录：
+```text
+3ccb881 stage 18 fixed desktop scroll layout
+```

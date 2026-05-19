@@ -542,6 +542,6 @@
   - commit：`e12809b stage 15 expanded system skills v1`
   - commit：`b3bb8f0 stage 16 llm secret vault v1`
   - commit：`150847e stage 17 legacy database migration guard`
-  - commit：待提交 `stage 18 fixed desktop scroll layout`
+  - commit：`3ccb881 stage 18 fixed desktop scroll layout`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
