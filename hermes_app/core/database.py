@@ -425,53 +425,126 @@ class Database:
                     FOREIGN KEY(opportunity_id) REFERENCES opportunities(id)
                 );
 
-                CREATE INDEX IF NOT EXISTS idx_pending_actions_status_created
-                    ON pending_actions(status, created_at);
-                CREATE INDEX IF NOT EXISTS idx_memory_candidates_status_created
-                    ON memory_candidates(status, created_at);
-                CREATE INDEX IF NOT EXISTS idx_reminders_status_created
-                    ON reminders(status, created_at);
-                CREATE INDEX IF NOT EXISTS idx_todo_items_status_created
-                    ON todo_items(status, created_at);
-                CREATE INDEX IF NOT EXISTS idx_idea_cards_status_created
-                    ON idea_cards(status, created_at);
-                CREATE INDEX IF NOT EXISTS idx_prd_drafts_status_created
-                    ON prd_drafts(status, created_at);
-                CREATE INDEX IF NOT EXISTS idx_context_signals_status_type_created
-                    ON context_signals(status, signal_type, created_at);
-                CREATE INDEX IF NOT EXISTS idx_opportunities_status_created
-                    ON opportunities(status, created_at);
-                CREATE INDEX IF NOT EXISTS idx_recommendations_status_created
-                    ON recommendations(status, created_at);
-                CREATE INDEX IF NOT EXISTS idx_news_articles_status_published
-                    ON news_articles(status, published_at);
-                CREATE INDEX IF NOT EXISTS idx_map_places_query_created
-                    ON map_places(query, created_at);
-                CREATE INDEX IF NOT EXISTS idx_llm_calls_provider_created
-                    ON llm_calls(provider_id, created_at);
-                CREATE INDEX IF NOT EXISTS idx_personal_skills_status_created
-                    ON personal_skills(status, created_at);
-                CREATE INDEX IF NOT EXISTS idx_personal_skill_patches_skill_created
-                    ON personal_skill_patches(personal_skill_id, created_at);
-                CREATE INDEX IF NOT EXISTS idx_skill_curator_runs_created
-                    ON skill_curator_runs(created_at);
                 """
             )
-            self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")
-            self._ensure_column("idea_cards", "direction", "TEXT NOT NULL DEFAULT ''")
-            self._ensure_column("idea_cards", "target_user", "TEXT NOT NULL DEFAULT ''")
-            self._ensure_column("idea_cards", "pain_point", "TEXT NOT NULL DEFAULT ''")
-            self._ensure_column("idea_cards", "core_assumption", "TEXT NOT NULL DEFAULT ''")
-            self._ensure_column("idea_cards", "counter_challenge", "TEXT NOT NULL DEFAULT ''")
-            self._ensure_column("idea_cards", "analogy", "TEXT NOT NULL DEFAULT ''")
-            self._ensure_column("idea_cards", "mvp_plan", "TEXT NOT NULL DEFAULT ''")
-            self._ensure_column("idea_cards", "risks_json", "TEXT NOT NULL DEFAULT '[]'")
-            self._ensure_column("idea_cards", "next_steps_json", "TEXT NOT NULL DEFAULT '[]'")
-            self._ensure_column("idea_cards", "score", "REAL NOT NULL DEFAULT 0")
-            self._ensure_column("idea_cards", "status", "TEXT NOT NULL DEFAULT 'active'")
+            self._ensure_legacy_columns()
+            self._create_indexes()
             for migration_id, description in MIGRATIONS:
                 self._record_migration(migration_id, description)
             self._conn.commit()
+
+    def _ensure_legacy_columns(self) -> None:
+        indexed_columns = {
+            "pending_actions": {
+                "status": "TEXT NOT NULL DEFAULT 'pending'",
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "memory_candidates": {
+                "status": "TEXT NOT NULL DEFAULT 'pending'",
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "reminders": {
+                "status": "TEXT NOT NULL DEFAULT 'active'",
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "todo_items": {
+                "status": "TEXT NOT NULL DEFAULT 'open'",
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "prd_drafts": {
+                "status": "TEXT NOT NULL DEFAULT 'draft'",
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "context_signals": {
+                "status": "TEXT NOT NULL DEFAULT 'active'",
+                "signal_type": "TEXT NOT NULL DEFAULT 'legacy'",
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "opportunities": {
+                "status": "TEXT NOT NULL DEFAULT 'open'",
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "recommendations": {
+                "status": "TEXT NOT NULL DEFAULT 'open'",
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "news_articles": {
+                "status": "TEXT NOT NULL DEFAULT 'active'",
+                "published_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "map_places": {
+                "query": "TEXT NOT NULL DEFAULT ''",
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "llm_calls": {
+                "provider_id": "TEXT NOT NULL DEFAULT ''",
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "personal_skills": {
+                "status": "TEXT NOT NULL DEFAULT 'draft'",
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "personal_skill_patches": {
+                "personal_skill_id": "TEXT NOT NULL DEFAULT ''",
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+            "skill_curator_runs": {
+                "created_at": "TEXT NOT NULL DEFAULT ''",
+            },
+        }
+        for table, columns in indexed_columns.items():
+            for column, definition in columns.items():
+                self._ensure_column(table, column, definition)
+
+        self._ensure_column("wardrobe_items", "status", "TEXT NOT NULL DEFAULT 'active'")
+        self._ensure_column("idea_cards", "direction", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("idea_cards", "target_user", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("idea_cards", "pain_point", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("idea_cards", "core_assumption", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("idea_cards", "counter_challenge", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("idea_cards", "analogy", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("idea_cards", "mvp_plan", "TEXT NOT NULL DEFAULT ''")
+        self._ensure_column("idea_cards", "risks_json", "TEXT NOT NULL DEFAULT '[]'")
+        self._ensure_column("idea_cards", "next_steps_json", "TEXT NOT NULL DEFAULT '[]'")
+        self._ensure_column("idea_cards", "score", "REAL NOT NULL DEFAULT 0")
+        self._ensure_column("idea_cards", "status", "TEXT NOT NULL DEFAULT 'active'")
+        self._ensure_column("idea_cards", "created_at", "TEXT NOT NULL DEFAULT ''")
+
+    def _create_indexes(self) -> None:
+        self._conn.executescript(
+            """
+            CREATE INDEX IF NOT EXISTS idx_pending_actions_status_created
+                ON pending_actions(status, created_at);
+            CREATE INDEX IF NOT EXISTS idx_memory_candidates_status_created
+                ON memory_candidates(status, created_at);
+            CREATE INDEX IF NOT EXISTS idx_reminders_status_created
+                ON reminders(status, created_at);
+            CREATE INDEX IF NOT EXISTS idx_todo_items_status_created
+                ON todo_items(status, created_at);
+            CREATE INDEX IF NOT EXISTS idx_idea_cards_status_created
+                ON idea_cards(status, created_at);
+            CREATE INDEX IF NOT EXISTS idx_prd_drafts_status_created
+                ON prd_drafts(status, created_at);
+            CREATE INDEX IF NOT EXISTS idx_context_signals_status_type_created
+                ON context_signals(status, signal_type, created_at);
+            CREATE INDEX IF NOT EXISTS idx_opportunities_status_created
+                ON opportunities(status, created_at);
+            CREATE INDEX IF NOT EXISTS idx_recommendations_status_created
+                ON recommendations(status, created_at);
+            CREATE INDEX IF NOT EXISTS idx_news_articles_status_published
+                ON news_articles(status, published_at);
+            CREATE INDEX IF NOT EXISTS idx_map_places_query_created
+                ON map_places(query, created_at);
+            CREATE INDEX IF NOT EXISTS idx_llm_calls_provider_created
+                ON llm_calls(provider_id, created_at);
+            CREATE INDEX IF NOT EXISTS idx_personal_skills_status_created
+                ON personal_skills(status, created_at);
+            CREATE INDEX IF NOT EXISTS idx_personal_skill_patches_skill_created
+                ON personal_skill_patches(personal_skill_id, created_at);
+            CREATE INDEX IF NOT EXISTS idx_skill_curator_runs_created
+                ON skill_curator_runs(created_at);
+            """
+        )
 
     def _ensure_column(self, table: str, column: str, definition: str) -> None:
         columns = self._conn.execute(f"PRAGMA table_info({table})").fetchall()

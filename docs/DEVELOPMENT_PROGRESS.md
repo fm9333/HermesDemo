@@ -452,6 +452,15 @@
   - 验证：`GET /api/llm/file-policy` 同步返回 `secret_protection`
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，122 passed
 
+## 阶段 17：旧数据库启动兼容修复
+
+- [x] Legacy schema migration guard v1
+  - 修复：旧数据库中 `idea_cards`、`wardrobe_items`、`prd_drafts` 等表缺少 `status` 列时，启动阶段创建索引会触发 `sqlite3.OperationalError: no such column: status`
+  - 验证：数据库初始化现在先补旧表缺失列，再创建索引
+  - 验证：新增旧库回归测试，模拟无 `status` 的旧表并确认 `idx_idea_cards_status_created`、`idx_prd_drafts_status_created` 可创建
+  - 验证：`python -c "from hermes_app.main import app; print('import ok')"` 可通过当前默认库导入
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，123 passed
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库
@@ -518,5 +527,6 @@
   - commit：`df250c8 stage 14 llm file policy ui v1`
   - commit：`e12809b stage 15 expanded system skills v1`
   - commit：`b3bb8f0 stage 16 llm secret vault v1`
+  - commit：待提交 `stage 17 legacy database migration guard`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
