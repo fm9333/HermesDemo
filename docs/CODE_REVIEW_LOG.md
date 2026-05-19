@@ -2416,3 +2416,42 @@ python -m pytest -q
 ```text
 150847e stage 17 legacy database migration guard
 ```
+
+## 2026-05-19 阶段 18 桌面 UI 固定视窗与独立滚动评审
+
+范围：
+```text
+桌面 Web 控制台 CSS 布局
+左侧导航滚动
+中间消息区滚动
+右侧 Inspector 列表滚动
+UI 布局回归测试
+```
+
+结论：
+```text
+通过，形成可提交点 stage-18-fixed-desktop-scroll-layout。
+```
+
+已验证：
+
+```text
+python -m compileall hermes_app tests
+node --check hermes_app\web\static\app.js
+python -m pytest tests\test_ui_layout.py tests\test_api.py::test_home_contains_recommendation_controls -q
+python -m pytest -q
+```
+
+评审结论：
+```text
+桌面 UI 不再依赖 body 整页滚动，html/body 固定在 100dvh 并隐藏页面级 overflow。
+主 shell 改为固定视窗内的 Grid；rail、workspace、inspector 都设置 min-height: 0 和 overflow hidden，避免内容把窗口撑高。
+左侧 rail-nav、中间 messages、右侧 panel-list 各自负责滚动，输入区和 Inspector 头部保持固定。
+textarea 禁止手动 resize，避免输入框拖拽破坏桌面布局高度。
+新增 UI 布局回归测试锁定关键 CSS 约束。
+```
+
+测试结果：
+```text
+124 passed, 3 warnings
+```

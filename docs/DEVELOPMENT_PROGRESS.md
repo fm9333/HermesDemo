@@ -461,6 +461,20 @@
   - 验证：`python -c "from hermes_app.main import app; print('import ok')"` 可通过当前默认库导入
   - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，123 passed
 
+## 阶段 18：桌面 UI 固定视窗与独立滚动
+
+- [x] 桌面主布局固定高度 v1
+  - 修复：桌面窗口滚动时整页上移，顶部、左侧导航、中间会话和右侧 Inspector 会一起滚走
+  - 验证：`html` / `body` 固定为 `100dvh`，页面整体 `overflow: hidden`
+  - 验证：`.shell` 使用固定视窗内 Grid，列容器 `min-height: 0` 且不撑开页面
+- [x] 分区独立滚动 v1
+  - 验证：左侧 `.rail-nav` 独立纵向滚动
+  - 验证：中间 `.messages` 独立滚动，输入框固定在会话面板底部
+  - 验证：右侧 `.panel-list` 独立滚动，Inspector 头部按钮固定
+- [x] UI 布局回归测试 v1
+  - 验证：新增 `tests/test_ui_layout.py` 锁定固定视窗与独立滚动 CSS 约束
+  - 测试：`python -m compileall hermes_app tests`、`node --check hermes_app/web/static/app.js`、`python -m pytest -q` 通过，124 passed
+
 ## GitHub / SVN 同步状态
 
 - [x] 当前目录初始化 Git 仓库
@@ -528,5 +542,6 @@
   - commit：`e12809b stage 15 expanded system skills v1`
   - commit：`b3bb8f0 stage 16 llm secret vault v1`
   - commit：`150847e stage 17 legacy database migration guard`
+  - commit：待提交 `stage 18 fixed desktop scroll layout`
 
 备注：当前工作目录已经绑定到 GitHub 仓库。后续每个验证通过的小功能继续按“开发 -> 测试 -> 评审 -> 勾选 -> commit -> push”的流程推进。
