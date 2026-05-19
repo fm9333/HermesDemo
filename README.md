@@ -76,7 +76,7 @@ Model: 由你的服务商提供的模型 ID
 API Key: 云模型填写；本地模型可留空
 ```
 
-API Key 只保存在本地数据库，接口不会回显完整密钥，只返回 `api_key_set` 和 `api_key_preview`。当前实现是本地保护保存，不等同于系统 Keychain 或 SQLCipher 强加密。
+API Key 只保存在本地数据库，接口不会回显完整密钥，只返回 `api_key_set`、`api_key_preview` 和 `secret_backend`。Windows 环境使用 DPAPI 做本机用户级加密；旧 `v1.` 本地混淆密钥可兼容读取，并可通过 `POST /api/llm/secret-policy/rotate` 迁移。
 
 云端模型默认不能处理上传文件内容。只有同时打开全局 `llm_allow_cloud_file_context` 设置，并且对应 LLM Provider 的 `allow_file_context=true` 时，文件总结类 Skill 才会把文件文本发送给云端模型；本地 OpenAI-compatible Provider 不受该云端限制。
 
@@ -93,6 +93,8 @@ POST /api/llm/providers/{provider_id}/test
 POST /api/llm/chat
 GET  /api/llm/calls
 GET  /api/llm/file-policy
+GET  /api/llm/secret-policy
+POST /api/llm/secret-policy/rotate
 GET  /api/prompts
 GET  /api/memory
 GET  /api/actions/pending
